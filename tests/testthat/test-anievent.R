@@ -76,6 +76,31 @@ test_that("as_anievent() on an existing anievent is a no-op", {
   expect_identical(as_anievent(ae), ae)
 })
 
+test_that("as_anievent() repairs an anievent serialised before the superclass", {
+  ae <- anievent(
+    individual = 1L,
+    channel = "behaviour",
+    label = "REM",
+    start = 3,
+    stop = 9
+  )
+
+  old <- ae
+  class(old) <- setdiff(class(old), "aniframe")
+
+  repaired <- as_anievent(old)
+  expect_identical(repaired, ae)
+  expect_equal(class(repaired)[1:2], c("anievent", "aniframe"))
+
+  # a downstream subclass keeps dispatch priority over the parent
+  sub <- old
+  class(sub) <- c("anievent_sub", class(sub))
+  expect_equal(
+    class(as_anievent(sub))[1:3],
+    c("anievent_sub", "anievent", "aniframe")
+  )
+})
+
 test_that("anievent standardises column types", {
   ae <- anievent(
     individual = c("a", "b"),
