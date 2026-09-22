@@ -26,7 +26,7 @@ capture_md_print <- function(x) {
 }
 
 test_that("print has no leading newline and no blank lines between entries", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   md <- get_metadata(data)
 
   out <- capture_md_print(md)
@@ -42,7 +42,7 @@ test_that("print has no leading newline and no blank lines between entries", {
 })
 
 test_that("print includes the metadata header", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   md <- get_metadata(data)
 
   out <- capture_md_print(md)
@@ -51,7 +51,7 @@ test_that("print includes the metadata header", {
 })
 
 test_that("print lists every metadata field name", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   md <- get_metadata(data)
 
   out <- capture_md_print(md)
@@ -71,7 +71,7 @@ test_that("print handles empty metadata", {
 })
 
 test_that("print renders multi-element character vectors comma-separated (#34)", {
-  data <- example_aniframe() |>
+  data <- example_anipoint() |>
     set_metadata(filename = c("a.csv", "b.csv"))
   md <- get_metadata(data)
 
@@ -81,7 +81,7 @@ test_that("print renders multi-element character vectors comma-separated (#34)",
 })
 
 test_that("print wraps single-element character values in quotes", {
-  data <- example_aniframe() |>
+  data <- example_anipoint() |>
     set_metadata(source = "deeplabcut")
   md <- get_metadata(data)
 
@@ -91,7 +91,7 @@ test_that("print wraps single-element character values in quotes", {
 })
 
 test_that("print formats single-element non-character values without quotes", {
-  data <- example_aniframe() |>
+  data <- example_anipoint() |>
     set_metadata(sampling_rate = 30)
   md <- get_metadata(data)
 
@@ -103,7 +103,7 @@ test_that("print formats single-element non-character values without quotes", {
 })
 
 test_that("print returns input invisibly", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   md <- get_metadata(data)
 
   capture.output(returned <- print(md))

@@ -6,7 +6,7 @@
 # disagree while the print header suggests all is well.
 
 flat_af <- function() {
-  aniframe(
+  anipoint(
     time = 1:6,
     x = as.numeric(1:6),
     y = as.numeric(1:6),
@@ -15,7 +15,7 @@ flat_af <- function() {
 }
 
 id_af <- function() {
-  aniframe(
+  anipoint(
     keypoint = rep(c("head", "tail"), each = 3),
     time = rep(1:3, 2),
     x = as.numeric(1:6),
@@ -64,7 +64,7 @@ test_that("a complete metadata object can still be restored wholesale", {
   af <- set_metadata(id_af(), sampling_rate = 30)
   md <- get_metadata(af)
 
-  rebuilt <- as_aniframe(dplyr::as_tibble(af))
+  rebuilt <- as_anipoint(dplyr::as_tibble(af))
   restored <- set_metadata(rebuilt, metadata = md)
 
   expect_equal(get_metadata(restored), md)
@@ -161,7 +161,7 @@ test_that("declaring a third spatial column refreshes coordinate_system", {
     as.character(get_metadata(af, "coordinate_system")),
     "cartesian_3d"
   )
-  expect_silent(validate_aniframe(af))
+  expect_silent(validate_anipoint(af))
 })
 
 test_that("removing a spatial column refreshes coordinate_system downwards", {
@@ -239,18 +239,18 @@ test_that("a non-character declaration errors", {
 test_that("the setters reject objects that are neither class", {
   df <- data.frame(time = 1:3, x = 1:3, y = 1:3)
 
-  expect_error(set_variables_what(df, "x"), "neither an aniframe nor an")
-  expect_error(get_variables_what(df), "neither an aniframe nor an")
-  expect_error(get_variables_when(df), "neither an aniframe nor an")
-  expect_error(get_variables_where(df), "neither an aniframe nor an")
-  expect_error(add_variables_what(df, "x"), "neither an aniframe nor an")
-  expect_error(remove_variables_what(df, "x"), "neither an aniframe nor an")
-  expect_error(add_variables_when(df, "x"), "neither an aniframe nor an")
-  expect_error(remove_variables_when(df, "x"), "neither an aniframe nor an")
-  expect_error(add_variables_where(df, "x"), "neither an aniframe nor an")
-  expect_error(remove_variables_where(df, "x"), "neither an aniframe nor an")
-  expect_error(set_variables_when(df, "x"), "neither an aniframe nor an")
-  expect_error(set_variables_where(df, "x"), "neither an aniframe nor an")
+  expect_error(set_variables_what(df, "x"), "not an aniframe")
+  expect_error(get_variables_what(df), "not an aniframe")
+  expect_error(get_variables_when(df), "not an aniframe")
+  expect_error(get_variables_where(df), "not an aniframe")
+  expect_error(add_variables_what(df, "x"), "not an aniframe")
+  expect_error(remove_variables_what(df, "x"), "not an aniframe")
+  expect_error(add_variables_when(df, "x"), "not an aniframe")
+  expect_error(remove_variables_when(df, "x"), "not an aniframe")
+  expect_error(add_variables_where(df, "x"), "not an aniframe")
+  expect_error(remove_variables_where(df, "x"), "not an aniframe")
+  expect_error(set_variables_when(df, "x"), "not an aniframe")
+  expect_error(set_variables_where(df, "x"), "not an aniframe")
 })
 
 # ---- anievent ----------------------------------------------------------
@@ -293,7 +293,7 @@ test_that("declaring reaches the same state as constructing with it", {
     dplyr::mutate(id = "hi") |>
     add_variables_what("id")
 
-  constructed <- as_aniframe(
+  constructed <- as_anipoint(
     dplyr::mutate(dplyr::as_tibble(flat_af()), id = "hi"),
     variables_what = "id"
   )

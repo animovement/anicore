@@ -8,7 +8,7 @@
 # through set_metadata() now runs behind declare_variables_event().
 
 event_af <- function() {
-  aniframe(
+  anipoint(
     time = 1:5,
     x = as.numeric(1:5),
     y = as.numeric(1:5),
@@ -237,10 +237,10 @@ test_that("an anievent cannot carry an event declaration", {
 test_that("the setters reject objects that are neither class", {
   df <- data.frame(time = 1:3, x = 1:3, y = 1:3, behaviour = "REM")
 
-  expect_error(set_variables_event(df, state = "behaviour"), "not an aniframe")
-  expect_error(get_variables_event(df), "not an aniframe")
-  expect_error(add_variables_event(df, state = "behaviour"), "not an aniframe")
-  expect_error(remove_variables_event(df, "behaviour"), "not an aniframe")
+  expect_error(set_variables_event(df, state = "behaviour"), "not an anipoint")
+  expect_error(get_variables_event(df), "not an anipoint")
+  expect_error(add_variables_event(df, state = "behaviour"), "not an anipoint")
+  expect_error(remove_variables_event(df, "behaviour"), "not an anipoint")
 })
 
 # ---- set_metadata refuses it -------------------------------------------
@@ -274,7 +274,7 @@ test_that("the refusal names every offending field at once", {
 # ---- Print header ------------------------------------------------------
 
 test_that("tbl_sum.aniframe surfaces state and point variables in the header", {
-  af <- aniframe(
+  af <- anipoint(
     individual = rep(1L, 4),
     time = 1:4,
     x = rnorm(4),
@@ -292,7 +292,7 @@ test_that("tbl_sum.aniframe surfaces state and point variables in the header", {
 })
 
 test_that("tbl_sum.aniframe omits state/point rows when variables_event is empty", {
-  af <- example_aniframe()
+  af <- example_anipoint()
   header <- pillar::tbl_sum(af)
 
   expect_false("State event variables" %in% names(header))
@@ -311,7 +311,7 @@ test_that("to_anievent reads a declaration made through the setter", {
   expect_equal(as.character(ae$label), c("REM", "wake"))
 })
 
-test_that("a declared event column passes validate_aniframe", {
+test_that("a declared event column passes validate_anipoint", {
   af <- set_variables_event(event_af(), state = "behaviour")
-  expect_silent(validate_aniframe(af))
+  expect_silent(validate_anipoint(af))
 })

@@ -6,7 +6,7 @@
 #' measurement. Handles automatic conversion between standard SI time
 #' units and custom calibration from frame or arbitrary units.
 #'
-#' @param data An [aniframe()] or [anievent()] object.
+#' @param data An [anipoint()] or [anievent()] object.
 #' @param to_unit Character string specifying the target time unit. Must be
 #'   one of the permitted units defined in `list_default_metadata()$unit_time`
 #'   (typically `"ms"`, `"s"`, `"m"`, `"h"`).
@@ -115,7 +115,7 @@ resolve_unit_time_calibration <- function(data, to_unit, calibration_factor) {
 #' Set the sampling rate of an aniframe or anievent
 #'
 #' @description
-#' Sets the sampling rate (in Hz) on an [aniframe()] or [anievent()] and,
+#' Sets the sampling rate (in Hz) on an [anipoint()] or [anievent()] and,
 #' if the object's `unit_time` is currently `"frame"` or `"unknown"`,
 #' converts the temporal columns from frames to seconds using
 #' `1 / sampling_rate`. If `unit_time` is already an SI unit, only the

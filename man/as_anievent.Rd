@@ -70,6 +70,6 @@ To \emph{encode} per-frame data (factor / logical / character columns)
 into the bout shape, use \code{\link[=to_anievent]{to_anievent()}} instead.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 try(as_anievent(af))
 }

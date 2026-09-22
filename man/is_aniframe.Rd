@@ -13,10 +13,13 @@ is_aniframe(x)
 Logical: TRUE if x inherits from aniframe
 }
 \description{
-Check if object is an aniframe
+\code{aniframe} is the abstract parent of every animovement frame class, so
+this tests for the whole family: an \link[=is_anipoint]{anipoint}, an
+\link[=is_anievent]{anievent}, and any subclass built on them all pass.
+Use \code{\link[=is_anipoint]{is_anipoint()}} to test for the position grain specifically.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_aniframe(af)
 
 # A plain data frame is not one

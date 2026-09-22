@@ -1,7 +1,7 @@
 # The index (#109) ----
 
 test_that("a frame with no declaration is indexed by time", {
-  af <- aniframe(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
+  af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
 
   expect_equal(get_index(af), "time")
   # `variables_when` is the temporal *context*, and this frame has none.
@@ -16,7 +16,7 @@ test_that("a frame can be indexed by a column that is not called time", {
     y = c(0, 1, 0)
   )
 
-  af <- as_aniframe(df, index = "frame")
+  af <- as_anipoint(df, index = "frame")
 
   expect_equal(get_index(af), "frame")
   # The index is declared separately, never as temporal context.
@@ -34,7 +34,7 @@ test_that("the index is numeric and the temporal context is not", {
     y = 1:4
   )
 
-  af <- as_aniframe(df, index = "frame")
+  af <- as_anipoint(df, index = "frame")
 
   expect_true(is.numeric(af$frame))
   expect_s3_class(af$session, "factor")
@@ -49,14 +49,14 @@ test_that("the frame is grouped by identity and context, never by the index", {
     y = 1:4
   )
 
-  af <- as_aniframe(df, index = "frame")
+  af <- as_anipoint(df, index = "frame")
 
   expect_setequal(dplyr::group_vars(af), c("individual", "session"))
   expect_false("frame" %in% dplyr::group_vars(af))
 })
 
 test_that("set_index() moves the index and regroups the frame", {
-  af <- aniframe(
+  af <- anipoint(
     individual = "a",
     time = 1:3,
     x = c(1, 2, 3),
@@ -76,14 +76,14 @@ test_that("set_index() moves the index and regroups the frame", {
 })
 
 test_that("set_index() rejects a column that cannot be an index", {
-  af <- aniframe(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
+  af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
 
   expect_error(set_index(af, "absent"), "not present")
   expect_error(set_index(af, "individual"), "must be numeric")
   expect_error(set_index(af, c("time", "x")), "single column name")
 })
 
-test_that("as_aniframe() aborts when the declared index is absent", {
+test_that("as_anipoint() aborts when the declared index is absent", {
   df <- data.frame(
     frame = 1:3,
     individual = "a",
@@ -91,14 +91,14 @@ test_that("as_aniframe() aborts when the declared index is absent", {
     y = c(0, 1, 0)
   )
 
-  expect_error(as_aniframe(df, index = "nope"), "not found in data")
+  expect_error(as_anipoint(df, index = "nope"), "not found in data")
 })
 
 test_that("variables_when never contains the index", {
   # Frames built before the field existed list the index in
   # `variables_when`. Carrying that through would group by it, putting
   # every row in its own group, so it is normalised out on construction.
-  af <- as_aniframe(data.frame(
+  af <- as_anipoint(data.frame(
     time = 1:4,
     session = c("a", "a", "b", "b"),
     individual = "x",
@@ -112,7 +112,7 @@ test_that("variables_when never contains the index", {
 })
 
 test_that("setting a new index does not promote the old one to a grouping variable", {
-  af <- aniframe(individual = "a", time = 1:5, x = 1:5, y = 1:5) |>
+  af <- anipoint(individual = "a", time = 1:5, x = 1:5, y = 1:5) |>
     dplyr::mutate(frame = c(10, 20, 30, 40, 50))
 
   result <- set_index(af, "frame")
@@ -123,7 +123,7 @@ test_that("setting a new index does not promote the old one to a grouping variab
 })
 
 test_that("set_metadata() refuses the index and names its setter", {
-  af <- aniframe(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
+  af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
 
   expect_error(
     set_metadata(af, variables_index = "x"),
@@ -135,7 +135,7 @@ test_that("metadata serialised before the field existed reads back as time", {
   # `variables_index` is optional precisely so that objects written by
   # earlier versions still validate. They were built when a column named
   # `time` was mandatory, so that is what they are indexed by.
-  af <- aniframe(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
+  af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
   md <- get_metadata(af)
   md[["variables_index"]] <- NULL
 
@@ -146,7 +146,7 @@ test_that("metadata serialised before the field existed reads back as time", {
 
 # The index is exactly one column ----
 
-test_that("as_aniframe() rejects an index that is not a single column name", {
+test_that("as_anipoint() rejects an index that is not a single column name", {
   # Unguarded, this fell back to `"time"` instead of complaining.
   df <- data.frame(
     time = 1:4,
@@ -157,16 +157,16 @@ test_that("as_aniframe() rejects an index that is not a single column name", {
   )
 
   expect_error(
-    as_aniframe(df, index = c("frame", "time")),
+    as_anipoint(df, index = c("frame", "time")),
     "single column name"
   )
-  expect_error(as_aniframe(df, index = character(0)), "single column name")
-  expect_error(as_aniframe(df, index = 3), "single column name")
-  expect_error(as_aniframe(df, index = NA_character_), "single column name")
+  expect_error(as_anipoint(df, index = character(0)), "single column name")
+  expect_error(as_anipoint(df, index = 3), "single column name")
+  expect_error(as_anipoint(df, index = NA_character_), "single column name")
 })
 
-test_that("aniframe() can declare an index too", {
-  af <- aniframe(
+test_that("anipoint() can declare an index too", {
+  af <- anipoint(
     individual = "a",
     frame = 1:3,
     x = c(1, 2, 3),
@@ -182,7 +182,7 @@ test_that("aniframe() can declare an index too", {
 # Everything temporal follows the index, not the name `time` ----
 
 test_that("set_unit_time() converts the index column", {
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   ) |>
@@ -195,7 +195,7 @@ test_that("set_unit_time() converts the index column", {
 })
 
 test_that("set_sampling_rate() rescales the index column", {
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   ) |>
@@ -208,7 +208,7 @@ test_that("set_sampling_rate() rescales the index column", {
 })
 
 test_that("to_anievent() delimits bouts by the host frame's index", {
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(
       frame = c(10, 20, 30, 40),
       individual = "a",
@@ -230,7 +230,7 @@ test_that("to_anievent() delimits bouts by the host frame's index", {
 # An anievent has no index ----
 
 test_that("an anievent declares no index", {
-  ae <- as_aniframe(
+  ae <- as_anipoint(
     data.frame(
       time = 1:4,
       individual = "a",
@@ -250,7 +250,7 @@ test_that("an anievent declares no index", {
 # The validator knows about the index ----
 
 test_that("get_declared_variables() reports the index alongside the other roles", {
-  af <- aniframe(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
+  af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
 
   declared <- get_declared_variables(get_metadata(af))
 
@@ -258,26 +258,26 @@ test_that("get_declared_variables() reports the index alongside the other roles"
   expect_equal(declared$variables_index, "time")
 })
 
-test_that("validate_aniframe() catches an index column that has been dropped", {
-  af <- as_aniframe(
+test_that("validate_anipoint() catches an index column that has been dropped", {
+  af <- as_anipoint(
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   )
   dropped <- af
   dropped$frame <- NULL
 
-  expect_error(validate_aniframe(dropped), "Index column")
+  expect_error(validate_anipoint(dropped), "Index column")
 })
 
-test_that("validate_aniframe() catches an index column that is no longer numeric", {
-  af <- as_aniframe(
+test_that("validate_anipoint() catches an index column that is no longer numeric", {
+  af <- as_anipoint(
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   )
   retyped <- af
   retyped$frame <- as.character(retyped$frame)
 
-  expect_error(validate_aniframe(retyped), "must be numeric")
+  expect_error(validate_anipoint(retyped), "must be numeric")
 })
 
 test_that("the default metadata skeleton keeps the index out of variables_when", {
@@ -290,25 +290,25 @@ test_that("the default metadata skeleton keeps the index out of variables_when",
 
 # Keys plus index identify an observation (#49) ----
 
-test_that("validate_aniframe() warns when keys and index repeat", {
+test_that("validate_anipoint() warns when keys and index repeat", {
   # Two rows for the same individual at the same time: whatever tells them
   # apart is undeclared, and every grouped operation folds them together.
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(individual = "a", time = c(1, 2, 2), x = 1:3, y = 1:3)
   )
 
-  expect_warning(validate_aniframe(af), "not uniquely identified")
-  expect_warning(validate_aniframe(af), "individual")
+  expect_warning(validate_anipoint(af), "not uniquely identified")
+  expect_warning(validate_anipoint(af), "individual")
 })
 
-test_that("validate_aniframe() is quiet when the declaration identifies rows", {
-  af <- example_aniframe(n_obs = 4, n_individuals = 2, n_keypoints = 2)
+test_that("validate_anipoint() is quiet when the declaration identifies rows", {
+  af <- example_anipoint(n_obs = 4, n_individuals = 2, n_keypoints = 2)
 
   expect_no_warning(warn_duplicate_observations(af))
 })
 
 test_that("declaring the missing variable resolves the duplication", {
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(
       individual = "a",
       keypoint = c("head", "tail", "head", "tail"),
@@ -318,7 +318,7 @@ test_that("declaring the missing variable resolves the duplication", {
     ),
     variables_what = "individual"
   )
-  expect_warning(validate_aniframe(af), "not uniquely identified")
+  expect_warning(validate_anipoint(af), "not uniquely identified")
 
   expect_no_warning(
     warn_duplicate_observations(add_variables_what(af, "keypoint"))
@@ -327,7 +327,7 @@ test_that("declaring the missing variable resolves the duplication", {
 
 test_that("the temporal context counts towards the key", {
   # Same individual and index, different session: not a duplicate.
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(
       individual = "a",
       session = c("s1", "s1", "s2", "s2"),
@@ -343,9 +343,9 @@ test_that("the temporal context counts towards the key", {
 
 test_that("there is nothing to check when no key column is present", {
   # Reachable only by calling the helper directly: through
-  # `validate_aniframe()` the index check aborts first. A frame that has
+  # `validate_anipoint()` the index check aborts first. A frame that has
   # drifted this far has bigger problems, and this should not be one of them.
-  af <- suppressWarnings(as_aniframe(
+  af <- suppressWarnings(as_anipoint(
     data.frame(time = 1:3, x = 1:3, y = 1:3),
     variables_what = character(0)
   ))

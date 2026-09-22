@@ -25,7 +25,7 @@ because dropping rows changes the answer and a stored logical would go
 on claiming the old one.
 }
 \examples{
-af <- example_aniframe(n_obs = 5, n_individuals = 2, n_keypoints = 1)
+af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 is_sampling_regular(af)
 
 # A gap in the recording

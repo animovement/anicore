@@ -21,7 +21,7 @@ test_that("tbl_sum omits Individuals row when individual column is absent", {
     x = 1:5,
     y = 1:5
   )
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
 
   result <- pillar::tbl_sum(data)
 
@@ -35,14 +35,14 @@ test_that("tbl_sum does not warn when individual column is absent", {
     x = 1:5,
     y = 1:5
   )
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
 
   expect_no_warning(pillar::tbl_sum(data))
   expect_no_warning(format(data))
 })
 
 test_that("tbl_sum includes Individuals when individual column is present", {
-  data <- example_aniframe(n_individuals = 2, n_keypoints = 3)
+  data <- example_anipoint(n_individuals = 2, n_keypoints = 3)
 
   result <- pillar::tbl_sum(data)
 
@@ -51,12 +51,12 @@ test_that("tbl_sum includes Individuals when individual column is present", {
 })
 
 test_that("tbl_sum includes Sessions and Trials only when present", {
-  data <- example_aniframe(n_sessions = 2, n_trials = 3)
+  data <- example_anipoint(n_sessions = 2, n_trials = 3)
   result <- pillar::tbl_sum(data)
   expect_true("Sessions" %in% names(result))
   expect_true("Trials" %in% names(result))
 
-  data_no_session <- example_aniframe(n_sessions = 1, n_trials = 1) |>
+  data_no_session <- example_anipoint(n_sessions = 1, n_trials = 1) |>
     dplyr::ungroup() |>
     dplyr::select(-dplyr::any_of(c("session", "trial"))) |>
     suppressWarnings()
@@ -66,7 +66,7 @@ test_that("tbl_sum includes Sessions and Trials only when present", {
 })
 
 test_that("tbl_sum includes Sampling rate only when set in metadata", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   result <- pillar::tbl_sum(data)
   expect_false("Sampling rate" %in% names(result))
 
@@ -77,7 +77,7 @@ test_that("tbl_sum includes Sampling rate only when set in metadata", {
 })
 
 test_that("tbl_sum omits Time row when unit_time = 'frame' and no sampling rate", {
-  data <- example_aniframe(n_obs = 10) # default unit_time is "frame", no sr
+  data <- example_anipoint(n_obs = 10) # default unit_time is "frame", no sr
 
   result <- pillar::tbl_sum(data)
 
@@ -86,7 +86,7 @@ test_that("tbl_sum omits Time row when unit_time = 'frame' and no sampling rate"
 
 test_that("tbl_sum includes Time row when unit_time = 'frame' and sampling rate set", {
   # 90 frames @ 30 Hz -> 0..89 frames -> 0..2.9667s -> rounds to 00:00:00 / 00:00:03
-  data <- example_aniframe(n_obs = 90)
+  data <- example_anipoint(n_obs = 90)
   data <- set_metadata(data, sampling_rate = 30)
 
   result <- pillar::tbl_sum(data)
@@ -102,7 +102,7 @@ test_that("tbl_sum formats Time interval as HH:MM:SS for unit_time = 's'", {
     x = 1:10,
     y = 1:10
   )
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
   data <- set_metadata(data, unit_time = "s")
 
   result <- pillar::tbl_sum(data)
@@ -118,7 +118,7 @@ test_that("tbl_sum formats Time as absolute datetimes when start_datetime is set
     x = 1:5,
     y = 1:5
   )
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
   data <- set_metadata(
     data,
     unit_time = "s",
@@ -166,7 +166,7 @@ test_that("tbl_sum Time row uses millisecond precision when span is sub-second",
     x = 1:3,
     y = 1:3
   )
-  data <- as_aniframe(df) |> set_metadata(unit_time = "ms")
+  data <- as_anipoint(df) |> set_metadata(unit_time = "ms")
 
   result <- pillar::tbl_sum(data)
 
@@ -181,7 +181,7 @@ test_that("tbl_sum Time row uses integer precision when span >= 1 second", {
     x = 1:2,
     y = 1:2
   )
-  data <- as_aniframe(df) |> set_metadata(unit_time = "ms")
+  data <- as_anipoint(df) |> set_metadata(unit_time = "ms")
 
   result <- pillar::tbl_sum(data)
 
@@ -212,14 +212,14 @@ test_that("format_seconds_as_hms handles negative seconds with a leading minus",
 })
 
 test_that("format_time_interval returns NULL when time column is absent", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   md <- get_metadata(data)
   data$time <- NULL
   expect_null(format_time_interval(data, md))
 })
 
 test_that("format_time_interval returns NULL when time has no finite values", {
-  data <- example_aniframe()
+  data <- example_anipoint()
   md <- get_metadata(data)
   data$time <- rep(NA_real_, nrow(data))
   expect_null(format_time_interval(data, md))
@@ -234,7 +234,7 @@ test_that("tbl_sum Time row uses sub-second datetime format with start_datetime"
     x = 1:3,
     y = 1:3
   )
-  data <- as_aniframe(df) |>
+  data <- as_anipoint(df) |>
     set_metadata(
       unit_time = "ms",
       start_datetime = "2024-01-15 14:30:00"

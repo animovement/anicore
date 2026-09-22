@@ -53,7 +53,7 @@ getters, a character vector of column names.
 \code{variables_what}, \code{variables_when} and \code{variables_where} name the
 columns that carry, respectively, entity identity, temporal position
 and spatial position. They are the frame's structure rather than a
-description of it: \code{\link[=as_aniframe]{as_aniframe()}} uses them to coerce column types,
+description of it: \code{\link[=as_anipoint]{as_anipoint()}} uses them to coerce column types,
 order columns and rows, group the frame, and derive
 \code{coordinate_system}.
 
@@ -77,7 +77,7 @@ always create-then-declare:
 }\if{html}{\out{</div>}}
 }
 \examples{
-af <- aniframe(time = 1:5, x = 1:5, y = 1:5)
+af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
 
 # Declaring an identity column groups the frame by it
 af |>
@@ -93,6 +93,6 @@ af |>
 
 }
 \seealso{
-\code{\link[=validate_aniframe]{validate_aniframe()}}, which reports a frame whose metadata
+\code{\link[=validate_anipoint]{validate_anipoint()}}, which reports a frame whose metadata
 has drifted out of sync by some other route.
 }

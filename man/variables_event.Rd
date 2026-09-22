@@ -17,7 +17,7 @@ add_variables_event(data, state = NULL, point = NULL)
 remove_variables_event(data, variables)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{state, point}{Character vectors of column names. \code{NULL} (the
 default) leaves that side of the declaration as it was.}
@@ -30,7 +30,7 @@ For the setters, \code{data} with the declaration recorded. For
 entries.
 }
 \description{
-\code{variables_event} names the \code{aniframe} columns holding per-frame
+\code{variables_event} names the \code{anipoint} columns holding per-frame
 categorical event labels, split into two kinds:
 \itemize{
 \item \strong{state} columns are interval-valued — a run of identical values is
@@ -59,11 +59,11 @@ side they are on — a column can only be one kind, so it needs no
 \item \code{get_variables_event()} reads the declaration back as a named list.
 }
 
-Only an \code{aniframe} can carry this declaration: an \code{anievent} is
+Only an \code{anipoint} can carry this declaration: an \code{anievent} is
 already the encoded form, with its events in \code{channel} and \code{label}.
 }
 \examples{
-af <- aniframe(
+af <- anipoint(
   time = 1:5,
   x = 1:5,
   y = 1:5,

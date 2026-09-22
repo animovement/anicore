@@ -20,7 +20,7 @@ library(anicore)
 
 ## At a glance
 
-An `anievent` is the sibling of [`aniframe`](aniframe-structure.html)
+An `anievent` is the sibling of [`anipoint`](aniframe-structure.html)
 for **behavioural events**: sleep bouts, vocalisations, manual scoring
 from BORIS, the output of segmentation models.
 
@@ -29,13 +29,13 @@ is, as a soft convention, mutually exclusive with other events on the
 same channel), has a **type** — either `"state"` (durative) or
 `"point"` (instant) — and carries a **label** identifying which event
 it is. Each event has a **start** and a **stop** time (identical for
-point events). Just like an `aniframe`, the event is *performed by
+point events). Just like an `anipoint`, the event is *performed by
 something* (identity columns, declared via `variables_what`) at *some
 time* (temporal-grouping columns, declared via `variables_when`).
 
-The class is a true sibling — it does **not** inherit from `aniframe`,
-but it shares the metadata substrate, so `get_metadata()`,
-`set_metadata()`, and the rest of the metadata API work on both.
+Both classes inherit from the abstract `aniframe` parent, which carries
+the shared substrate — so `get_metadata()`, `set_metadata()`, the dplyr
+methods, and the rest of the family API work on both.
 
 ## Channels
 
@@ -91,7 +91,7 @@ travel via `variables_what`:
 
 Identity columns are auto-detected from a known list
 (`model`, `individual`, `subject`, `track`, `keypoint`) — the same list
-`aniframe` uses, so identity means the same thing on both sides — or you
+`anipoint` uses, so identity means the same thing on both sides — or you
 can supply any name via `variables_what`. An `anievent` with no identity
 column at all is fine for single-subject experiments.
 
@@ -110,7 +110,7 @@ own time origin (`start = 0` means "the start of *this* clip", not "the
 start of the experiment"). To carry that context, add an `observation`,
 `session`, or `trial` column — those three names are auto-detected
 into `variables_when` alongside `start` and `stop`, and the column is
-coerced to factor / integer the same way aniframe does it:
+coerced to factor / integer the same way anipoint does it:
 
 ```{r}
 ae_multi <- anievent(
@@ -135,7 +135,7 @@ observation-level offset table; the class itself just carries the key.
 
 `unit_time` is carried in the shared metadata substrate, so an
 `anievent` declares the unit of its `start`/`stop` values just like
-an `aniframe` declares the unit of its
+an `anipoint` declares the unit of its
 [index column](aniframe-structure.html#the-index) (`"frame"`,
 `"ms"`, `"s"`, `"m"`, `"h"`, …). `set_unit_time()` and
 `set_sampling_rate()` dispatch on both classes — on an anievent they
@@ -169,14 +169,14 @@ each row tells you everything the class needs.
 
 Type only becomes load-bearing at conversion / plotting / metric time:
 
-- when converting an `anievent` to a per-frame `aniframe` (so the
+- when converting an `anievent` to a per-frame `anipoint` (so the
   conversion knows whether to fill the whole interval or just a single
   frame),
 - when plotting (state → coloured band; point → marker),
 - when computing metrics that differ by type.
 
 Those operations live in companion packages (`animetric`, `anivis`)
-and will accept type declarations at call time. On the `aniframe`
+and will accept type declarations at call time. On the `anipoint`
 side the distinction can be recorded explicitly with
 `set_variables_event(state = ..., point = ...)`, but the `anievent`
 class itself does not enforce it — an anievent has no
@@ -295,13 +295,13 @@ The channel name always comes from the column name. Use `state` vs
 `point` to pick how the column is interpreted — the value-shape
 (factor / character / logical) is handled internally.
 
-### From an `aniframe`
+### From an `anipoint`
 
-If you already have an `aniframe` with `variables_event` declared in
+If you already have an `anipoint` with `variables_event` declared in
 metadata, `to_anievent()` reads everything from there:
 
 ```{r}
-af <- aniframe(
+af <- anipoint(
   individual = rep(1L, 8),
   time = 1:8,
   x = 1:8,
@@ -321,18 +321,18 @@ the host. `stop` is the time of the last frame of each bout
 present alongside an event column, its cells are gathered into the
 anievent's `modifiers` column, one entry per emitted bout.
 
-The reverse direction (`anievent` → `aniframe`) is intentionally not
+The reverse direction (`anievent` → `anipoint`) is intentionally not
 provided yet — the anievent's loose mutual-exclusion semantics don't
-map onto an aniframe's per-frame columns without a design decision
+map onto an anipoint's per-frame columns without a design decision
 about how to resolve overlap, and that design is still pending.
 
 ## Where things live in the ecosystem
 
 | Concern                                 | Planned home | Status     |
 |-----------------------------------------|--------------|------------|
-| The `anievent` class                    | `aniframe`   | ✅ implemented |
-| Encoding per-frame data (`to_anievent()`) | `aniframe`   | ✅ implemented |
-| Conversion to `aniframe`                | `aniframe`   | planned    |
+| The `anievent` class                    | `anipoint`   | ✅ implemented |
+| Encoding per-frame data (`to_anievent()`) | `anipoint`   | ✅ implemented |
+| Conversion to `anipoint`                | `anipoint`   | planned    |
 | Readers (BORIS, Solomon, …)             | `aniread`    | planned    |
 | Bout-summary metrics                    | `animetric`  | planned    |
 | Plots (state band, point marker)        | `anivis`     | planned    | -->

@@ -20,7 +20,7 @@ axes out — most 3D recordings — has it from the field
 \code{\link[=set_handedness]{set_handedness()}} writes.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
 # Two axes are not enough
 af <- set_axis_directions(af, c(x = "right", y = "up"))

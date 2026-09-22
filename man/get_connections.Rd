@@ -2,12 +2,12 @@
 % Please edit documentation in R/connections.R
 \name{get_connections}
 \alias{get_connections}
-\title{Get connections from an aniframe}
+\title{Get connections from an anipoint}
 \usage{
 get_connections(data, variable = NULL)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{variable}{Optional character scalar. When \code{NULL} (default), returns
 the full named list of connection tables (one per variable). When a
@@ -21,12 +21,12 @@ A named list of tibbles (when \code{variable} is NULL), or a single
 \description{
 \strong{[Experimental]}
 
-Read the connections currently stored on an aniframe. Returns the full
+Read the connections currently stored on an anipoint. Returns the full
 named list of \code{from}/\code{to} tibbles by default, or a single tibble when
 \code{variable} is supplied.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 get_connections(af)
 }
 \seealso{

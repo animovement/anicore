@@ -86,14 +86,14 @@ list_direction_vectors <- function() {
 #'   frame declares none.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' af <- set_axis_directions(af, c(x = "right", y = "up"))
 #' get_axis_directions(af)
 #'
 #' @seealso [set_axis_directions()], [get_axis_extents()]
 #' @export
 get_axis_directions <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   resolve_axis_directions(get_metadata(data))
 }
 
@@ -125,11 +125,11 @@ resolve_axis_directions <- function(md) {
 #' extent, so the data ends up expressed in the direction being declared.
 #' Any other change is a re-description and leaves the values untouched.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param directions Named character vector, axis role to direction — one of
 #'   `right`, `left`, `up`, `down`, `back` or `forward`. `NA` clears an axis.
 #'
-#' @return The aniframe, with reflected coordinates for any axis turned to
+#' @return The anipoint, with reflected coordinates for any axis turned to
 #'   its opposite and the new directions recorded.
 #'
 #' @details
@@ -147,7 +147,7 @@ resolve_axis_directions <- function(md) {
 #' and `theta` are measured from the axes and are recomputed instead.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' af <- set_axis_extents(af, c(y = 1080))
 #' af <- set_axis_directions(af, c(x = "right", y = "down"))
 #'
@@ -159,7 +159,7 @@ resolve_axis_directions <- function(md) {
 #'   [get_angle_direction()]
 #' @export
 set_axis_directions <- function(data, directions) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_valid_axis_directions(directions)
 
   current <- get_axis_directions(data)
@@ -195,7 +195,7 @@ set_axis_directions <- function(data, directions) {
 
 #' Reflect the column carrying an axis role around its extent
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param role An axis role.
 #'
 #' @return `data`, with that column reflected.
@@ -327,7 +327,7 @@ ensure_named_axis_map <- function(x, arg, example, call = rlang::caller_env()) {
 #'
 #' `reference - data[[axis]]`, which is what turning an axis over amounts to.
 #'
-#' @param data A data frame (typically an aniframe) containing `axis`.
+#' @param data A data frame (typically an anipoint) containing `axis`.
 #' @param axis Name of the column to reflect.
 #' @param reference A single finite value to reflect around.
 #'
@@ -376,7 +376,7 @@ list_angular_axis_dependencies <- function() {
 #' about the equator. Anything else leaves the data alone: the direction is
 #' then a fact about the space rather than about the columns.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param role An axis role.
 #'
 #' @return `data`, with the angles it stores measured the other way.

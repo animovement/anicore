@@ -90,13 +90,13 @@ compute_sampling_interval <- function(data) {
 #' @return Numeric scalar, or `NA` when the frame is too short to measure.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 5, n_individuals = 2, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 #' get_sampling_interval(af)
 #'
 #' @seealso [is_sampling_regular()], [get_sampling_rate()]
 #' @export
 get_sampling_interval <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   interval <- get_metadata(data, "sampling_interval")
   if (is.null(interval)) {
     return(as.numeric(NA))
@@ -122,7 +122,7 @@ get_sampling_interval <- function(data) {
 #' @return `TRUE`, `FALSE`, or `NA` when the frame is too short to tell.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 5, n_individuals = 2, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 #' is_sampling_regular(af)
 #'
 #' # A gap in the recording
@@ -132,7 +132,7 @@ get_sampling_interval <- function(data) {
 #' @seealso [get_sampling_interval()]
 #' @export
 is_sampling_regular <- function(data, tolerance = 1e-6) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   if (!is.numeric(tolerance) || length(tolerance) != 1L || is.na(tolerance)) {
     cli::cli_abort("{.arg tolerance} must be a single number.")
   }

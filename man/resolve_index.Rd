@@ -20,7 +20,7 @@ are indexed by, and defaulting here keeps them working untouched.
 \details{
 \code{NA} — how an \code{\link[=anievent]{anievent()}} spells "not applicable" — falls back the
 same way. The only path that reaches here with anievent metadata is a
-cast to \code{\link[=aniframe]{aniframe()}}, which needs \emph{some} index; \code{\link[=get_index]{get_index()}} refuses
+cast to \code{\link[=anipoint]{anipoint()}}, which needs \emph{some} index; \code{\link[=get_index]{get_index()}} refuses
 the anievent before it gets this far.
 }
 \keyword{internal}

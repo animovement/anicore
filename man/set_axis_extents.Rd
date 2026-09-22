@@ -7,13 +7,13 @@
 set_axis_extents(data, extents)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{extents}{Named numeric vector, axis role to extent. Each must be
 positive and finite; \code{NA} clears an axis.}
 }
 \value{
-The aniframe with updated \code{axis_extents} metadata.
+The anipoint with updated \code{axis_extents} metadata.
 }
 \description{
 Records the extent of one or more axes, keyed by axis role — the height of
@@ -24,7 +24,7 @@ The extent is what \code{\link[=set_axis_directions]{set_axis_directions()}} ref
 turned over: \code{new = extent - old}.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_axis_extents(af, c(x = 1920, y = 1080))
 get_axis_extents(af)
 

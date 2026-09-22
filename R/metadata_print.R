@@ -6,7 +6,7 @@
 #' aligned columns, similar to [str()].
 #'
 #' The S3 class is named `aniframe_metadata` for historical reasons,
-#' but the metadata substrate is shared by both [aniframe()] and
+#' but the metadata substrate is shared by both [anipoint()] and
 #' [anievent()] objects.
 #'
 #' @param x An `aniframe_metadata` list.

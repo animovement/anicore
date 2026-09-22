@@ -4,7 +4,7 @@
 # scene recorded from opposite sides.
 
 frame_2d <- function(y = c(0, 5, 10)) {
-  as_aniframe(
+  as_anipoint(
     data.frame(individual = "a", time = 1:3, x = c(1, 2, 3), y = y)
   )
 }
@@ -232,7 +232,7 @@ test_that("angle direction must be one of the two", {
 # An anievent has no orientation at all ----
 
 test_that("an anievent claims neither", {
-  ae <- example_aniframe(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
+  ae <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     dplyr::mutate(b = factor(rep(c("r", "w"), each = 2))) |>
     set_variables_event(state = "b") |>
     to_anievent()

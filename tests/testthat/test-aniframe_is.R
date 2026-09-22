@@ -6,8 +6,8 @@ test_that("return FALSE for a non-aniframe", {
   )
 })
 
-test_that("as_aniframe works with minimal required columns", {
-  result <- suppressMessages(as_aniframe(df))
+test_that("as_anipoint works with minimal required columns", {
+  result <- suppressMessages(as_anipoint(df))
 
   expect_true(
     is_aniframe(result)

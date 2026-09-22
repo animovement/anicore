@@ -1,6 +1,6 @@
-#' Create example aniframe data
+#' Create example anipoint data
 #'
-#' Generates a synthetic aniframe object with random coordinates for
+#' Generates a synthetic anipoint object with random coordinates for
 #' testing and demonstration purposes. The function creates a complete design
 #' with all combinations of time points, individuals, keypoints, trials, and
 #' sessions.
@@ -16,7 +16,7 @@
 #'   If 1, only x coordinates are generated. If 2, x and y coordinates are generated.
 #'   If 3, x, y, and z coordinates are generated.
 #'
-#' @return An aniframe object containing randomly generated tracking data with
+#' @return An anipoint object containing randomly generated tracking data with
 #'   columns for individual, keypoint, time, trial, session, and spatial coordinates
 #'   (x, y, and/or z depending on `n_dims`). The coordinates are drawn from a
 #'   standard normal distribution.
@@ -25,23 +25,23 @@
 #'
 #' @examples
 #' # Create a basic example with default parameters (2D)
-#' example_aniframe()
+#' example_anipoint()
 #'
 #' # Create a 1D example
-#' example_aniframe(n_dims = 1)
+#' example_anipoint(n_dims = 1)
 #'
 #' # Create a 3D example
-#' example_aniframe(n_dims = 3)
+#' example_anipoint(n_dims = 3)
 #'
 #' # Create a smaller example with 2 individuals and 5 keypoints
-#' example_aniframe(n_individuals = 2, n_keypoints = 5)
+#' example_anipoint(n_individuals = 2, n_keypoints = 5)
 #'
 #' # Create example with multiple trials and sessions
-#' example_aniframe(n_obs = 100, n_trials = 3, n_sessions = 2)
+#' example_anipoint(n_obs = 100, n_trials = 3, n_sessions = 2)
 #'
 #' # Create minimal example with just centroid in 3D
-#' example_aniframe(n_keypoints = 1, n_dims = 3)
-example_aniframe <- function(
+#' example_anipoint(n_keypoints = 1, n_dims = 3)
+example_anipoint <- function(
   n_obs = 50,
   n_individuals = 3,
   n_keypoints = 11,
@@ -95,8 +95,8 @@ example_aniframe <- function(
     "3" = c("x", "y", "z")
   )
 
-  # Create base aniframe arguments
-  aniframe_args <- list(
+  # Create base anipoint arguments
+  anipoint_args <- list(
     individual = design$individual,
     keypoint = design$keypoint,
     session = design$session,
@@ -111,12 +111,12 @@ example_aniframe <- function(
   )
 
   if (n_dims >= 2) {
-    aniframe_args$y <- stats::rnorm(n_total)
+    anipoint_args$y <- stats::rnorm(n_total)
   }
 
   if (n_dims == 3) {
-    aniframe_args$z <- stats::rnorm(n_total)
+    anipoint_args$z <- stats::rnorm(n_total)
   }
 
-  do.call(aniframe, aniframe_args)
+  do.call(anipoint, anipoint_args)
 }

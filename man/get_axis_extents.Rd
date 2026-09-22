@@ -17,7 +17,7 @@ declares none.
 Get how far each axis runs
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 get_axis_extents(af)
 
 }

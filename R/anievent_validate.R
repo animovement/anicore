@@ -19,7 +19,7 @@
 #'
 #' @return The input `data`, invisibly.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(validate_anievent(af))
 #' @export
 validate_anievent <- function(data) {

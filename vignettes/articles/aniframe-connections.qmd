@@ -25,7 +25,7 @@ values of an identity or temporal variable. The most common case is a
 **skeleton** — edges between keypoints — but the same shape works for
 a social network (edges between individuals) or a session graph.
 
-`aniframe` stores this as a single metadata field, `connections`, plus
+`anipoint` stores this as a single metadata field, `connections`, plus
 a small family of functions for managing it. This article covers that
 field and those functions.
 
@@ -42,7 +42,7 @@ consumers can treat the table as either directed (parent → child
 kinematic chains) or undirected (skeleton edges).
 
 ```{r}
-fish <- example_aniframe(n_keypoints = 7) |>
+fish <- example_anipoint(n_keypoints = 7) |>
   set_connections(
     list(
       c("head", "neck"),
@@ -133,7 +133,7 @@ keypoints. A social-network study, for example, might record edges
 between individuals:
 
 ```{r}
-social <- example_aniframe(n_individuals = 3) |>
+social <- example_anipoint(n_individuals = 3) |>
   set_connections(
     list(c("1", "2"), c("2", "3")),
     variable = "individual"
@@ -155,6 +155,6 @@ particular recording while being valid elsewhere.
 
 ```{r}
 #| warning: true
-example_aniframe(n_keypoints = 5) |>
+example_anipoint(n_keypoints = 5) |>
   set_connections(list(c("head", "necc"))) # typo
 ```

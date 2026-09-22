@@ -16,6 +16,6 @@ A logical value.
 Test whether an aniframe uses a spherical coordinate system
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_spherical(af)
 }

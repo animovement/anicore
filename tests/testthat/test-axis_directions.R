@@ -1,7 +1,7 @@
 # Declaring which way the axes point, and how far they run (#124)
 
 frame_uv <- function(v = c(0, 5, 10)) {
-  as_aniframe(
+  as_anipoint(
     data.frame(individual = "a", time = 1:3, u = c(1, 2, 3), v = v),
     variables_where = c(x = "u", y = "v")
   )
@@ -122,7 +122,7 @@ test_that("turning an axis onto a different line reflects nothing", {
 
 test_that("an angular frame moves its angles instead of a column", {
   # Covered fully in test-angular_flips.R (#134).
-  pol <- as_aniframe(
+  pol <- as_anipoint(
     data.frame(individual = "a", time = 1:3, rho = c(1, 2, 3), phi = c(0, 1, 2))
   )
   pol <- set_axis_directions(pol, c(x = "right", y = "up"))
@@ -201,8 +201,8 @@ test_that("a frame is constructed with neither declared", {
 test_that("the accessors reject a plain data frame", {
   df <- data.frame(x = 1)
 
-  expect_error(get_axis_directions(df), "neither an aniframe")
-  expect_error(set_axis_directions(df, c(x = "right")), "not an aniframe")
+  expect_error(get_axis_directions(df), "not an aniframe")
+  expect_error(set_axis_directions(df, c(x = "right")), "not an anipoint")
 })
 
 

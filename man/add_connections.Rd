@@ -2,12 +2,12 @@
 % Please edit documentation in R/connections.R
 \name{add_connections}
 \alias{add_connections}
-\title{Add connections to an aniframe}
+\title{Add connections to an anipoint}
 \usage{
 add_connections(data, from, to, variable = "keypoint")
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{from}{Character vector of source endpoints.}
 
@@ -19,7 +19,7 @@ relate to (must be in \code{variables_what} or \code{variables_when}). Defaults
 to \code{"keypoint"}.}
 }
 \value{
-The aniframe with the new connections appended.
+The anipoint with the new connections appended.
 }
 \description{
 \strong{[Experimental]}
@@ -35,7 +35,7 @@ produce a warning but are still appended.
 }
 \examples{
 \dontrun{
-data <- example_aniframe()
+data <- example_anipoint()
 data <- add_connections(data, from = "head", to = "neck")
 data <- add_connections(
   data,

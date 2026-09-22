@@ -6,13 +6,13 @@
 #'   declares none.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_axis_extents(af)
 #'
 #' @seealso [set_axis_extents()], [get_axis_directions()]
 #' @export
 get_axis_extents <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   resolve_axis_extents(get_metadata(data))
 }
 
@@ -43,21 +43,21 @@ resolve_axis_extents <- function(md) {
 #' The extent is what [set_axis_directions()] reflects around when an axis is
 #' turned over: `new = extent - old`.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param extents Named numeric vector, axis role to extent. Each must be
 #'   positive and finite; `NA` clears an axis.
 #'
-#' @return The aniframe with updated `axis_extents` metadata.
+#' @return The anipoint with updated `axis_extents` metadata.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' af <- set_axis_extents(af, c(x = 1920, y = 1080))
 #' get_axis_extents(af)
 #'
 #' @seealso [get_axis_extents()], [set_axis_directions()]
 #' @export
 set_axis_extents <- function(data, extents) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_valid_axis_extents(extents)
 
   wanted <- merge_axis_map(get_axis_extents(data), extents)
@@ -96,7 +96,7 @@ ensure_valid_axis_extents <- function(extents) {
 #' Reflecting around it would put the axis below zero, which usually means
 #' the extent belongs to a different recording.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param extents Named numeric vector of extents.
 #'
 #' @return `TRUE`, invisibly.

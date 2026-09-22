@@ -134,25 +134,25 @@ ensure_valid_axis_roles <- function(axes) {
 }
 
 
-#' The axis roles of an aniframe, and the columns carrying them
+#' The axis roles of an anipoint, and the columns carrying them
 #'
 #' Where [get_variables_where()] gives the column names, this gives what
 #' each of them *means*. Index by role to write a transformation that does
 #' not care what the columns are called:
 #' `data[[get_axes(data)[["x"]]]]`.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return Named character vector: names are axis roles (`x`, `y`, `z`,
 #'   `rho`, `phi`, `theta`), values are the columns carrying them. Empty
 #'   for a frame whose coordinate system is `"unknown"`.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_axes(af)
 #'
 #' df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
-#' renamed <- as_aniframe(df, variables_where = c(x = "u", y = "v"))
+#' renamed <- as_anipoint(df, variables_where = c(x = "u", y = "v"))
 #' get_axes(renamed)
 #' get_metadata(renamed, "coordinate_system")
 #'
@@ -160,7 +160,7 @@ ensure_valid_axis_roles <- function(axes) {
 #'   columns without their roles.
 #' @export
 get_axes <- function(data) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   resolve_axes(get_metadata(data))
 }
 
@@ -248,7 +248,7 @@ warn_shadowed_axis_roles <- function(axes, columns) {
 #' returns it and as [dplyr::rename()] reads, so `set_axes(af, get_axes(af))`
 #' does nothing.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param axes Named character vector: names are axis roles, values are the
 #'   columns carrying them. The roles must form a coordinate system, and
 #'   every column must exist in `data`.
@@ -257,7 +257,7 @@ warn_shadowed_axis_roles <- function(axes, columns) {
 #'
 #' @examples
 #' df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
-#' af <- as_aniframe(df, variables_where = c("u", "v"))
+#' af <- as_anipoint(df, variables_where = c("u", "v"))
 #' get_metadata(af, "coordinate_system")
 #'
 #' af <- set_axes(af, c(x = "u", y = "v"))
@@ -267,7 +267,7 @@ warn_shadowed_axis_roles <- function(axes, columns) {
 #' @seealso [get_axes()]
 #' @export
 set_axes <- function(data, axes) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_variables_character(axes)
   if (!has_axis_roles(axes)) {
     cli::cli_abort(c(

@@ -4,7 +4,7 @@
 # Helper ----------------------------------------------------------------
 # Create a fresh aniframe object and capture its metadata once.
 make_af <- function() {
-  af <- example_aniframe() # ← your convenience constructor
+  af <- example_anipoint() # ← your convenience constructor
   meta <- get_metadata(af)
   list(obj = af, meta = meta)
 }

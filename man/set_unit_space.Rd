@@ -2,12 +2,12 @@
 % Please edit documentation in R/unit_space.R
 \name{set_unit_space}
 \alias{set_unit_space}
-\title{Set the spatial unit of an aniframe object}
+\title{Set the spatial unit of an anipoint object}
 \usage{
 set_unit_space(data, to_unit, calibration_factor = 1)
 }
 \arguments{
-\item{data}{An aniframe object containing spatial coordinate data.}
+\item{data}{An anipoint object containing spatial coordinate data.}
 
 \item{to_unit}{Character string specifying the target spatial unit. Must be
 one of the permitted units defined in \code{list_default_metadata()$unit_space}.}
@@ -19,11 +19,11 @@ When converting from "px" or "unknown", you must provide a calibration factor
 to define the relationship between the current units and the target unit.}
 }
 \value{
-An aniframe object with spatial coordinates converted to the specified
+An anipoint object with spatial coordinates converted to the specified
 unit and updated metadata reflecting the new unit_space.
 }
 \description{
-Converts the spatial coordinates of an aniframe object to a different unit
+Converts the spatial coordinates of an anipoint object to a different unit
 of measurement. The function handles both automatic unit conversion between
 standard units and custom calibration from pixel or arbitrary units.
 

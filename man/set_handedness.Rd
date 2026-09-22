@@ -7,14 +7,14 @@
 set_handedness(data, handedness = "right")
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{handedness}{Either \code{"right"} or \code{"left"}. Right-handed is the
 convention across the suite and the default here; a frame is only
 left-handed if it is told to be.}
 }
 \value{
-The aniframe, with the axis directions that give this handedness
+The anipoint, with the axis directions that give this handedness
 and the depth axis reflected if it had to turn over.
 }
 \description{
@@ -37,7 +37,7 @@ for the third to follow from this one. Declare them with
 \code{\link[=set_axis_directions]{set_axis_directions()}}.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_axis_directions(af, c(x = "right", y = "up"))
 
 # z follows from the handedness, which defaults to right

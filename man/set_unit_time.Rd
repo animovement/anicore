@@ -13,7 +13,7 @@ set_unit_time(data, to_unit, calibration_factor = 1)
 \method{set_unit_time}{anievent}(data, to_unit, calibration_factor = 1)
 }
 \arguments{
-\item{data}{An \code{\link[=aniframe]{aniframe()}} or \code{\link[=anievent]{anievent()}} object.}
+\item{data}{An \code{\link[=anipoint]{anipoint()}} or \code{\link[=anievent]{anievent()}} object.}
 
 \item{to_unit}{Character string specifying the target time unit. Must be
 one of the permitted units defined in \code{list_default_metadata()$unit_time}

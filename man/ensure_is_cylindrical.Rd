@@ -13,7 +13,7 @@ ensure_is_cylindrical(data)
 Internal guard for cylindrical checks
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 # Passes silently when the coordinate system matches
 try(ensure_is_cylindrical(af))
 }

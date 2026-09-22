@@ -8,7 +8,7 @@ test_that("set_unit_space converts between standard units correctly", {
     z = c(5, 10, 15),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "mm")
 
   # Convert mm to cm
@@ -26,7 +26,7 @@ test_that("set_unit_space converts mm to m correctly", {
     y = c(500, 1000, 1500),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "mm")
 
   result <- set_unit_space(data, to_unit = "m")
@@ -42,7 +42,7 @@ test_that("set_unit_space converts cm to mm correctly", {
     y = c(1.5, 2.5, 3.5),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "cm")
 
   result <- set_unit_space(data, to_unit = "mm")
@@ -58,7 +58,7 @@ test_that("set_unit_space handles custom calibration factor", {
     y = c(150, 250, 350),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "px")
 
   # 1 pixel = 0.5 mm
@@ -75,7 +75,7 @@ test_that("set_unit_space warns when calibration_factor is 1 for px/unknown", {
     y = c(150, 250, 350),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "px")
 
   expect_message(
@@ -89,7 +89,7 @@ test_that("set_unit_space errors on invalid to_unit", {
     x = c(10, 20, 30),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "mm")
 
   expect_error(
@@ -104,7 +104,7 @@ test_that("set_unit_space handles missing spatial columns gracefully", {
     x = c(10, 20, 30),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "mm")
 
   result <- set_unit_space(data, to_unit = "cm")
@@ -122,7 +122,7 @@ test_that("set_unit_space preserves non-spatial columns", {
     id = c("a", "b", "c"),
     value = c(100, 200, 300)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_space = "mm")
 
   result <- set_unit_space(data, to_unit = "cm")
@@ -141,7 +141,7 @@ test_that("set_unit_time converts between standard units correctly", {
     y = c(15, 25, 35),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "s")
 
   # Convert s to ms
@@ -156,7 +156,7 @@ test_that("set_unit_time converts ms to s correctly", {
     x = c(10, 20, 30),
     time = c(1000, 2000, 3000)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "ms")
 
   result <- set_unit_time(data, to_unit = "s")
@@ -170,7 +170,7 @@ test_that("set_unit_time converts s to m correctly", {
     x = c(10, 20, 30),
     time = c(60, 120, 180)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "s")
 
   result <- set_unit_time(data, to_unit = "m")
@@ -184,7 +184,7 @@ test_that("set_unit_time converts m to h correctly", {
     x = c(10, 20, 30),
     time = c(60, 120, 180)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "m")
 
   result <- set_unit_time(data, to_unit = "h")
@@ -198,7 +198,7 @@ test_that("set_unit_time converts h to s correctly", {
     x = c(10, 20, 30),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "h")
 
   result <- set_unit_time(data, to_unit = "s")
@@ -212,7 +212,7 @@ test_that("set_unit_time handles custom calibration factor", {
     x = c(10, 20, 30),
     time = c(0, 1, 2)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "frame")
 
   # 30 frames per second (1 frame = 1/30 seconds)
@@ -227,7 +227,7 @@ test_that("set_unit_time warns when calibration_factor is 1 for frame/unknown", 
     x = c(10, 20, 30),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "frame")
 
   expect_message(
@@ -241,7 +241,7 @@ test_that("set_unit_time errors on invalid to_unit", {
     x = c(10, 20, 30),
     time = c(1, 2, 3)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "s")
 
   expect_error(
@@ -259,7 +259,7 @@ test_that("set_unit_time preserves spatial and other columns", {
     id = c("a", "b", "c"),
     value = c(100, 200, 300)
   ) |>
-    as_aniframe() |>
+    as_anipoint() |>
     set_metadata(unit_time = "s")
 
   result <- set_unit_time(data, to_unit = "ms")
@@ -387,7 +387,7 @@ test_that("get_conversion_factor_time returns 1 for same units", {
 # Length axes vs angular axes (#98) ----
 
 test_that("set_unit_space converts rho on a polar frame", {
-  data <- aniframe(
+  data <- anipoint(
     individual = "a",
     time = 1:3,
     rho = c(100, 200, 300),
@@ -407,7 +407,7 @@ test_that("set_unit_space converts both length axes of a cylindrical frame", {
   # The sharp case: one length axis named rho and one named z. Selecting
   # columns by name converted z and left rho, leaving two axes of the same
   # coordinate system in different units under a single unit_space (#98).
-  data <- aniframe(
+  data <- anipoint(
     individual = "a",
     time = 1:3,
     rho = c(100, 200, 300),
@@ -423,7 +423,7 @@ test_that("set_unit_space converts both length axes of a cylindrical frame", {
 })
 
 test_that("set_unit_space converts rho on a spherical frame and leaves both angles", {
-  data <- aniframe(
+  data <- anipoint(
     individual = "a",
     time = 1:3,
     rho = c(100, 200, 300),
@@ -442,7 +442,7 @@ test_that("set_unit_space warns rather than silently claiming a unit it did not 
   # An unrecognised set of spatial names leaves coordinate_system "unknown",
   # so there is no way to tell a length from an angle. Converting nothing
   # while updating the metadata is the same lie as #98, so it warns.
-  data <- suppressWarnings(as_aniframe(
+  data <- suppressWarnings(as_anipoint(
     dplyr::tibble(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c("u", "v")
   ))

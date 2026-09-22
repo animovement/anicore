@@ -1,9 +1,10 @@
 #' Create an anievent data frame
 #'
 #' Creates a specialised data frame for behavioural events in long format:
-#' one row per bout (state event) or instant (point event). The class is a
-#' sibling of [aniframe()] — it shares the metadata substrate but holds
-#' event-bout records rather than per-frame movement data.
+#' one row per bout (state event) or instant (point event). Like
+#' [anipoint()], the class inherits the shared `aniframe` substrate —
+#' metadata, accessors, dplyr methods — but holds event-bout records
+#' rather than per-frame movement data.
 #'
 #' Mandatory columns: `channel`, `type`, `label`, `start`, `stop`. A
 #' "channel" is one mutually-exclusive categorical track of behaviour —

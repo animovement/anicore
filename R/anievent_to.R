@@ -3,7 +3,7 @@
 #' Run-length-encodes per-frame state and point variables into the
 #' long-format [anievent()]. Works on a data frame (with bare-name
 #' selection of the event columns and explicit `time` / identity)
-#' or on an [aniframe()] (where everything is read from metadata).
+#' or on an [anipoint()] (where everything is read from metadata).
 #'
 #' Distinct from [as_anievent()]: that one is a strict cast — the
 #' input must already be in canonical anievent shape (one row per
@@ -11,7 +11,7 @@
 #' `to_anievent()` is the encoding verb that *produces* that shape
 #' from per-frame data.
 #'
-#' @param data A data frame or an [aniframe()].
+#' @param data A data frame or an [anipoint()].
 #' @param time For data-frame input, the column holding per-frame
 #'   times. Bare name (tidyselect). Required.
 #' @param state For data-frame input, columns to run-length-encode

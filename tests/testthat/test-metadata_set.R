@@ -183,7 +183,7 @@ test_that("set_metadata works with empty arguments", {
 })
 
 test_that("set_metadata preserves aniframe class", {
-  data <- example_aniframe()
+  data <- example_anipoint()
 
   result <- set_metadata(data, sampling_rate = 30)
 
@@ -267,7 +267,7 @@ test_that("set_metadata converts datetime values to POSIXct", {
     x = runif(5),
     y = runif(5)
   ) |>
-    as_aniframe()
+    as_anipoint()
 
   # Test character datetime conversion
   test_dt_string <- "2024-01-15 14:30:00"

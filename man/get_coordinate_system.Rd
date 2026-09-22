@@ -22,7 +22,7 @@ what the columns mean, or \code{anispace}'s \verb{map_to_*()} functions to conve
 the coordinates themselves.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 get_coordinate_system(af)
 
 }

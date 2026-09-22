@@ -13,7 +13,7 @@ ensure_can_declare_events(data)
 \code{TRUE}, invisibly.
 }
 \description{
-\code{variables_event} names per-frame columns, which only an aniframe
+\code{variables_event} names per-frame columns, which only an anipoint
 has. An anievent already \emph{is} the encoded form — its events live in
 \code{channel} and \code{label} — so \code{to_anievent()} drops the field rather than
 inheriting it.

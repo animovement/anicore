@@ -2,12 +2,12 @@
 % Please edit documentation in R/variables_index.R
 \name{set_index}
 \alias{set_index}
-\title{Declare which column an aniframe is indexed by}
+\title{Declare which column an anipoint is indexed by}
 \usage{
 set_index(data, column)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{column}{Length-one character vector naming the index column. It
 must exist in \code{data} and be numeric.}
@@ -31,7 +31,7 @@ group.
 }
 \examples{
 df <- data.frame(frame = 1:3, individual = "a", x = c(1, 2, 3), y = c(0, 1, 0))
-af <- as_aniframe(df, index = "frame")
+af <- as_anipoint(df, index = "frame")
 get_index(af)
 
 }

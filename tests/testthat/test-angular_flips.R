@@ -5,7 +5,7 @@
 # axis, map back.
 
 polar_frame <- function(rho, phi, unit_angle = "rad") {
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(
       individual = "a",
       time = seq_along(rho),
@@ -106,7 +106,7 @@ test_that("a frame keeping phi signed gets signed angles back", {
 # theta ----
 
 spherical_frame <- function(theta) {
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(
       individual = "a",
       time = seq_along(theta),

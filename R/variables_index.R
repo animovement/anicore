@@ -12,7 +12,7 @@
 # old index to a grouping variable, and every downstream package
 # repeating the same `setdiff` to undo it.
 
-#' The column an aniframe is indexed by
+#' The column an anipoint is indexed by
 #'
 #' Exactly one column, of any name, holding the position of each row
 #' within its temporal context. It is declared separately from
@@ -25,12 +25,12 @@
 #' declared temporal columns. Its `variables_index` is `NA`, and asking
 #' for it here is an error rather than a guess.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return Length-one character vector naming the index column.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_index(af)
 #'
 #' @seealso [set_index()] to change it, [get_variables_when()] for the
@@ -44,7 +44,7 @@ get_index <- function(data) {
       "i" = "Both are in {.field variables_when}; read them with {.fn get_variables_when}."
     ))
   }
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   resolve_index(get_metadata(data))
 }
 
@@ -57,7 +57,7 @@ get_index <- function(data) {
 #'
 #' `NA` — how an [anievent()] spells "not applicable" — falls back the
 #' same way. The only path that reaches here with anievent metadata is a
-#' cast to [aniframe()], which needs *some* index; [get_index()] refuses
+#' cast to [anipoint()], which needs *some* index; [get_index()] refuses
 #' the anievent before it gets this far.
 #'
 #' @param md A metadata list.
@@ -73,7 +73,7 @@ resolve_index <- function(md) {
 }
 
 
-#' Declare which column an aniframe is indexed by
+#' Declare which column an anipoint is indexed by
 #'
 #' Changing the index changes the order the rows come in, so — like the
 #' `variables_*` declarations — it is not reachable through
@@ -87,7 +87,7 @@ resolve_index <- function(md) {
 #' which, holding one value per row, would put every row in its own
 #' group.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param column Length-one character vector naming the index column. It
 #'   must exist in `data` and be numeric.
 #'
@@ -95,13 +95,13 @@ resolve_index <- function(md) {
 #'
 #' @examples
 #' df <- data.frame(frame = 1:3, individual = "a", x = c(1, 2, 3), y = c(0, 1, 0))
-#' af <- as_aniframe(df, index = "frame")
+#' af <- as_anipoint(df, index = "frame")
 #' get_index(af)
 #'
 #' @seealso [get_index()]
 #' @export
 set_index <- function(data, column) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_valid_index(data, column)
 
   md <- get_metadata(data)
@@ -123,7 +123,7 @@ set_index <- function(data, column) {
 
 #' Ensure a declared index names exactly one column
 #'
-#' Split out from [ensure_valid_index()] because [as_aniframe()] needs it
+#' Split out from [ensure_valid_index()] because [as_anipoint()] needs it
 #' before the column is looked up, and under its own argument name.
 #' Unchecked, a two-column `index` falls through to [resolve_index()],
 #' which reads anything but a single name as "unset" and answers `"time"`.
@@ -146,7 +146,7 @@ ensure_index_name <- function(index, arg = "index") {
 
 #' Ensure a proposed index is usable
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param column The proposed index column.
 #'
 #' @return `TRUE`, invisibly.

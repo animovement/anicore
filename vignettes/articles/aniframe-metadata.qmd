@@ -20,7 +20,7 @@ library(anicore)
 
 ## Why an attribute, not columns?
 
-Every `aniframe` carries a metadata list as an R attribute alongside
+Every `anipoint` carries a metadata list as an R attribute alongside
 the data columns. The metadata records the things that are true of the
 recording as a whole rather than of any single observation: the source
 software, the sampling rate, what units the spatial coordinates are
@@ -43,13 +43,13 @@ and update it. For the data-column structure see
 You can see the full metadata by printing it directly:
 
 ```{r}
-data <- example_aniframe()
+data <- example_anipoint()
 get_metadata(data)
 ```
 
 The fields and their defaults are defined in one place,
 `list_default_metadata()` — that's the canonical source of truth for what
-an `aniframe`'s metadata looks like.
+an `anipoint`'s metadata looks like.
 
 ```{r}
 str(list_default_metadata(), max.level = 1)
@@ -110,7 +110,7 @@ column called `time` — see
 than describing values, so a name that matches nothing is a promise the
 frame can't keep. All but `variables_event` go further — they are not a
 description of the frame, they *are* its structure.
-`as_aniframe()` uses them to coerce column types, order columns and
+`as_anipoint()` uses them to coerce column types, order columns and
 rows, group the frame, and derive `coordinate_system`. Writing them
 without redoing that work would leave the frame and its own metadata
 disagreeing — the print header would update while the grouping still
@@ -170,7 +170,7 @@ For 2D image-derived data there's an annoying convention split: most
 image and video tooling counts y **downward** from the top of the frame,
 while plotting and most maths counts it **upward**. What differs is not
 where `(0, 0)` sits — it is a corner either way — but the direction y
-increases in, so that is what `aniframe` records.
+increases in, so that is what `anipoint` records.
 
 `axis_directions` maps each axis role to one of six words, in three
 opposed pairs, read from where the recording was made: `right`/`left`
@@ -184,7 +184,7 @@ with no declared extent is centred on its origin instead, so turning it
 over negates it.
 
 ```{r}
-img <- aniframe(
+img <- anipoint(
   individual = 1L, time = 1:4,
   x = c(0, 10, 20, 30),
   y = c(50, 100, 150, 200)
@@ -241,7 +241,7 @@ unknown / `frame` / `px` units require an explicit calibration factor
 (or, for time, a `sampling_rate`).
 
 ```{r}
-data <- example_aniframe(n_dims = 2) |>
+data <- example_anipoint(n_dims = 2) |>
   set_metadata(unit_space = "mm")
 
 data_cm <- set_unit_space(data, to_unit = "cm")
@@ -249,7 +249,7 @@ get_metadata(data_cm, "unit_space")
 ```
 
 ```{r}
-data <- example_aniframe() # default unit_time = "frame"
+data <- example_anipoint() # default unit_time = "frame"
 data_s <- set_sampling_rate(data, sampling_rate = 30)
 get_metadata(data_s, "unit_time") # now "s"
 range(data_s$time) # frames divided by fps
@@ -260,7 +260,7 @@ by `set_unit_angle()` whenever they're present. Pass `cols` only for
 non-spatial angular columns (e.g. heading direction).
 
 ```{r}
-pol <- aniframe(
+pol <- anipoint(
   individual = 1L, time = 1:3,
   rho = c(1, 1, 1), phi = c(0, pi / 2, pi)
 )

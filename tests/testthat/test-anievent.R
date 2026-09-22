@@ -32,7 +32,9 @@ test_that("anievent() builds an object with the expected class chain", {
 
   expect_s3_class(ae, "anievent")
   expect_s3_class(ae, "tbl_df")
-  expect_false(inherits(ae, "aniframe"))
+  # an anievent inherits the shared aniframe substrate, but is not an anipoint
+  expect_s3_class(ae, "aniframe")
+  expect_false(inherits(ae, "anipoint"))
 })
 
 test_that("as_anievent() coerces a plain data.frame", {
@@ -522,7 +524,7 @@ test_that("metadata the caller supplies is left alone", {
 })
 
 test_that("an aniframe keeps its movement defaults", {
-  md <- get_metadata(aniframe(time = 1:3, x = 1:3, y = 1:3))
+  md <- get_metadata(anipoint(time = 1:3, x = 1:3, y = 1:3))
 
   expect_equal(as.character(md$reference_frame), "allocentric")
   expect_equal(as.character(md$unit_space), "px")
@@ -530,7 +532,7 @@ test_that("an aniframe keeps its movement defaults", {
 })
 
 test_that("to_anievent does not carry the host frame's spatial metadata over", {
-  af <- aniframe(
+  af <- anipoint(
     individual = rep(1L, 5),
     time = 1:5,
     x = 1:5,
@@ -551,7 +553,7 @@ test_that("to_anievent does not carry the host frame's spatial metadata over", {
 })
 
 test_that("the neutral values are permitted on an aniframe too", {
-  af <- aniframe(time = 1:3, x = 1:3, y = 1:3)
+  af <- anipoint(time = 1:3, x = 1:3, y = 1:3)
   af <- set_metadata(af, reference_frame = "none", unit_space = "none")
 
   expect_equal(as.character(get_metadata(af, "reference_frame")), "none")

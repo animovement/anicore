@@ -31,7 +31,7 @@ to_anievent(data, ...)
 )
 }
 \arguments{
-\item{data}{A data frame or an \code{\link[=aniframe]{aniframe()}}.}
+\item{data}{A data frame or an \code{\link[=anipoint]{anipoint()}}.}
 
 \item{...}{Passed to methods.}
 
@@ -69,7 +69,7 @@ An \code{\link[=anievent]{anievent()}}.
 Run-length-encodes per-frame state and point variables into the
 long-format \code{\link[=anievent]{anievent()}}. Works on a data frame (with bare-name
 selection of the event columns and explicit \code{time} / identity)
-or on an \code{\link[=aniframe]{aniframe()}} (where everything is read from metadata).
+or on an \code{\link[=anipoint]{anipoint()}} (where everything is read from metadata).
 }
 \details{
 Distinct from \code{\link[=as_anievent]{as_anievent()}}: that one is a strict cast — the

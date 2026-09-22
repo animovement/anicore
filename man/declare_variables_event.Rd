@@ -7,7 +7,7 @@
 declare_variables_event(data, state, point)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{state, point}{Character vectors of column names, or \code{NULL}.}
 }

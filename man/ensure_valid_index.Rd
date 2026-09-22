@@ -7,7 +7,7 @@
 ensure_valid_index(data, column)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{column}{The proposed index column.}
 }

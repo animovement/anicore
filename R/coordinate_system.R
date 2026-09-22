@@ -26,13 +26,13 @@
 #'   `"spherical"` or `"unknown"`.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_coordinate_system(af)
 #'
 #' @seealso [get_axes()], [is_cartesian()], [is_polar()]
 #' @export
 get_coordinate_system <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   as.character(get_metadata(data, "coordinate_system"))
 }
 
@@ -45,7 +45,7 @@ get_coordinate_system <- function(data) {
 #' @param data An aniframe.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian(af)
 #' @export
 is_cartesian <- function(data) {
@@ -59,7 +59,7 @@ is_cartesian <- function(data) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' ensure_is_cartesian(af)
 #' @export
@@ -75,7 +75,7 @@ ensure_is_cartesian <- function(data) {
 #'   It has no effect.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_1d(af)
 #' @export
 is_cartesian_1d <- function(data, stop = FALSE) {
@@ -87,7 +87,7 @@ is_cartesian_1d <- function(data, stop = FALSE) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(ensure_is_cartesian_1d(af))
 #' @export
 ensure_is_cartesian_1d <- function(data) {
@@ -100,7 +100,7 @@ ensure_is_cartesian_1d <- function(data) {
 #' @param data An aniframe.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_2d(af)
 #' @export
 is_cartesian_2d <- function(data) {
@@ -112,7 +112,7 @@ is_cartesian_2d <- function(data) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' ensure_is_cartesian_2d(af)
 #' @export
 ensure_is_cartesian_2d <- function(data) {
@@ -125,7 +125,7 @@ ensure_is_cartesian_2d <- function(data) {
 #' @param data An aniframe.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_3d(af)
 #' @export
 is_cartesian_3d <- function(data) {
@@ -137,7 +137,7 @@ is_cartesian_3d <- function(data) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(ensure_is_cartesian_3d(af))
 #' @export
 ensure_is_cartesian_3d <- function(data) {
@@ -150,7 +150,7 @@ ensure_is_cartesian_3d <- function(data) {
 #' @param data An aniframe.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_polar(af)
 #' @export
 is_polar <- function(data) {
@@ -162,7 +162,7 @@ is_polar <- function(data) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' try(ensure_is_polar(af))
 #' @export
@@ -176,7 +176,7 @@ ensure_is_polar <- function(data) {
 #' @param data An aniframe.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cylindrical(af)
 #' @export
 is_cylindrical <- function(data) {
@@ -188,7 +188,7 @@ is_cylindrical <- function(data) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' try(ensure_is_cylindrical(af))
 #' @export
@@ -202,7 +202,7 @@ ensure_is_cylindrical <- function(data) {
 #' @param data An aniframe.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_spherical(af)
 #' @export
 is_spherical <- function(data) {
@@ -214,7 +214,7 @@ is_spherical <- function(data) {
 #'
 #' @param data An aniframe.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' try(ensure_is_spherical(af))
 #' @export

@@ -22,7 +22,7 @@ The input object with \code{sampling_rate} metadata updated and,
 where applicable, temporal columns converted to seconds.
 }
 \description{
-Sets the sampling rate (in Hz) on an \code{\link[=aniframe]{aniframe()}} or \code{\link[=anievent]{anievent()}} and,
+Sets the sampling rate (in Hz) on an \code{\link[=anipoint]{anipoint()}} or \code{\link[=anievent]{anievent()}} and,
 if the object's \code{unit_time} is currently \code{"frame"} or \code{"unknown"},
 converts the temporal columns from frames to seconds using
 \code{1 / sampling_rate}. If \code{unit_time} is already an SI unit, only the

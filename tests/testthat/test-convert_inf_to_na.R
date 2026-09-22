@@ -40,7 +40,7 @@ test_that("a frame with no Inf comes back unchanged", {
 })
 
 test_that("it works on an aniframe without dropping its class", {
-  data <- example_aniframe()
+  data <- example_anipoint()
 
   expect_s3_class(convert_inf_to_na(data), "aniframe")
 })

@@ -7,12 +7,12 @@
 set_angle_direction(data, angle_direction)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{angle_direction}{Either \code{"clockwise"} or \code{"counter_clockwise"}.}
 }
 \value{
-The aniframe, with the axis directions that give this sense and the
+The anipoint, with the axis directions that give this sense and the
 vertical axis reflected if it had to turn over.
 }
 \description{
@@ -22,7 +22,7 @@ reflects that column — the image-plane flip, stated as what it does to the
 angles rather than to a corner.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_axis_directions(af, c(x = "right"))
 
 # y follows from the sense of rotation

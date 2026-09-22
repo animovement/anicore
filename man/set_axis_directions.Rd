@@ -7,13 +7,13 @@
 set_axis_directions(data, directions)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{directions}{Named character vector, axis role to direction — one of
 \code{right}, \code{left}, \code{up}, \code{down}, \code{back} or \code{forward}. \code{NA} clears an axis.}
 }
 \value{
-The aniframe, with reflected coordinates for any axis turned to
+The anipoint, with reflected coordinates for any axis turned to
 its opposite and the new directions recorded.
 }
 \description{
@@ -40,7 +40,7 @@ On a frame that stores angles there is no column to reflect, but \code{phi}
 and \code{theta} are measured from the axes and are recomputed instead.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_axis_extents(af, c(y = 1080))
 af <- set_axis_directions(af, c(x = "right", y = "down"))
 

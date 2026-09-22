@@ -19,6 +19,6 @@ A logical value.
 Test for a 1-D Cartesian coordinate system
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_cartesian_1d(af)
 }
