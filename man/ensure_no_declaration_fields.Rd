@@ -24,11 +24,10 @@ setters do the job instead.
 }
 \details{
 Restoring a \strong{complete} metadata object is a different operation, and
-is allowed. Rebuilding a frame and putting its metadata back is the
-round-trip the class-preserving methods perform internally, and
+is allowed — \code{\link[=set_metadata]{set_metadata()}} hands it to \code{\link[=write_metadata]{write_metadata()}} before
+this check runs. Rebuilding a frame and putting its metadata back is
+the round-trip the class-preserving methods perform internally, and
 downstream packages do it too — \code{animetric::summarise_keypoints()}
 recomputes a frame and restores the metadata it captured beforehand.
-Refusing that left them no way to carry metadata across a rebuild at
-all.
 }
 \keyword{internal}

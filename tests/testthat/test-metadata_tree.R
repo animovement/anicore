@@ -165,3 +165,119 @@ test_that("dplyr operations carry the tree through unchanged", {
   expect_identical(get_metadata(out, "sampling_rate"), 30)
   expect_true(is_nested_metadata(attr(out, "metadata")))
 })
+
+
+# ---- Branch coverage ---------------------------------------------------
+
+test_that("resolve_axes() handles every position shape", {
+  md <- unclass(get_metadata(af()))
+  empty <- stats::setNames(character(), character())
+
+  # No position at all
+  md$variables$where$position <- character()
+  expect_equal(resolve_axes(md), empty)
+
+  # Unnamed columns that do name a coordinate system are inferred
+  md$variables$where$position <- c("rho", "phi")
+  expect_equal(resolve_axes(md), c(rho = "rho", phi = "phi"))
+})
+
+test_that("get_connections() answers empty on legacy flat metadata", {
+  data <- af()
+  legacy <- unclass(get_metadata(data))
+  legacy <- c(
+    legacy$recording,
+    legacy$time,
+    legacy$space,
+    list(
+      variables_what = "individual",
+      variables_when = character(),
+      variables_where = c("x", "y"),
+      variables_index = "time",
+      connections = NULL
+    )
+  )
+  data <- attach_metadata(data, legacy)
+
+  expect_equal(get_connections(data), list())
+})
+
+test_that("get_unit_angle() is NA on an anievent", {
+  expect_true(is.na(get_unit_angle(ae())))
+})
+
+test_that("the flat variables names are refused with a redirect", {
+  expect_error(get_metadata(af(), "variables_what"), "get_variables_what")
+  expect_error(get_metadata(af(), "connections"), "get_connections")
+})
+
+test_that("set_metadata() refuses axes with a pointer at set_axes", {
+  expect_error(set_metadata(af(), axes = c(x = "x")), "set_axes")
+})
+
+test_that("md_field_set() rejects an unknown field", {
+  expect_error(
+    md_field_set(unclass(get_metadata(af())), "no_such_field", 1),
+    "not a metadata field"
+  )
+})
+
+test_that("legacy metadata carries its event declaration through migration", {
+  legacy <- list(
+    variables_what = "individual",
+    variables_when = character(),
+    variables_where = c("x", "y"),
+    variables_index = "time",
+    variables_event = list(state = "behaviour", point = character()),
+    connections = list()
+  )
+
+  migrated <- migrate_metadata_layout(legacy)
+  expect_equal(migrated$variables$event$state, "behaviour")
+})
+
+# ---- Validator branches ------------------------------------------------
+
+test_that("the validator enforces space presence by class", {
+  md <- unclass(get_metadata(af()))
+  no_space <- md[setdiff(names(md), "space")]
+
+  expect_error(ensure_valid_metadata(no_space, space = TRUE), "requires")
+  expect_error(ensure_valid_metadata(md, space = FALSE), "must not carry")
+  expect_no_error(ensure_valid_metadata(no_space, space = FALSE))
+})
+
+test_that("a missing mandatory leaf fails the type check", {
+  md <- unclass(get_metadata(af()))
+  md$time$unit_time <- NULL
+
+  expect_error(ensure_valid_metadata(md), "correct types")
+})
+
+test_that("the variables shape is validated", {
+  base <- unclass(get_metadata(af()))
+
+  bad <- base
+  bad$variables <- "not a list"
+  expect_error(ensure_valid_metadata_variables(bad), "list of roles")
+
+  bad <- base
+  bad$variables$colour <- list(keys = "x")
+  expect_error(ensure_valid_metadata_variables(bad), "Unknown variable role")
+
+  bad <- base
+  bad$variables$what <- "not a list"
+  expect_error(ensure_valid_metadata_variables(bad), "list of slots")
+
+  bad <- base
+  bad$variables$what$level <- "individual"
+  expect_error(ensure_valid_metadata_variables(bad), "Unknown slot")
+
+  bad <- base
+  bad$variables$what$keys <- 1L
+  expect_error(ensure_valid_metadata_variables(bad), "character vector")
+})
+
+test_that("set_metadata() points connections writes at set_connections", {
+  expect_error(set_metadata(af(), connections = list()), "set_connections")
+})

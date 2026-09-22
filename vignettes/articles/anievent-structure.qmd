@@ -121,7 +121,7 @@ ae_multi <- anievent(
   start = c(3, 14, 1, 7),
   stop = c(9, 19, 5, 12)
 )
-get_metadata(ae_multi, "variables_when")
+get_variables_when(ae_multi)
 ae_multi
 ```
 

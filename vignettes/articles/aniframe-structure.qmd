@@ -82,7 +82,7 @@ which recording session this row belongs to, and where it sits inside
 it. The first is context the row shares with its neighbours, and it is
 what the frame groups by; the second is what tells the row apart from
 them, and it orders rather than groups. That second half is the
-**index**, declared on its own in `variables_index` and covered in
+**index**, declared in its own slot (`when$index`) and covered in
 [its own section](#the-index) below.
 
 The combination of all identity and temporal columns forms a composite
@@ -93,11 +93,10 @@ that row *records* about that entity at that timepoint.
 downstream code can introspect:
 
 ```{r}
-md <- get_metadata(data)
-md$variables_index
-md$variables_what
-md$variables_when
-md$variables_where
+get_index(data)
+get_variables_what(data)
+get_variables_when(data)
+get_variables_where(data)
 ```
 
 ### Customising the slots

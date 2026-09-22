@@ -110,3 +110,57 @@ test_that("print returns input invisibly", {
 
   expect_identical(returned, md)
 })
+
+test_that("print renders the category tree with sections", {
+  data <- example_anipoint()
+  data <- suppressWarnings(set_connections(
+    data,
+    list(c("head", "thorax"), c("thorax", "abdomen")),
+    variable = "keypoint"
+  ))
+  out <- capture_md_print(get_metadata(data))
+  text <- paste(out, collapse = "\n")
+
+  expect_match(text, "spec_version")
+  for (category in list_metadata_categories()) {
+    expect_match(text, category, fixed = TRUE)
+  }
+  # variables print one line per role, slots inline
+  expect_match(text, "keys:")
+  expect_match(text, "index: time")
+  # structure prints one line per keyed variable
+  expect_match(text, "keypoint: 2 connections")
+})
+
+test_that("print renders an empty structure category as (empty)", {
+  out <- capture_md_print(get_metadata(example_anipoint()))
+  expect_match(paste(out, collapse = "\n"), "(empty)", fixed = TRUE)
+})
+
+test_that("print renders a flat field selection", {
+  data <- set_metadata(example_anipoint(), sampling_rate = 30)
+  out <- capture_md_print(get_metadata(data, c("sampling_rate", "source")))
+  text <- paste(out, collapse = "\n")
+
+  expect_match(text, "sampling_rate")
+  expect_match(text, "30")
+})
+
+test_that("empty categories render as (empty)", {
+  expect_match(
+    paste(
+      cli::cli_format_method(print_metadata_leaves(list())),
+      collapse = "\n"
+    ),
+    "(empty)",
+    fixed = TRUE
+  )
+  expect_match(
+    paste(
+      cli::cli_format_method(print_metadata_variables(list())),
+      collapse = "\n"
+    ),
+    "(empty)",
+    fixed = TRUE
+  )
+})

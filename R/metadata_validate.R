@@ -239,7 +239,7 @@ ensure_valid_metadata_variables <- function(metadata) {
     unknown <- setdiff(names(slots), known_slots[[role]])
     if (length(unknown) > 0L) {
       cli::cli_abort(
-        "Unknown slot{?s} for the {.field {role}} role: {.val {unknown}}."
+        "{cli::qty(unknown)}Unknown slot{?s} for the {.field {role}} role: {.val {unknown}}."
       )
     }
     is_character <- vapply(slots, is.character, logical(1))
