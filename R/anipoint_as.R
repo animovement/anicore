@@ -128,7 +128,7 @@ as_anipoint <- function(
   # `index` is a declaration, so `set_metadata()` refuses it — it goes on
   # directly, before the restructure that reads it back.
   md <- get_metadata(data)
-  md[["variables_index"]] <- index
+  md$variables$when$index <- index
   data <- attach_metadata(data, md)
 
   data <- restructure_anipoint(
@@ -227,7 +227,14 @@ get_declared_if_present <- function(data, field) {
     return(NULL)
   }
 
-  declared <- as.character(get_metadata(data, field))
+  role <- sub("^variables_", "", field)
+  declared <- if (identical(role, "where")) {
+    # Keep the role mapping: a re-cast must not degrade a frame with
+    # renamed coordinate columns to "unknown" (#109).
+    get_declared_where(data)
+  } else {
+    get_variables(data, role)
+  }
   declared <- declared[!is.na(declared)]
 
   # An empty declaration is a deliberate opt-out (`variables_what =

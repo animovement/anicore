@@ -58,7 +58,7 @@ test_that("as_anipoint detects cylindrical data (rho, phi, z), not cartesian_1d"
     "cylindrical"
   )
   expect_equal(
-    get_metadata(data, "variables_where"),
+    get_variables_where(data),
     c("rho", "phi", "z")
   )
 })
@@ -101,7 +101,7 @@ test_that("as_anipoint detects spherical data (rho, phi, theta)", {
     "spherical"
   )
   expect_equal(
-    get_metadata(data, "variables_where"),
+    get_variables_where(data),
     c("rho", "phi", "theta")
   )
 })
@@ -121,7 +121,7 @@ test_that("as_anipoint detects polar data (rho, phi)", {
     "polar"
   )
   expect_equal(
-    get_metadata(data, "variables_where"),
+    get_variables_where(data),
     c("rho", "phi")
   )
 })
@@ -369,9 +369,9 @@ test_that("as_anipoint stores variables in metadata", {
   )
 
   result_md <- get_metadata(result)
-  expect_equal(result_md$variables_what, "individual")
-  expect_equal(result_md$variables_when, "trial")
-  expect_equal(result_md$variables_where, c("x", "y"))
+  expect_equal(get_variables_what(result), "individual")
+  expect_equal(get_variables_when(result), "trial")
+  expect_equal(get_variables_where(result), c("x", "y"))
 })
 
 test_that("as_anipoint respects custom variables_what", {
@@ -399,7 +399,7 @@ test_that("as_anipoint respects custom variables_when with time", {
   result <- as_anipoint(df, variables_when = c("session", "time"))
 
   expect_s3_class(result, "aniframe")
-  expect_equal(get_metadata(result)$variables_when, "session")
+  expect_equal(get_variables_when(result), "session")
 })
 
 test_that("as_anipoint auto-detects observation as a temporal grouping column", {
@@ -414,7 +414,7 @@ test_that("as_anipoint auto-detects observation as a temporal grouping column", 
   result <- as_anipoint(df)
 
   expect_equal(
-    get_metadata(result, "variables_when"),
+    get_variables_when(result),
     "observation"
   )
 })
@@ -488,15 +488,15 @@ test_that("as_anipoint infers coordinate system from spatial variables", {
   result_polar <- as_anipoint(df_polar, variables_where = c("rho", "phi"))
 
   expect_equal(
-    as.character(get_metadata(result_2d)$coordinate_system),
+    as.character(get_metadata(result_2d, "coordinate_system")),
     "cartesian_2d"
   )
   expect_equal(
-    as.character(get_metadata(result_3d)$coordinate_system),
+    as.character(get_metadata(result_3d, "coordinate_system")),
     "cartesian_3d"
   )
   expect_equal(
-    as.character(get_metadata(result_polar)$coordinate_system),
+    as.character(get_metadata(result_polar, "coordinate_system")),
     "polar"
   )
 })
@@ -562,10 +562,10 @@ test_that("as_anipoint detects polar coordinates", {
 
   expect_s3_class(result, "aniframe")
   expect_equal(
-    get_metadata(result)$variables_where,
+    get_variables_where(result),
     c("rho", "phi")
   )
-  expect_equal(as.character(get_metadata(result)$coordinate_system), "polar")
+  expect_equal(as.character(get_metadata(result, "coordinate_system")), "polar")
 })
 
 test_that("detect_variables_where returns NULL when no spatial columns", {

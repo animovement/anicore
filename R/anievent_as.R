@@ -129,7 +129,7 @@ as_anievent.data.frame <- function(
   # variable setters use, so construction and re-declaration can't drift
   # apart (#82).
   data <- new_anievent(data)
-  data <- set_metadata(data, metadata = neutralise_spatial_metadata(metadata))
+  data <- set_metadata(data, metadata = drop_neutral_spatial_metadata(metadata))
   data <- restructure_anievent(data, variables_what, variables_when)
 
   data
@@ -210,23 +210,20 @@ standardise_anievent_cols <- function(data, variables_what, variables_when) {
 }
 
 
-#' Fill the spatial metadata fields with their "not applicable" values
+#' Drop legacy neutral spellings of the spatial metadata fields
 #'
 #' An anievent shares the metadata substrate with [anipoint()] but has no
 #' spatial component: a stream of behavioural events has no axes, no
-#' reference frame and no angular unit. Inheriting the movement defaults
-#' made it claim otherwise — a BORIS export read into an anievent
-#' announced a coordinate system it had no coordinates for (#73).
-#'
-#' Values the caller supplied are left alone, so a reader that knows
-#' better can still say so.
+#' reference frame and no angular unit. The flat layout expressed that as
+#' five neutral values (#73); the category tree expresses it as an absent
+#' `space` category, so all this has to do is tolerate metadata that
+#' still spells the absence the old way.
 #'
 #' @param metadata Metadata supplied by the caller.
 #'
-#' @return `metadata`, with the untouched spatial fields set to their
-#'   neutral values.
+#' @return `metadata`, with legacy neutral spatial fields dropped.
 #' @keywords internal
-neutralise_spatial_metadata <- function(metadata) {
+drop_neutral_spatial_metadata <- function(metadata) {
   neutral <- list(
     unit_space = "none",
     unit_angle = "none",
@@ -236,9 +233,14 @@ neutralise_spatial_metadata <- function(metadata) {
     axis_extents = stats::setNames(numeric(), character())
   )
 
-  supplied <- names(metadata)
-  for (field in setdiff(names(neutral), supplied)) {
-    metadata[[field]] <- neutral[[field]]
+  for (field in names(neutral)) {
+    value <- metadata[[field]]
+    if (is.null(value)) {
+      next
+    }
+    if (identical(as.character(value), as.character(neutral[[field]]))) {
+      metadata[[field]] <- NULL
+    }
   }
 
   metadata

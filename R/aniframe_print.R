@@ -20,7 +20,7 @@ tbl_sum.aniframe <- function(x, ...) {
   md <- get_metadata(x)
   new_header <- character()
 
-  identity_vars <- intersect(md$variables_what, names(x))
+  identity_vars <- intersect(md_what_keys(md), names(x))
   for (col in identity_vars) {
     new_header <- c(
       new_header,
@@ -32,7 +32,7 @@ tbl_sum.aniframe <- function(x, ...) {
   }
 
   temporal_vars <- intersect(
-    setdiff(md$variables_when, resolve_index(md)),
+    md_when_keys(md),
     names(x)
   )
   for (col in temporal_vars) {
@@ -45,7 +45,7 @@ tbl_sum.aniframe <- function(x, ...) {
     )
   }
 
-  event_vars <- md$variables_event
+  event_vars <- md_event(md)
   if (!is.null(event_vars)) {
     state_vars <- intersect(event_vars$state, names(x))
     if (length(state_vars) > 0) {
@@ -63,7 +63,7 @@ tbl_sum.aniframe <- function(x, ...) {
     }
   }
 
-  sampling_rate <- md$sampling_rate
+  sampling_rate <- md_field(md, "sampling_rate")
   if (!is.null(sampling_rate) && !is.na(sampling_rate)) {
     new_header <- c(new_header, "Sampling rate" = paste(sampling_rate, "Hz"))
   }
@@ -109,8 +109,8 @@ format_time_interval <- function(x, md) {
   }
 
   spu <- compute_seconds_per_time_unit(
-    as.character(md$unit_time),
-    md$sampling_rate
+    as.character(md_field(md, "unit_time")),
+    md_field(md, "sampling_rate")
   )
   if (is.null(spu) || !is.finite(spu)) {
     return(NULL)
@@ -125,7 +125,7 @@ format_time_interval <- function(x, md) {
   # 00:00:00").
   fractional <- (secs_max - secs_min) < 1
 
-  start_dt <- md$start_datetime
+  start_dt <- md_field(md, "start_datetime")
   if (
     !is.null(start_dt) &&
       length(start_dt) == 1 &&

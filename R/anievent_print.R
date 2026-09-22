@@ -18,7 +18,7 @@ tbl_sum.anievent <- function(x, ...) {
   md <- get_metadata(x)
   new_header <- default_header
 
-  identity_vars <- intersect(md$variables_what, names(x))
+  identity_vars <- intersect(md_what_keys(md), names(x))
   for (col in identity_vars) {
     new_header <- c(
       new_header,
@@ -54,7 +54,7 @@ tbl_sum.anievent <- function(x, ...) {
     }
   }
 
-  sampling_rate <- md$sampling_rate
+  sampling_rate <- md_field(md, "sampling_rate")
   if (!is.null(sampling_rate) && !is.na(sampling_rate)) {
     new_header <- c(new_header, "Sampling rate" = paste(sampling_rate, "Hz"))
   }

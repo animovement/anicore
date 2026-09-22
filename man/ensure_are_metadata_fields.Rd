@@ -7,7 +7,7 @@
 ensure_are_metadata_fields(fields, call = rlang::caller_env())
 }
 \arguments{
-\item{fields}{Character vector of field names, or \code{NULL}.}
+\item{fields}{Character vector of field or category names, or \code{NULL}.}
 }
 \value{
 \code{TRUE}, invisibly.

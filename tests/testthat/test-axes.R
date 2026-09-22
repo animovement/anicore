@@ -101,7 +101,7 @@ test_that("an unnamed declaration that matches nothing still warns rather than a
   )
   expect_equal(as.character(get_metadata(af, "coordinate_system")), "unknown")
   # Roles are only stored once they mean something.
-  expect_equal(get_metadata(af, "variables_where"), c("u", "v"))
+  expect_equal(get_variables_where(af), c("u", "v"))
   expect_equal(get_axes(af), stats::setNames(character(), character()))
 })
 
@@ -172,8 +172,8 @@ test_that("variables_where stays a plain vector when the roles are known", {
     variables_where = c(x = "u", y = "v")
   )
 
-  expect_null(names(get_metadata(af, "variables_where")))
-  expect_equal(get_metadata(af, "variables_where"), c("u", "v"))
+  expect_null(names(get_variables_where(af)))
+  expect_equal(get_variables_where(af), c("u", "v"))
   expect_equal(get_variables_where(af), c("u", "v"))
   expect_equal(get_axes(af), c(x = "u", y = "v"))
 })
@@ -184,7 +184,7 @@ test_that("selecting by variables_where does not rename the columns", {
     variables_where = c(x = "u", y = "v")
   )
 
-  where_cols <- get_metadata(af, "variables_where")
+  where_cols <- get_variables_where(af)
   bare <- dplyr::ungroup(dplyr::as_tibble(af))
 
   expect_equal(
@@ -276,7 +276,9 @@ test_that("an anievent has no axes", {
     set_variables_event(state = "b") |>
     to_anievent()
 
-  expect_length(get_metadata(ae, "axes"), 0)
+  # No `where` role, and no `space` category at all (#118)
+  expect_length(get_variables_where(ae), 0)
+  expect_null(get_metadata(ae, "space"))
 })
 
 
@@ -479,8 +481,9 @@ test_that("resolve_axes() gives nothing when the columns name no system", {
     n_individuals = 1,
     n_keypoints = 1
   ))
-  md[["axes"]] <- NULL
-  md[["variables_where"]] <- c("u", "v")
+  # Roles unknown: `where$position` carries the bare columns, and names
+  # that spell no coordinate system resolve to no axes.
+  md$variables$where$position <- c("u", "v")
 
   expect_equal(resolve_axes(md), stats::setNames(character(), character()))
 })

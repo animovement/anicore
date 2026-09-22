@@ -61,7 +61,7 @@ get_handedness <- function(data) {
   if (!identical(derived, "unknown")) {
     return(derived)
   }
-  as.character(md[["handedness"]] %||% "unknown")
+  as.character(md_field(md, "handedness") %||% "unknown")
 }
 
 

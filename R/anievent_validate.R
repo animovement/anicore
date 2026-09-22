@@ -89,7 +89,7 @@ find_anievent_channel_overlap <- function(data) {
 
   md <- get_metadata(data)
   group_cols <- intersect(
-    c(md$variables_what, setdiff(md$variables_when, c("start", "stop"))),
+    c(md_what_keys(md), md_when_keys(md)),
     names(data)
   )
 

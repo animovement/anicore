@@ -22,7 +22,7 @@ declare_variables_event <- function(data, state, point) {
   # not-supplied, and silently clearing the side the caller never mentioned
   # is the same footgun `add_*()` exists to avoid elsewhere. A side is
   # cleared by naming it explicitly as `character()`.
-  current <- normalise_variables_event(get_metadata(data, "variables_event"))
+  current <- normalise_variables_event(md_event(get_metadata(data)))
   if (is.null(state)) {
     state <- current$state
   }
@@ -39,7 +39,7 @@ declare_variables_event <- function(data, state, point) {
   )
 
   md <- get_metadata(data)
-  md$variables_event <- declared
+  md$variables$event <- declared
 
   write_metadata(data, md)
 }
@@ -143,7 +143,7 @@ NULL
 #' @export
 get_variables_event <- function(data) {
   ensure_can_declare_events(data)
-  normalise_variables_event(get_metadata(data, "variables_event"))
+  normalise_variables_event(md_event(get_metadata(data)))
 }
 
 

@@ -139,7 +139,7 @@ test_that("aniframe.quiet silences the mismatch warning", {
 test_that("metadata written before the field existed still validates", {
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
   md <- get_metadata(af)
-  md[["sampling_interval"]] <- NULL
+  md$time$sampling_interval <- NULL
 
   expect_no_error(ensure_valid_metadata(md))
   expect_true(has_all_metadata_fields(md))
@@ -174,7 +174,7 @@ test_that("no gaps are taken when the index column is gone", {
 test_that("the interval is NA when metadata predates the field", {
   af <- example_anipoint(n_obs = 5, n_individuals = 1, n_keypoints = 1)
   md <- attr(af, "metadata")
-  md[["sampling_interval"]] <- NULL
+  md$time$sampling_interval <- NULL
   attr(af, "metadata") <- md
 
   expect_true(is.na(get_sampling_interval(af)))

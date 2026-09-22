@@ -125,7 +125,7 @@ test_that("observation grouping isolates bouts across clips", {
   ae <- to_anievent(af)
   expect_equal(nrow(ae), 4)
   expect_true("observation" %in% names(ae))
-  expect_true("observation" %in% get_metadata(ae, "variables_when"))
+  expect_true("observation" %in% get_variables_when(ae))
 })
 
 test_that("metadata is inherited from the host aniframe", {
@@ -215,7 +215,7 @@ test_that("redundant identity columns (e.g. keypoint when behaviour is constant 
   # Should be 2 bouts (REM 1-2, wake 3-3), not 4 (duplicated per keypoint)
   expect_equal(nrow(ae), 2)
   expect_false("keypoint" %in% names(ae))
-  expect_false("keypoint" %in% get_metadata(ae, "variables_what"))
+  expect_false("keypoint" %in% get_variables_what(ae))
   expect_equal(ae$start, c(1, 3))
   expect_equal(ae$stop, c(2, 3))
 })
@@ -237,7 +237,7 @@ test_that("non-redundant identity columns (e.g. behaviour varying by keypoint) a
 
   ae <- to_anievent(af)
   expect_true("keypoint" %in% names(ae))
-  expect_true("keypoint" %in% get_metadata(ae, "variables_what"))
+  expect_true("keypoint" %in% get_variables_what(ae))
   expect_equal(nrow(ae), 2) # one bout per keypoint
 })
 
@@ -256,7 +256,7 @@ test_that("singleton identity columns are preserved (single individual aniframe 
   # No auto-added keypoint: `individual` already satisfies the
   # at-least-one-identity rule (#77).
   expect_false("keypoint" %in% names(ae))
-  expect_setequal(get_metadata(ae, "variables_what"), "individual")
+  expect_setequal(get_variables_what(ae), "individual")
 })
 
 test_that("temporal-grouping columns (observation / session / trial) are always carried over regardless of variation", {
@@ -275,7 +275,7 @@ test_that("temporal-grouping columns (observation / session / trial) are always 
 
   ae <- to_anievent(af)
   expect_true("observation" %in% names(ae))
-  expect_true("observation" %in% get_metadata(ae, "variables_when"))
+  expect_true("observation" %in% get_variables_when(ae))
   # 4 bouts: REM clip_a, wake clip_a, REM clip_b, wake clip_b
   expect_equal(nrow(ae), 4)
 })
@@ -295,7 +295,7 @@ test_that("multi-value identity columns are dropped when the event is constant a
   ae <- to_anievent(af)
   expect_false("individual" %in% names(ae))
   expect_false("keypoint" %in% names(ae))
-  expect_length(get_metadata(ae, "variables_what"), 0)
+  expect_length(get_variables_what(ae), 0)
   expect_equal(nrow(ae), 2) # one A bout, one B bout
 })
 
@@ -431,7 +431,7 @@ test_that("explicit variables_when overrides metadata-driven grouping", {
 
   # Override drops `observation` from the grouping; bouts cross clips.
   ae <- to_anievent(af, variables_when = character())
-  expect_false("observation" %in% get_metadata(ae, "variables_when"))
+  expect_false("observation" %in% get_variables_when(ae))
 })
 
 test_that("to_anievent.aniframe gathers <col>_modifiers on point channels", {

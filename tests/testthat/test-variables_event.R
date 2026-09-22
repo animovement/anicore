@@ -30,16 +30,15 @@ mini_ae <- function() {
 
 # ---- The field itself --------------------------------------------------
 
-test_that("list_default_metadata() includes variables_event with empty state and point", {
-  md <- list_default_metadata()
+test_that("list_default_metadata() includes an event role with empty state and point", {
+  event <- list_default_metadata()$variables$event
 
-  expect_true("variables_event" %in% names(md))
-  expect_type(md$variables_event, "list")
-  expect_named(md$variables_event, c("state", "point"))
-  expect_type(md$variables_event$state, "character")
-  expect_type(md$variables_event$point, "character")
-  expect_length(md$variables_event$state, 0)
-  expect_length(md$variables_event$point, 0)
+  expect_type(event, "list")
+  expect_named(event, c("state", "point"))
+  expect_type(event$state, "character")
+  expect_type(event$point, "character")
+  expect_length(event$state, 0)
+  expect_length(event$point, 0)
 })
 
 test_that("ensure_valid_metadata() tolerates metadata missing variables_event", {

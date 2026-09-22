@@ -4,124 +4,56 @@
 \alias{list_default_metadata}
 \title{Default metadata structure}
 \usage{
-list_default_metadata()
+list_default_metadata(class = c("anipoint", "anievent"))
+}
+\arguments{
+\item{class}{Which class's tree to return: \code{"anipoint"} (the default)
+or \code{"anievent"}. An anievent's tree has no \code{space} category, and its
+\code{when} role carries \code{interval = c("start", "stop")} instead of an
+index.}
 }
 \value{
-A named list with the following fields:
-\itemize{
-\item \code{source}: Data source identifier (character, NA)
-\item \code{source_version}: Version of the software that wrote the file
-(character, NA). Set only when the file states it — most tracking
-formats record no version, and an inferred one must not be stored
-here.
-\item \code{source_format}: The export layout the file was read as (character,
-NA), e.g. \code{"by_frame_9col"}. Software changes its export layout
-between releases, so knowing which variant was parsed is what makes
-drift visible. Unlike \code{source_version} this is normally derived from
-the file's structure rather than read from a version string.
-\item \code{filename}: Original filename(s) (character vector, NA). Accepts a
-vector of length 1 or more — readers that load from multiple files
-(e.g. \code{aniread::read_trackball()}) populate this with all source paths.
-\item \code{sampling_rate}: Sampling rate in Hz (numeric, NA). Declared, not
-derived — set it with \code{\link[=set_sampling_rate]{set_sampling_rate()}}.
-\item \code{sampling_interval}: The interval between consecutive observations
-(numeric, NA), in the unit the index is in. Derived from the index at
-construction and refreshed on every re-declaration, so it describes
-the data rather than a claim about it. Read it with
-\code{\link[=get_sampling_interval]{get_sampling_interval()}}; ask whether the spacing is even with
-\code{\link[=is_sampling_regular]{is_sampling_regular()}}, which is computed on demand because dropping
-rows changes the answer.
-\item \code{start_datetime}: Start date and time of recording (POSIXct, NA)
-\item \code{variables_index}: The single column the frame is indexed by (character,
-\code{"time"}). Exactly one column, and it may be called anything — the
-constructor requires \emph{that} column rather than a column literally
-named \code{time}. It is never one of the \code{variables_when}, which holds
-the surrounding temporal context and is what the frame is grouped by;
-the index positions each row \emph{within} its context and so is never a
-grouping variable. Read it with \code{\link[=get_index]{get_index()}}, change it with
-\code{\link[=set_index]{set_index()}}. Absent from objects serialised before the field
-existed, where it reads back as \code{"time"} — the value they were built
-with.
-\item \code{variables_what}, \code{variables_when}, \code{variables_where}: The columns
-that carry, respectively, entity identity, temporal context and
-spatial position. These are the structural fields — \code{\link[=as_anipoint]{as_anipoint()}}
-uses them to coerce column types, order columns and rows, group the
-frame, and derive \code{coordinate_system}. The values here are a
-placeholder skeleton for an object with no data attached; every
-constructor overwrites them from the data or from its arguments.
-In particular \code{variables_what} is \strong{not} a requirement that a frame
-carry \code{individual} and \code{keypoint} columns — the rule is that a frame
-has at least one identity variable, whichever it happens to be. Nor
-does the order of \code{variables_what} assert a hierarchy: identity
-variables need not nest, and a position in the vector does not mean a
-level. See \code{\link[=list_recognised_variables_what]{list_recognised_variables_what()}}.
-\item \code{axes}: Which column carries which axis role (named character,
-\code{c(x = "x", y = "y")}). Names are roles — \code{x}, \code{y}, \code{z}, \code{rho},
-\code{phi}, \code{theta} — and values are the columns carrying them, so a frame
-whose coordinates are called something else still has a usable
-\code{coordinate_system}. The role set is closed, which is what keeps
-transformations between coordinate systems well defined; the column
-names are free. Empty when the roles are unknown. Read it with
-\code{\link[=get_axes]{get_axes()}}, change it with \code{\link[=set_axes]{set_axes()}}. \code{variables_where} names the
-same columns without their roles, and is derived from this.
-\item \code{reference_frame}: Reference frame (factor, "allocentric").
-Permitted values: "allocentric", "egocentric", "none".
-\item \code{coordinate_system}: Coordinate system (factor, "cartesian_2d")
-\item \code{axis_directions}: Which way each axis points, keyed by axis role
-(named character, empty). One of "right", "left", "up", "down",
-"back" or "forward", read from where the recording was made. Read it
-with \code{\link[=get_axis_directions]{get_axis_directions()}}, change it with \code{\link[=set_axis_directions]{set_axis_directions()}},
-which reflects an axis turned over. \code{\link[=get_angle_direction]{get_angle_direction()}} and
-\code{\link[=get_handedness]{get_handedness()}} follow from it.
-\item \code{axis_extents}: How far each axis runs, keyed by axis role (named
-numeric, empty) — the video frame height for \code{y}. Read it with
-\code{\link[=get_axis_extents]{get_axis_extents()}}, change it with \code{\link[=set_axis_extents]{set_axis_extents()}}. It is what
-an axis is reflected around.
-\item \code{handedness}: Whether the frame is right- or left-handed (factor,
-"unknown"). Three declared axis directions determine it and are read
-in preference; the field carries the convention on its own for a frame
-that states one without spelling the axes out. Read it with
-\code{\link[=get_handedness]{get_handedness()}}, change it with \code{\link[=set_handedness]{set_handedness()}}.
-}
-
-The spatial fields all have a way of saying "not applicable", because
-the metadata substrate is shared with \code{\link[=anievent]{anievent()}}, which has no
-spatial component at all: \code{unit_space}, \code{unit_angle} and
-\code{reference_frame} take "none", \code{coordinate_system} takes "unknown", and
-\code{axes}, \code{axis_directions} and \code{axis_extents} are empty. An anievent is
-constructed with those values rather than inheriting movement defaults
-it cannot honour (#73).
-\itemize{
-\item \code{connections}: Named list of connection tables, one per identity or
-temporal variable (typically \code{keypoint} for skeletons; could also be
-\code{individual} for social networks). Each entry is a 2-column tibble of
-\code{from}/\code{to} pairs. Default is an empty list. Manage via
-\code{\link[=set_connections]{set_connections()}}, \code{\link[=get_connections]{get_connections()}}, \code{\link[=add_connections]{add_connections()}} and
-\code{\link[=remove_connections]{remove_connections()}}.
-\item \code{variables_event}: Named list with two entries, \code{state} and \code{point},
-each a character vector naming columns that carry per-frame
-categorical event labels. \code{state} columns are interval-valued
-(durative behaviours, listed coarse to fine where they nest);
-\code{point} columns are instantaneous (zero-duration events). Foundation
-for the \code{anievent} class and downstream event-handling utilities.
-Default is an empty list for each.
-\item \code{spec_version}: Named list of semantic version strings, one per class
-in the animovement ecosystem (currently \code{aniframe} and \code{anievent}).
-Versions the full data contract of each class (mandatory columns,
-validator, and the metadata fields the class uses), independently of
-the package version. Objects serialised before this field existed are
-tolerated by the metadata validator; new objects always get it.
-}
+A named list: the categories above plus \code{spec_version}.
 }
 \description{
-Returns a list containing the default metadata fields and their initial
-values. The same metadata substrate is shared by both \code{\link[=anipoint]{anipoint()}} and
-\code{\link[=anievent]{anievent()}} objects; per-class data contracts are versioned via
-\code{spec_version}. Most fields are initialized as \code{NA} and should be set
-appropriately for your data.
+Returns the default metadata tree. Fields are grouped into categories
+(#118) — \code{recording}, \code{time}, \code{space}, \code{variables}, \code{structure} — with
+\code{spec_version} at the top level. Access stays flat: a field is read
+with \code{get_metadata(data, "sampling_rate")} and written with
+\code{set_metadata(data, sampling_rate = 30)} regardless of its category,
+and a category name returns the whole category.
+
+The categories:
+\itemize{
+\item \code{recording} — provenance: \code{source}, \code{source_version},
+\code{source_format}, \code{filename}.
+\item \code{time} — \code{unit_time}, \code{sampling_rate} (declared), \code{sampling_interval}
+(derived from the index; read it with \code{\link[=get_sampling_interval]{get_sampling_interval()}}),
+\code{start_datetime}.
+\item \code{space} — \code{coordinate_system}, \code{reference_frame}, \code{handedness},
+\code{axis_directions}, \code{axis_extents}, \code{unit_space}, \code{unit_angle}. The
+one category a class can lack: an \code{\link[=anievent]{anievent()}} has no spatial
+component, so its metadata simply has no \code{space} (#73).
+\item \code{variables} — which columns play which role, as a list of roles each
+holding named slots: \code{what$keys} (identity), \code{when$index} +
+\code{when$keys} (temporal; an anievent has \code{when$interval} instead of an
+index), \code{where$position} (the axis-role mapping; names are roles,
+values are columns), \code{event$state} + \code{event$point}. The frame groups
+by \code{c(what$keys, when$keys)} and nothing else. These slots are
+reached through the \verb{*_variables_*()} accessors, \code{\link[=get_index]{get_index()}} and
+\code{\link[=get_axes]{get_axes()}}, never by flat name — \code{keys} appears under two roles.
+\item \code{structure} — relationships between levels of a variable, keyed by
+that variable (typically \code{keypoint} for skeletons). Today this holds
+the connection tables managed via \code{\link[=set_connections]{set_connections()}}; it is where
+an \code{anistructure} will live.
+\item \code{spec_version} — named list of semantic version strings, one per
+class, versioning the full data contract independently of the
+package version.
+}
 }
 \examples{
 names(list_default_metadata())
+names(list_default_metadata("anievent"))
 }
 \seealso{
 \code{\link[=set_metadata]{set_metadata()}}, \code{\link[=get_metadata]{get_metadata()}}

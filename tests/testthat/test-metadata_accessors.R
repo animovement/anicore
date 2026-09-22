@@ -67,7 +67,7 @@ test_that("they work on an anievent too, where the field applies", {
 
   expect_equal(get_unit_time(ae), as.character(get_metadata(ae, "unit_time")))
   # An anievent has no spatial component, so these read as "not applicable".
-  expect_equal(get_unit_space(ae), "none")
+  expect_true(is.na(get_unit_space(ae)))
   expect_length(get_axis_directions(ae), 0)
   expect_equal(get_handedness(ae), "unknown")
 })

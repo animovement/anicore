@@ -40,5 +40,8 @@ test_that("Tests for ensure_has_all_metadata_fields()", {
 test_that("Tests for ensure_has_all_metadata_fields()", {
   x <- example_anipoint()
   md <- get_metadata(x)
-  expect_error(ensure_has_all_metadata_fields(md[-1]))
+  expect_error(ensure_has_all_metadata_fields(unclass(md)[setdiff(
+    names(md),
+    "variables"
+  )]))
 })

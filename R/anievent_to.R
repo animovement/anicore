@@ -120,7 +120,7 @@ to_anievent.aniframe <- function(
   ...
 ) {
   md <- get_metadata(data)
-  ve <- md$variables_event
+  ve <- md_event(md)
   if (is.null(ve) || (length(ve$state) == 0 && length(ve$point) == 0)) {
     cli::cli_abort(c(
       "The {.cls aniframe} has no event columns declared.",
@@ -138,9 +138,9 @@ to_anievent.aniframe <- function(
   }
 
   index <- resolve_index(md)
-  host_what <- intersect(md$variables_what, names(data))
+  host_what <- intersect(md_what_keys(md), names(data))
   grouping_when <- intersect(
-    setdiff(md$variables_when, index),
+    setdiff(md_when_keys(md), index),
     names(data)
   )
 
@@ -191,31 +191,14 @@ to_anievent.aniframe <- function(
     grouping_when <- setdiff(variables_when, c("start", "stop"))
   }
 
-  inherited_metadata <- md[
-    setdiff(
-      names(md),
-      c(
-        "variables_what",
-        "variables_when",
-        "variables_where",
-        "variables_event",
-        # An anievent is ordered by bout start, not by the host frame's
-        # index column, so the declaration does not carry over (#109).
-        "variables_index",
-        "axes",
-        "spec_version",
-        "axis_directions",
-        "axis_extents",
-        "coordinate_system",
-        "connections",
-        # Spatial fields describe the host frame, not the bouts encoded
-        # from it; `as_anievent()` sets them to "none" (#73).
-        "unit_space",
-        "unit_angle",
-        "reference_frame"
-      )
-    )
-  ]
+  # The bouts inherit the host's provenance and clock, and nothing else:
+  # `space` describes the host frame, not the bouts encoded from it (#73),
+  # the variable declaration is rebuilt for the anievent's own columns,
+  # and `structure` is keyed by variables the anievent may not carry.
+  inherited_metadata <- c(
+    unclass(md[["recording"]]),
+    unclass(md[["time"]])
+  )
   metadata <- utils::modifyList(inherited_metadata, metadata)
 
   to_anievent_from_columns(

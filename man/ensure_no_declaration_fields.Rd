@@ -14,12 +14,13 @@ ensure_no_declaration_fields(user_md)
 }
 \description{
 \code{\link[=set_metadata]{set_metadata()}} writes the metadata list and nothing else, which is
-what makes it safe to use everywhere. The \verb{variables_*} fields need
-more than that: they name columns, so the names have to be checked
+what makes it safe to use everywhere. The variable declaration needs
+more than that: it names columns, so the names have to be checked
 against the frame, and for the three structural roles the frame has to
 be retyped, reordered, regrouped and its derived fields refreshed.
-Writing one of them as a \emph{field} is therefore refused, and the
-dedicated setters do the job instead.
+Writing it — as an old flat field, or as the \code{variables} or
+\code{structure} category — is therefore refused, and the dedicated
+setters do the job instead.
 }
 \details{
 Restoring a \strong{complete} metadata object is a different operation, and

@@ -126,10 +126,11 @@ test_that("anievent metadata gets anievent-flavoured defaults", {
     stop = 9
   )
 
-  md <- get_metadata(ae)
-  expect_equal(md$variables_what, "individual")
-  expect_equal(md$variables_when, c("start", "stop"))
-  expect_length(md$variables_where, 0)
+  expect_equal(get_variables_what(ae), "individual")
+  expect_equal(get_variables_when(ae), c("start", "stop"))
+  expect_length(get_variables_where(ae), 0)
+  # and no space category at all (#73, #118)
+  expect_null(get_metadata(ae, "space"))
 })
 
 test_that("anievent auto-detects recognised identity columns", {
@@ -141,7 +142,7 @@ test_that("anievent auto-detects recognised identity columns", {
     stop = c(9, 19)
   )
 
-  expect_equal(get_metadata(ae, "variables_what"), "subject")
+  expect_equal(get_variables_what(ae), "subject")
 })
 
 test_that("anievent accepts an explicit non-default identity column", {
@@ -154,7 +155,7 @@ test_that("anievent accepts an explicit non-default identity column", {
     variables_what = "rat"
   )
 
-  expect_equal(get_metadata(ae, "variables_what"), "rat")
+  expect_equal(get_variables_what(ae), "rat")
   expect_s3_class(ae$rat, "factor")
 })
 
@@ -167,7 +168,7 @@ test_that("anievent works with no identity column", {
   )
 
   expect_s3_class(ae, "anievent")
-  expect_length(get_metadata(ae, "variables_what"), 0)
+  expect_length(get_variables_what(ae), 0)
 })
 
 test_that("anievent auto-detects observation / session / trial into variables_when", {
@@ -182,7 +183,7 @@ test_that("anievent auto-detects observation / session / trial into variables_wh
   )
 
   expect_equal(
-    get_metadata(ae, "variables_when"),
+    get_variables_when(ae),
     c("observation", "trial", "start", "stop")
   )
 })
@@ -519,41 +520,43 @@ test_that("an anievent does not claim a spatial layout it cannot have", {
     start = c(1, 4),
     stop = c(3, 5)
   )
-  md <- get_metadata(ae)
-
-  expect_equal(as.character(md$reference_frame), "none")
-  expect_equal(as.character(md$unit_angle), "none")
-  expect_equal(as.character(md$unit_space), "none")
-  expect_equal(as.character(md$coordinate_system), "unknown")
-  expect_length(md$axis_directions, 0)
-  expect_length(md$axis_extents, 0)
+  # The absence is spelled as an absent `space` category (#73, #118),
+  # so every spatial field reads as NULL rather than as a neutral value.
+  expect_null(get_metadata(ae, "space"))
+  expect_null(get_metadata(ae, "reference_frame"))
+  expect_null(get_metadata(ae, "unit_space"))
+  expect_null(get_metadata(ae, "coordinate_system"))
   expect_equal(get_angle_direction(ae), "unknown")
   expect_equal(get_handedness(ae), "unknown")
 })
 
-test_that("metadata the caller supplies is left alone", {
-  ae <- anievent(
-    individual = 1L,
-    channel = "behaviour",
-    label = c("REM", "wake"),
-    start = c(1, 4),
-    stop = c(3, 5),
-    metadata = list(unit_space = "mm", reference_frame = "egocentric")
-  )
-  md <- get_metadata(ae)
+test_that("legacy neutral spatial values are tolerated, real ones refused", {
+  build <- function(metadata) {
+    anievent(
+      individual = 1L,
+      channel = "behaviour",
+      label = c("REM", "wake"),
+      start = c(1, 4),
+      stop = c(3, 5),
+      metadata = metadata
+    )
+  }
 
-  expect_equal(as.character(md$unit_space), "mm")
-  expect_equal(as.character(md$reference_frame), "egocentric")
-  # Fields the caller said nothing about are still neutral.
-  expect_equal(as.character(md$coordinate_system), "unknown")
+  # The old spelling of "not applicable" is dropped silently, so readers
+  # written against the flat layout keep working.
+  ae <- build(list(unit_space = "none", coordinate_system = "unknown"))
+  expect_null(get_metadata(ae, "space"))
+
+  # A real spatial claim has nowhere to go on an anievent.
+  expect_error(build(list(unit_space = "mm")), "space")
 })
 
 test_that("an aniframe keeps its movement defaults", {
-  md <- get_metadata(anipoint(time = 1:3, x = 1:3, y = 1:3))
+  af <- anipoint(time = 1:3, x = 1:3, y = 1:3)
 
-  expect_equal(as.character(md$reference_frame), "allocentric")
-  expect_equal(as.character(md$unit_space), "px")
-  expect_equal(as.character(md$unit_angle), "rad")
+  expect_equal(as.character(get_metadata(af, "reference_frame")), "allocentric")
+  expect_equal(as.character(get_metadata(af, "unit_space")), "px")
+  expect_equal(as.character(get_metadata(af, "unit_angle")), "rad")
 })
 
 test_that("to_anievent does not carry the host frame's spatial metadata over", {
@@ -567,14 +570,14 @@ test_that("to_anievent does not carry the host frame's spatial metadata over", {
   af <- set_variables_event(af, state = "behaviour")
   af <- set_metadata(af, sampling_rate = 30, unit_time = "s")
 
-  md <- get_metadata(to_anievent(af))
+  ae <- to_anievent(af)
 
-  expect_length(md$axis_directions, 0)
-  expect_equal(as.character(md$unit_space), "none")
-  expect_equal(as.character(md$reference_frame), "none")
+  expect_null(get_metadata(ae, "space"))
+  expect_null(get_metadata(ae, "unit_space"))
+  expect_null(get_metadata(ae, "reference_frame"))
   # Fields that do mean something for bouts are still inherited.
-  expect_equal(md$sampling_rate, 30)
-  expect_equal(as.character(md$unit_time), "s")
+  expect_equal(get_metadata(ae, "sampling_rate"), 30)
+  expect_equal(as.character(get_metadata(ae, "unit_time")), "s")
 })
 
 test_that("the neutral values are permitted on an aniframe too", {

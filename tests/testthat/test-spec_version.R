@@ -15,11 +15,11 @@ test_that("list_default_metadata() includes spec_version with aniframe and aniev
   expect_true("spec_version" %in% names(md))
   expect_type(md$spec_version, "list")
   expect_named(md$spec_version, c("aniframe", "anievent"))
-  # aniframe is major: `variables_when` no longer names the index, which
-  # breaks a consumer reading the index out of it. anievent is minor: it
-  # gains `variables_index`, always `NA` (#109).
-  expect_equal(md$spec_version$aniframe, "2.1.0")
-  expect_equal(md$spec_version$anievent, "0.4.0")
+  # Major for both: the flat metadata list became the category tree, the
+  # variable roles became slotted lists, and an anievent's spatial
+  # component became an absent `space` category (#118).
+  expect_equal(md$spec_version$aniframe, "3.0.0")
+  expect_equal(md$spec_version$anievent, "1.0.0")
 })
 
 test_that("set_metadata round-trips a custom spec_version list", {

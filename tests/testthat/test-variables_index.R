@@ -242,7 +242,9 @@ test_that("an anievent declares no index", {
     set_variables_event(state = "behaviour") |>
     to_anievent()
 
-  expect_true(is.na(get_metadata(ae, "variables_index")))
+  # The `when` role carries an interval instead of an index (#118)
+  expect_null(get_metadata(ae, "variables")$when$index)
+  expect_equal(get_metadata(ae, "variables")$when$interval, c("start", "stop"))
   expect_error(get_index(ae), "no index column")
 })
 
@@ -280,11 +282,11 @@ test_that("validate_anipoint() catches an index column that is no longer numeric
   expect_error(validate_anipoint(retyped), "must be numeric")
 })
 
-test_that("the default metadata skeleton keeps the index out of variables_when", {
-  md <- list_default_metadata()
+test_that("the default metadata skeleton keeps the index out of the when keys", {
+  when <- list_default_metadata()$variables$when
 
-  expect_equal(md$variables_index, "time")
-  expect_false(md$variables_index %in% md$variables_when)
+  expect_equal(when$index, "time")
+  expect_false(when$index %in% when$keys)
 })
 
 

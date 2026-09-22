@@ -105,7 +105,7 @@ get_axis_directions <- function(data) {
 #' @return Named character vector, empty when nothing is declared.
 #' @keywords internal
 resolve_axis_directions <- function(md) {
-  declared <- md[["axis_directions"]]
+  declared <- md_field(md, "axis_directions")
   if (is.null(declared) || length(declared) == 0L) {
     return(stats::setNames(character(), character()))
   }

@@ -24,7 +24,7 @@ get_axis_extents <- function(data) {
 #' @return Named numeric vector, empty when nothing is declared.
 #' @keywords internal
 resolve_axis_extents <- function(md) {
-  declared <- md[["axis_extents"]]
+  declared <- md_field(md, "axis_extents")
   if (is.null(declared) || length(declared) == 0L) {
     return(stats::setNames(numeric(), character()))
   }

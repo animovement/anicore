@@ -22,6 +22,9 @@
 #' @keywords internal
 list_declaration_metadata_fields <- function() {
   c(
+    "variables",
+    "structure",
+    "connections",
     "variables_index",
     "variables_what",
     "variables_when",
@@ -34,13 +37,23 @@ list_declaration_metadata_fields <- function() {
 
 #' Read a variable role from the metadata
 #'
+#' Returns the flat column vector a role names. For `when` on an
+#' anievent, the interval columns come after the context keys, matching
+#' the order the flat field carried before the slots existed.
+#'
 #' @param data An aniframe or anievent object.
 #' @param role One of `"what"`, `"when"`, `"where"`.
 #'
 #' @return Character vector of column names.
 #' @keywords internal
 get_variables <- function(data, role) {
-  as.character(get_metadata(data, paste0("variables_", role)))
+  md <- get_metadata(data)
+  switch(
+    role,
+    what = md_what_keys(md),
+    when = c(md_when_keys(md), md_when_interval(md)),
+    where = unname(md_where_position(md))
+  )
 }
 
 

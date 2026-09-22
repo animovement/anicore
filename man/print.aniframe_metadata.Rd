@@ -15,10 +15,10 @@
 \code{x}, invisibly.
 }
 \description{
-Renders the metadata as a single block, captured via
-\code{\link[cli:cli_format_method]{cli::cli_format_method()}} and emitted with \code{\link[=cat]{cat()}}. Field names
-and types are padded to fixed widths so the values line up in
-aligned columns, similar to \code{\link[=str]{str()}}.
+Renders the metadata grouped by category (#118): \code{spec_version} at the
+top, then one section per category. Leaf names and types are padded to
+fixed widths so the values line up, similar to \code{\link[=str]{str()}}. The
+\code{variables} category prints one line per role, its slots inline.
 }
 \details{
 The S3 class is named \code{aniframe_metadata} for historical reasons,

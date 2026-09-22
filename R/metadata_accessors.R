@@ -40,7 +40,13 @@ get_sampling_rate <- function(data) {
 #' @export
 get_unit_space <- function(data) {
   ensure_is_aniframe(data)
-  as.character(get_metadata(data, "unit_space"))
+  value <- get_metadata(data, "unit_space")
+  if (is.null(value)) {
+    # An anievent carries no `space` category, so the unit is not
+    # applicable rather than unset (#73, #118).
+    return(NA_character_)
+  }
+  as.character(value)
 }
 
 
@@ -76,5 +82,9 @@ get_unit_time <- function(data) {
 #' @export
 get_unit_angle <- function(data) {
   ensure_is_aniframe(data)
-  as.character(get_metadata(data, "unit_angle"))
+  value <- get_metadata(data, "unit_angle")
+  if (is.null(value)) {
+    return(NA_character_)
+  }
+  as.character(value)
 }

@@ -52,26 +52,34 @@ The fields and their defaults are defined in one place,
 an `anipoint`'s metadata looks like.
 
 ```{r}
-str(list_default_metadata(), max.level = 1)
+str(list_default_metadata(), max.level = 2)
 ```
 
-The fields fall into a few groups:
+The fields are grouped into **categories**, each answering one kind of
+question:
 
-| Group              | Fields                                                              |
-|--------------------|---------------------------------------------------------------------|
-| **Provenance**     | `source`, `source_version`, `filename`, `start_datetime`            |
-| **Sampling**       | `sampling_rate`                                                     |
-| **Units**          | `unit_space`, `unit_time`, `unit_angle`                             |
-| **Frame of reference** | `reference_frame`, `coordinate_system`, `axes`, `axis_directions`, `axis_extents`, `handedness` |
-| **Slot vocabulary**| `variables_index`, `variables_what`, `variables_when`, `variables_where` |
-| **Relationships**  | `connections`                                                       |
+| Category      | Fields                                                              |
+|---------------|---------------------------------------------------------------------|
+| `recording`   | provenance: `source`, `source_version`, `source_format`, `filename` |
+| `time`        | `unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime` |
+| `space`       | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle` |
+| `variables`   | which columns play which role: `what`, `when`, `where`, `event`, each a list of named slots |
+| `structure`   | relationships between levels of a variable — today's connections    |
+
+`spec_version` sits above the categories: it is metadata about the
+metadata, versioning the contract they describe. `space` is the one
+category a class can lack — an `anievent` has no spatial component, so
+its metadata simply has no `space` rather than a set of "none" values.
 
 `filename` accepts a character vector — readers like
 `aniread::read_trackball()` populate it with all source paths.
 
 ## Reading and writing metadata
 
-`get_metadata()` and `set_metadata()` are the workhorses.
+`get_metadata()` and `set_metadata()` are the workhorses. The categories
+group the storage, but access stays **flat**: a field is found and
+written by its own name wherever it lives, and a category name returns
+the whole category.
 
 ```{r}
 get_metadata(data, "sampling_rate")
@@ -79,6 +87,8 @@ get_metadata(data, "sampling_rate")
 data <- set_metadata(data, sampling_rate = 30, source = "deeplabcut")
 get_metadata(data, "sampling_rate")
 get_metadata(data, "source")
+
+names(get_metadata(data, "space"))
 ```
 
 `set_metadata()` validates the input — factor fields are checked
@@ -105,18 +115,24 @@ column called `time` — see
 
 ## Declaring the slot vocabulary
 
-`variables_index`, `variables_what`, `variables_when`, `variables_where`,
-`variables_event` and `axes` are a special case: they name columns rather
-than describing values, so a name that matches nothing is a promise the
-frame can't keep. All but `variables_event` go further — they are not a
-description of the frame, they *are* its structure.
+The `variables` category is a special case: its roles name columns
+rather than describing values, so a name that matches nothing is a
+promise the frame can't keep. All but the `event` role go further — they
+are not a description of the frame, they *are* its structure.
 `as_anipoint()` uses them to coerce column types, order columns and
 rows, group the frame, and derive `coordinate_system`. Writing them
 without redoing that work would leave the frame and its own metadata
 disagreeing — the print header would update while the grouping still
 reflected the old declaration.
 
-`set_metadata()` therefore refuses all six, and points you at the
+The category holds one list per role, each with named slots:
+`what$keys` (identity), `when$index` and `when$keys` (the position
+within a context, and the context itself — an `anievent` has
+`when$interval` instead of an index), `where$position` (the axis-role
+mapping), and `event$state` / `event$point`. The frame groups by
+`c(what$keys, when$keys)` and nothing else.
+
+`set_metadata()` refuses the whole category, and points you at the
 setters that do the whole job:
 
 ```{r error=TRUE}

@@ -146,27 +146,40 @@ restructure_anipoint <- function(
 
   coordinate_system <- infer_coordinate_system(axes)
 
-  md$variables_what <- variables_what
-  md$variables_when <- variables_when
-  # `variables_where` is always a plain vector; the roles live in `axes`,
-  # which is derived from the same declaration and so cannot drift from it.
-  md$variables_where <- where_cols
-  md$axes <- if (identical(coordinate_system, "unknown")) {
-    stats::setNames(character(), character())
+  # `where$position` carries the role mapping when the coordinate system
+  # is known, and the bare columns when it is not — the roles cannot
+  # drift from the columns because they are one slot.
+  position <- if (identical(coordinate_system, "unknown")) {
+    where_cols
   } else {
     axes
   }
-  warn_shadowed_axis_roles(md$axes, names(bare))
-  md$variables_index <- index
-  md$coordinate_system <- as_metadata_factor(
-    coordinate_system,
-    "coordinate_system"
+  warn_shadowed_axis_roles(
+    if (identical(coordinate_system, "unknown")) {
+      stats::setNames(character(), character())
+    } else {
+      axes
+    },
+    names(bare)
+  )
+
+  md <- migrate_metadata_layout(md)
+  md$variables <- list(
+    what = list(keys = variables_what),
+    when = list(index = index, keys = variables_when),
+    where = list(position = position),
+    event = md_event(md) %||% list(state = character(), point = character())
+  )
+  md <- md_field_set(
+    md,
+    "coordinate_system",
+    as_metadata_factor(coordinate_system, "coordinate_system")
   )
 
   out <- preserve_animovement_class(bare, cls, md)
 
   # Derived from the finished frame, so it measures the data as it now is.
-  md$sampling_interval <- compute_sampling_interval(out)
+  md <- md_field_set(md, "sampling_interval", compute_sampling_interval(out))
   attach_metadata(out, md)
 }
 
@@ -210,17 +223,20 @@ restructure_anievent <- function(data, variables_what, variables_when) {
     .data$start
   )
 
-  md$variables_what <- variables_what
-  md$variables_when <- variables_when
-  # An anievent carries no spatial variables — position lives on the
-  # anipoint it was encoded from.
-  md$variables_where <- character()
-  md$axes <- stats::setNames(character(), character())
+  # An anievent has no `where` role and no index: a bout is delimited by
+  # `start` and `stop`, which get the `interval` slot the flat vector
+  # could never express (#118). Position lives on the anipoint it was
+  # encoded from, so `space` stays absent too.
+  md <- migrate_metadata_layout(md)
+  md$variables <- list(
+    what = list(keys = variables_what),
+    when = list(
+      interval = intersect(variables_when, c("start", "stop")),
+      keys = setdiff(variables_when, c("start", "stop"))
+    )
+  )
   # No index, so nothing to measure a sampling interval from.
-  md$sampling_interval <- as.numeric(NA)
-  # Nor an index: a bout is delimited by `start` and `stop`. `NA` is the
-  # substrate's "not applicable" (#73).
-  md$variables_index <- as.character(NA)
+  md <- md_field_set(md, "sampling_interval", as.numeric(NA))
 
   preserve_animovement_class(bare, cls, md)
 }

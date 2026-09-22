@@ -64,7 +64,7 @@ mini_aniframe <- function() {
 
 test_that("default connections metadata is an empty list", {
   data <- mini_aniframe()
-  expect_equal(get_metadata(data, "connections"), list())
+  expect_equal(get_connections(data), list())
 })
 
 test_that("set_connections stores a from/to tibble keyed by variable", {
@@ -336,9 +336,10 @@ test_that("set_connections doesn't warn when variable is in metadata but absent 
   data <- as_anipoint(
     data.frame(individual = 1L, time = 1:3, x = 1:3, y = 1:3)
   )
-  drifted <- get_metadata(data)
-  drifted$variables_what <- c("individual", "future_keypoint")
-  data <- attach_metadata(data, drifted)
+  data <- drift_metadata(
+    data,
+    variables_what = c("individual", "future_keypoint")
+  )
 
   expect_no_warning(
     data <- set_connections(

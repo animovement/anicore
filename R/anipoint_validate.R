@@ -65,7 +65,7 @@ validate_anipoint <- function(data) {
 warn_duplicate_observations <- function(data) {
   md <- get_metadata(data)
   key <- intersect(
-    c(md$variables_what, md$variables_when, resolve_index(md)),
+    c(md_what_keys(md), md_when_keys(md), resolve_index(md)),
     names(data)
   )
   if (length(key) == 0L) {
@@ -107,12 +107,12 @@ get_declared_variables <- function(md) {
 
   list(
     variables_index = drop_na(resolve_index(md)),
-    variables_what = drop_na(md$variables_what),
-    variables_when = drop_na(md$variables_when),
-    variables_where = drop_na(md$variables_where),
+    variables_what = drop_na(md_what_keys(md)),
+    variables_when = drop_na(md_when_keys(md)),
+    variables_where = drop_na(unname(md_where_position(md))),
     variables_event = drop_na(c(
-      md$variables_event$state,
-      md$variables_event$point
+      md_event(md)$state,
+      md_event(md)$point
     ))
   )
 }
@@ -180,7 +180,7 @@ ensure_has_index <- function(data) {
 #'   `missing` and `non_numeric` subsets of them.
 #' @keywords internal
 find_spatial_problems <- function(data) {
-  declared <- get_metadata(data, "variables_where")
+  declared <- get_variables(data, "where")
   declared <- as.character(declared[!is.na(declared)])
 
   present <- intersect(declared, names(data))
@@ -295,8 +295,10 @@ ensure_is_spatial <- function(data) {
 #' @keywords internal
 warn_coordinate_system_drift <- function(data) {
   md <- get_metadata(data)
-  declared <- as.character(md$variables_where[!is.na(md$variables_where)])
-  recorded <- as.character(md$coordinate_system)
+  declared <- as.character(unname(md_where_position(md))[
+    !is.na(unname(md_where_position(md)))
+  ])
+  recorded <- as.character(md_field(md, "coordinate_system"))
   # `infer_coordinate_system()` warns on combinations it doesn't
   # recognise; we report the mismatch ourselves below.
   implied <- suppressWarnings(infer_coordinate_system(declared))

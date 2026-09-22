@@ -39,7 +39,7 @@ compute_sampling_gaps <- function(data) {
   if (!is.numeric(bare[[index]])) {
     return(numeric())
   }
-  key <- intersect(c(md$variables_what, md$variables_when), names(bare))
+  key <- intersect(c(md_what_keys(md), md_when_keys(md)), names(bare))
   values <- if (length(key) == 0L) {
     list(bare[[index]])
   } else {
@@ -168,9 +168,9 @@ warn_sampling_rate_mismatch <- function(data) {
   }
 
   md <- get_metadata(data)
-  rate <- md$sampling_rate
+  rate <- md_field(md, "sampling_rate")
   interval <- get_sampling_interval(data)
-  unit <- as.character(md$unit_time)
+  unit <- as.character(md_field(md, "unit_time"))
 
   if (
     is.null(rate) ||

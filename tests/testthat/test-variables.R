@@ -143,8 +143,17 @@ test_that("adding an identity column keeps the other roles intact", {
     dplyr::mutate(id_af(), id = "hi") |> add_variables_what("id")
   )
 
+  before <- unclass(before)
+  after <- unclass(after)
   changed <- names(before)[!mapply(identical, before, after[names(before)])]
-  expect_equal(changed, "variables_what")
+  expect_equal(changed, "variables")
+  expect_equal(
+    setdiff(after$variables$what$keys, before$variables$what$keys),
+    "id"
+  )
+  expect_identical(after$variables$when, before$variables$when)
+  expect_identical(after$variables$where, before$variables$where)
+  expect_identical(after$variables$event, before$variables$event)
 })
 
 # ---- Declaring position ------------------------------------------------

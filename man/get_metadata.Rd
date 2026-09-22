@@ -9,20 +9,29 @@ get_metadata(data, fields = NULL)
 \arguments{
 \item{data}{An aniframe or anievent object.}
 
-\item{fields}{If only specific metadata fields should be returned. A field
-the object does not carry gives \code{NULL}; a name that is not a metadata
-field at all is an error.}
+\item{fields}{Field or category names. A field the object does not
+carry gives \code{NULL} — an \code{\link[=anievent]{anievent()}} has no \code{space} category, so its
+spatial fields read as absent rather than as neutral values. A name
+that is not a metadata field at all is an error.}
 }
 \value{
 The metadata associated with the object.
 }
 \description{
-Get metadata
+The metadata is stored as a category tree (see
+\code{\link[=list_default_metadata]{list_default_metadata()}}), but lookup stays flat: a field is found by
+its own name wherever it lives, and a category name returns the whole
+category. The \code{variables} category is the exception — its slots are
+reached through the \verb{*_variables_*()} accessors, \code{\link[=get_index]{get_index()}} and
+\code{\link[=get_axes]{get_axes()}}, not by flat name.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 names(get_metadata(af))
 
-# A single field can be pulled out by name
+# A single field can be pulled out by name, wherever it lives
 get_metadata(af, 'sampling_rate')
+
+# A category name returns the whole category
+names(get_metadata(af, 'space'))
 }

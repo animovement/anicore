@@ -178,25 +178,23 @@ get_axes <- function(data) {
 #' @keywords internal
 resolve_axes <- function(md) {
   empty <- stats::setNames(character(), character())
-  axes <- md[["axes"]]
+  position <- md_where_position(md)
 
-  if (is.null(axes)) {
-    # Pre-#109: fall back to the historical reading of `variables_where`,
-    # but only when the columns do name a coordinate system.
-    declared <- as.character(md[["variables_where"]])
-    declared <- declared[!is.na(declared)]
-    axes <- normalise_axes(declared)
+  if (length(position) == 0L) {
+    return(empty)
+  }
+
+  if (is.null(names(position))) {
+    # Columns whose roles are unknown: usable as axes only when their
+    # names themselves name a coordinate system.
+    axes <- normalise_axes(position)
     if (identical(infer_coordinate_system(axes), "unknown")) {
       return(empty)
     }
     return(axes)
   }
 
-  axes <- axes[!is.na(axes)]
-  if (length(axes) == 0L || is.null(names(axes))) {
-    return(empty)
-  }
-  stats::setNames(as.character(axes), names(axes))
+  position
 }
 
 

@@ -186,7 +186,7 @@ test_that("variables_when isolates bouts across temporal groups", {
   )
 
   expect_true("observation" %in% names(ae))
-  expect_true("observation" %in% get_metadata(ae, "variables_when"))
+  expect_true("observation" %in% get_variables_when(ae))
   expect_equal(nrow(ae), 4) # REM/wake per clip
 })
 
