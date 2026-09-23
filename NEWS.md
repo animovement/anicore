@@ -8,9 +8,11 @@
 
   The variable roles become lists of named slots — `what$keys`, `when$index` + `when$keys`, `where$position` (the axis-role mapping, absorbing the separate `axes` field), `event$state` + `event$point` — and the frame groups by `c(what$keys, when$keys)`. An anievent's `start`/`stop` get the slot the flat vector could never express, `when$interval`, which is why `get_index()` had to refuse anievents by string comparison before.
 
-  An anievent's spatial "not applicable" is now spelled as an absent `space` category instead of five neutral values (#73): its spatial fields read as `NULL`, and writing one errors. Legacy neutral spellings (`unit_space = "none"`) passed to `as_anievent()` are dropped silently, so readers written against the flat layout keep working.
+  An anievent's spatial "not applicable" is now spelled as an absent `space` category instead of five neutral values (#73): its spatial fields read as `NULL` (`NA` through `get_unit_space()`, `get_unit_angle()` and `get_coordinate_system()`), and writing one errors. Spatial fields passed to `as_anievent()` are dropped silently, so readers written against the flat layout keep working.
 
-  Objects serialised with the flat layout are migrated to the tree the first time their metadata is written — a cast (`as_anipoint()`, `as_anievent()`) or any `set_metadata()` call does it; reads of legacy metadata work either way.
+  Objects serialised with the flat layout are migrated to the tree, with `spec_version` bumped, whenever their metadata is read or written.
+
+  Assigning through the metadata object writes into the tree too, so `md$sampling_rate <- 30; set_metadata(x, metadata = md)` works; an unknown name errors. `names(get_metadata(x))` lists the categories, not the fields. `get_metadata()` with several names returns a plain named list. Setting a field to `NULL` errors; use `NA` for unknown.
 
 * The position-grain frame class is renamed from `aniframe` to `anipoint`, and `aniframe` becomes the abstract parent class shared by every animovement frame (#154). The class vectors are now `c("anipoint", "aniframe", ...)` and `c("anievent", "aniframe", ...)`, so the shared substrate — metadata accessors, dplyr methods, printing — is written once on the parent. The renamed structural-frame family (`anisegment`, `anijoint`) will join it as siblings of `anipoint`.
 

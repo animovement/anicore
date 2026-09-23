@@ -35,9 +35,11 @@ test_that("set_metadata round-trips a custom spec_version list", {
   expect_equal(sv$anievent, "0.2.0")
 })
 
-test_that("ensure_valid_metadata() tolerates metadata missing spec_version", {
+test_that("ensure_valid_metadata() requires a well-formed spec_version", {
   md <- list_default_metadata()
   md$spec_version <- NULL
+  expect_error(ensure_valid_metadata(md), "spec_version")
 
-  expect_no_error(ensure_valid_metadata(md))
+  md$spec_version <- list(aniframe = "junk")
+  expect_error(ensure_valid_metadata(md), "spec_version")
 })

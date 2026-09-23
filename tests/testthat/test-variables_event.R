@@ -41,11 +41,17 @@ test_that("list_default_metadata() includes an event role with empty state and p
   expect_length(event$point, 0)
 })
 
-test_that("ensure_valid_metadata() tolerates metadata missing variables_event", {
-  md <- list_default_metadata()
+test_that("legacy metadata missing variables_event still reads and writes", {
+  af <- legacy_anipoint()
+  md <- attr(af, "metadata")
   md$variables_event <- NULL
+  attr(af, "metadata") <- md
 
-  expect_no_error(ensure_valid_metadata(md))
+  expect_equal(
+    get_variables_event(af),
+    list(state = character(), point = character())
+  )
+  expect_no_error(set_metadata(af, source = "x"))
 })
 
 test_that("ensure_valid_variables_event() returns invisibly on NULL", {

@@ -262,12 +262,13 @@ test_that("re-declaring another role keeps the axis mapping", {
 })
 
 test_that("metadata serialised before the field existed still resolves its axes", {
-  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
-  md <- get_metadata(af)
-  md[["axes"]] <- NULL
+  af <- legacy_anipoint()
+  md <- attr(af, "metadata")
+  md$axes <- NULL
+  attr(af, "metadata") <- md
 
   expect_true(has_all_metadata_fields(md))
-  expect_equal(resolve_axes(md), c(x = "x", y = "y"))
+  expect_equal(get_axes(af), c(x = "x", y = "y"))
 })
 
 test_that("an anievent has no axes", {

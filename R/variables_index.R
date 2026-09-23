@@ -41,7 +41,7 @@ get_index <- function(data) {
     cli::cli_abort(c(
       "An {.cls anievent} has no index column.",
       "i" = "A bout spans an interval, delimited by {.field start} and {.field stop}.",
-      "i" = "Both are in {.field variables_when}; read them with {.fn get_variables_when}."
+      "i" = "Read them with {.fn get_variables_when}."
     ))
   }
   ensure_is_anipoint(data)

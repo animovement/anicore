@@ -4,13 +4,12 @@
 \alias{ensure_valid_metadata}
 \title{Validate a metadata tree}
 \usage{
-ensure_valid_metadata(metadata, space = TRUE)
+ensure_valid_metadata(metadata, class = "anipoint")
 }
 \arguments{
 \item{metadata}{A metadata list in the category layout.}
 
-\item{space}{Whether the \code{space} category is required (\code{TRUE}, the
-anipoint contract) or must be absent (\code{FALSE}, the anievent one).}
+\item{class}{Frame class the metadata belongs to.}
 }
 \value{
 Invisibly \code{TRUE}; errors otherwise.

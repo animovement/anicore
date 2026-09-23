@@ -290,13 +290,10 @@ test_that("connections on different variables coexist", {
 # Defensive paths and input-validation edge cases
 # ------------------------------------------------------------------
 
-test_that("get_connections defensively returns an empty list when the field is NULL", {
-  # Older / externally-constructed metadata may have a NULL connections
-  # field rather than an empty list. Force that state and confirm the
-  # defensive `is.null(current)` branch returns list().
-  data <- mini_aniframe()
+test_that("get_connections returns an empty list on legacy metadata without connections", {
+  data <- legacy_anipoint()
   md <- attr(data, "metadata")
-  md["connections"] <- list(NULL)
+  md$connections <- NULL
   attr(data, "metadata") <- md
 
   expect_equal(get_connections(data), list())

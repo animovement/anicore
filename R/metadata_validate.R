@@ -1,29 +1,116 @@
+#' The metadata layout each frame class must follow
+#'
+#' `space` says whether the class carries the category; `slots` lists the
+#' permitted variable roles and their slots. A new frame class adds a row.
+#'
+#' @param class Frame class name.
+#'
+#' @return A list with `space` (logical) and `slots` (named list).
+#' @keywords internal
+list_metadata_schema <- function(class = c("anipoint", "anievent")) {
+  class <- rlang::arg_match(class)
+  switch(
+    class,
+    anipoint = list(
+      space = TRUE,
+      slots = list(
+        what = "keys",
+        when = c("index", "keys"),
+        where = c("position", "orientation"),
+        event = c("state", "point")
+      )
+    ),
+    anievent = list(
+      space = FALSE,
+      slots = list(
+        what = "keys",
+        when = c("interval", "keys")
+      )
+    )
+  )
+}
+
+
 #' Validate a metadata tree
 #'
 #' @param metadata A metadata list in the category layout.
-#' @param space Whether the `space` category is required (`TRUE`, the
-#'   anipoint contract) or must be absent (`FALSE`, the anievent one).
+#' @param class Frame class the metadata belongs to.
 #'
 #' @return Invisibly `TRUE`; errors otherwise.
 #' @keywords internal
-ensure_valid_metadata <- function(metadata, space = TRUE) {
+ensure_valid_metadata <- function(metadata, class = "anipoint") {
+  schema <- list_metadata_schema(class)
   ensure_is_list(metadata)
   ensure_has_all_metadata_fields(metadata)
 
-  if (isTRUE(space) && !"space" %in% names(metadata)) {
+  unknown <- setdiff(
+    names(metadata),
+    c("spec_version", list_metadata_categories())
+  )
+  if (length(unknown) > 0L) {
     cli::cli_abort(
-      "The metadata carries no {.field space} category, which an {.cls anipoint} requires."
+      "Unknown metadata {cli::qty(unknown)}entr{?y/ies}: {.val {unknown}}."
     )
   }
-  if (!isTRUE(space) && "space" %in% names(metadata)) {
+
+  if (schema$space && !"space" %in% names(metadata)) {
+    cli::cli_abort(
+      "The metadata carries no {.field space} category, which an {.cls {class}} requires."
+    )
+  }
+  if (!schema$space && "space" %in% names(metadata)) {
     cli::cli_abort(c(
-      "An {.cls anievent} has no spatial component, so its metadata must not carry a {.field space} category (#73).",
+      "An {.cls {class}} has no spatial component, so its metadata must not carry a {.field space} category (#73).",
       "i" = "Position lives on the {.cls anipoint} it was encoded from."
     ))
   }
 
+  ensure_valid_spec_version(metadata[["spec_version"]])
+  ensure_known_metadata_fields(metadata)
+  if (!is.list(metadata[["structure"]])) {
+    cli::cli_abort("The {.field structure} category must be a list.")
+  }
   ensure_valid_metadata_types(metadata)
-  ensure_valid_metadata_variables(metadata)
+  ensure_valid_metadata_variables(metadata, schema$slots)
+}
+
+
+#' @keywords internal
+ensure_valid_spec_version <- function(x) {
+  ok <- is.list(x) &&
+    length(x) > 0L &&
+    !is.null(names(x)) &&
+    all(vapply(
+      x,
+      function(v) {
+        is.character(v) && length(v) == 1L && grepl("^\\d+\\.\\d+\\.\\d+$", v)
+      },
+      logical(1)
+    ))
+  if (!ok) {
+    cli::cli_abort(
+      "{.field spec_version} must be a named list of version strings like {.val 3.0.0}."
+    )
+  }
+  invisible(TRUE)
+}
+
+
+#' @keywords internal
+ensure_known_metadata_fields <- function(metadata) {
+  categories <- list_metadata_field_categories()
+  for (category in c("recording", "time", "space")) {
+    unknown <- setdiff(
+      names(metadata[[category]]),
+      names(categories)[categories == category]
+    )
+    if (length(unknown) > 0L) {
+      cli::cli_abort(
+        "Unknown {.field {category}} field{?s}: {.val {unknown}}."
+      )
+    }
+  }
+  invisible(TRUE)
 }
 
 
@@ -206,23 +293,16 @@ ensure_valid_metadata_types <- function(metadata) {
 # ------------------------------------------------------------------
 # Is the variables category well-shaped?
 # ------------------------------------------------------------------
-# Roles are lists of named slots; every slot is a character vector. The
-# closed sets: roles from (what, when, where, event); slots per role as
-# below. `where$position` may carry names (axis roles) or not (columns
-# whose roles are unknown).
-ensure_valid_metadata_variables <- function(metadata) {
+ensure_valid_metadata_variables <- function(
+  metadata,
+  known_slots = list_metadata_schema("anipoint")$slots
+) {
   variables <- metadata[["variables"]]
-  if (!is.list(variables)) {
+  if (!is.list(variables) || !all(c("what", "when") %in% names(variables))) {
     cli::cli_abort(
-      "The {.field variables} category must be a list of roles."
+      "The {.field variables} category must be a list of roles including {.field what} and {.field when}."
     )
   }
-  known_slots <- list(
-    what = "keys",
-    when = c("index", "interval", "keys"),
-    where = c("position", "orientation"),
-    event = c("state", "point")
-  )
   unknown_roles <- setdiff(names(variables), names(known_slots))
   if (length(unknown_roles) > 0L) {
     cli::cli_abort(
@@ -248,6 +328,12 @@ ensure_valid_metadata_variables <- function(metadata) {
         "Every slot of the {.field {role}} role must be a character vector."
       )
     }
+  }
+  overlap <- intersect(variables$when$index, variables$when$keys)
+  if (length(overlap) > 0L) {
+    cli::cli_abort(
+      "The index {.val {overlap}} cannot also be a {.field when} key."
+    )
   }
   invisible(TRUE)
 }

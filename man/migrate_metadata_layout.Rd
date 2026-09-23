@@ -4,18 +4,18 @@
 \alias{migrate_metadata_layout}
 \title{Migrate a legacy flat metadata list to the category layout}
 \usage{
-migrate_metadata_layout(md)
+migrate_metadata_layout(md, anievent = NULL)
 }
 \arguments{
 \item{md}{A metadata list, flat or nested.}
+
+\item{anievent}{Whether the metadata belongs to an anievent. \code{NULL}
+infers it from a \code{start}/\code{stop} interval in \code{variables_when}.}
 }
 \value{
 The metadata in the nested layout.
 }
 \description{
-The write path runs every incoming metadata list through this, so an
-object serialised before the categories existed is migrated the first
-time it is written to. Already-nested metadata passes through
-untouched.
+Already-nested metadata passes through untouched.
 }
 \keyword{internal}

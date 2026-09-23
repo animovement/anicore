@@ -127,7 +127,7 @@ as_anievent.data.frame <- function(
   # variable setters use, so construction and re-declaration can't drift
   # apart (#82).
   data <- new_anievent(data)
-  data <- set_metadata(data, metadata = drop_neutral_spatial_metadata(metadata))
+  data <- set_metadata(data, metadata = drop_spatial_metadata(metadata))
   data <- restructure_anievent(data, variables_what, variables_when)
 
   data
@@ -208,38 +208,19 @@ standardise_anievent_cols <- function(data, variables_what, variables_when) {
 }
 
 
-#' Drop legacy neutral spellings of the spatial metadata fields
+#' Drop spatial metadata an anievent cannot carry
 #'
-#' An anievent shares the metadata substrate with [anipoint()] but has no
-#' spatial component: a stream of behavioural events has no axes, no
-#' reference frame and no angular unit. The flat layout expressed that as
-#' five neutral values (#73); the category tree expresses it as an absent
-#' `space` category, so all this has to do is tolerate metadata that
-#' still spells the absence the old way.
+#' Readers and older code pass spatial fields (often the old neutral
+#' spellings, #73); an anievent has no `space` category, so they are
+#' dropped rather than refused.
 #'
 #' @param metadata Metadata supplied by the caller.
 #'
-#' @return `metadata`, with legacy neutral spatial fields dropped.
+#' @return `metadata` without spatial fields.
 #' @keywords internal
-drop_neutral_spatial_metadata <- function(metadata) {
-  neutral <- list(
-    unit_space = "none",
-    unit_angle = "none",
-    reference_frame = "none",
-    coordinate_system = "unknown",
-    axis_directions = stats::setNames(character(), character()),
-    axis_extents = stats::setNames(numeric(), character())
-  )
-
-  for (field in names(neutral)) {
-    value <- metadata[[field]]
-    if (is.null(value)) {
-      next
-    }
-    if (identical(as.character(value), as.character(neutral[[field]]))) {
-      metadata[[field]] <- NULL
-    }
-  }
-
-  metadata
+drop_spatial_metadata <- function(metadata) {
+  metadata <- unclass(metadata)
+  categories <- list_metadata_field_categories()
+  spatial <- c("space", names(categories)[categories == "space"])
+  metadata[setdiff(names(metadata), spatial)]
 }

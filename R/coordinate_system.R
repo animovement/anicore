@@ -33,7 +33,7 @@
 #' @export
 get_coordinate_system <- function(data) {
   ensure_is_aniframe(data)
-  as.character(get_metadata(data, "coordinate_system"))
+  as.character(get_metadata(data, "coordinate_system") %||% NA_character_)
 }
 
 

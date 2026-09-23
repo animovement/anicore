@@ -118,6 +118,43 @@ md_field <- function(md, field) {
   .subset2(x, i)
 }
 
+#' @rdname cash-.aniframe_metadata
+#' @param value The value to write.
+#' @keywords internal
+#' @export
+`$<-.aniframe_metadata` <- function(x, name, value) {
+  set_metadata_entry(x, name, value)
+}
+
+#' @rdname cash-.aniframe_metadata
+#' @keywords internal
+#' @export
+`[[<-.aniframe_metadata` <- function(x, i, ..., value) {
+  if (is.character(i) && length(i) == 1L) {
+    return(set_metadata_entry(x, i, value))
+  }
+  cls <- class(x)
+  x <- unclass(x)
+  x[[i]] <- value
+  class(x) <- cls
+  x
+}
+
+#' Write a category or flat field on the classed metadata object
+#'
+#' @keywords internal
+set_metadata_entry <- function(md, name, value) {
+  cls <- class(md)
+  md <- unclass(md)
+  if (name %in% c("spec_version", list_metadata_categories())) {
+    md[[name]] <- value
+  } else {
+    md <- md_field_set(md, name, value)
+  }
+  class(md) <- cls
+  md
+}
+
 
 #' Write one flat-addressable field into a metadata list
 #'
@@ -182,13 +219,14 @@ md_variables <- function(md) {
     when = if (length(interval) == 2L) {
       list(interval = interval, keys = setdiff(when_cols, interval))
     } else {
-      list(index = resolve_index(md), keys = when_cols)
+      # Before #109 the index sat in variables_when.
+      index <- resolve_index(md)
+      list(index = index, keys = setdiff(when_cols, index))
     },
-    where = list(position = legacy_where_position(md))
+    where = list(position = legacy_where_position(md)),
+    event = md[["variables_event"]] %||%
+      list(state = character(), point = character())
   )
-  if (!is.null(md[["variables_event"]])) {
-    variables$event <- md[["variables_event"]]
-  }
   variables
 }
 
@@ -244,38 +282,38 @@ md_where_position <- function(md) {
 
 #' Migrate a legacy flat metadata list to the category layout
 #'
-#' The write path runs every incoming metadata list through this, so an
-#' object serialised before the categories existed is migrated the first
-#' time it is written to. Already-nested metadata passes through
-#' untouched.
+#' Already-nested metadata passes through untouched.
 #'
 #' @param md A metadata list, flat or nested.
+#' @param anievent Whether the metadata belongs to an anievent. `NULL`
+#'   infers it from a `start`/`stop` interval in `variables_when`.
 #'
 #' @return The metadata in the nested layout.
 #' @keywords internal
-migrate_metadata_layout <- function(md) {
+migrate_metadata_layout <- function(md, anievent = NULL) {
   if (is_nested_metadata(md)) {
     return(md)
   }
+  md <- unclass(md)
 
   variables <- md_variables(md)
-  spatial <- length(legacy_where_position(md)) > 0L ||
-    !identical(as.character(md[["unit_space"]] %||% "none"), "none")
+  anievent <- anievent %||% (length(variables$when$interval) == 2L)
+  class <- if (anievent) "anievent" else "anipoint"
 
-  out <- list(spec_version = md[["spec_version"]])
+  out <- list(
+    spec_version = unclass(list_default_metadata(class))[["spec_version"]]
+  )
   categories <- list_metadata_field_categories()
   for (category in c("recording", "time", "space")) {
     fields <- names(categories)[categories == category]
-    present <- fields[fields %in% names(md)]
-    out[[category]] <- md[present]
+    out[[category]] <- md[intersect(fields, names(md))]
   }
   out$variables <- variables
   out$structure <- md[["connections"]] %||% list()
 
-  # An anievent's flat metadata spelled "no spatial component" as five
-  # neutral values; the nested layout spells it as an absent category.
-  if (!spatial && length(md_when_interval(md)) == 2L) {
+  if (anievent) {
     out$space <- NULL
+    out$variables <- variables[c("what", "when")]
   }
 
   class(out) <- "aniframe_metadata"

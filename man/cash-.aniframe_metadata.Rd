@@ -3,16 +3,24 @@
 \name{$.aniframe_metadata}
 \alias{$.aniframe_metadata}
 \alias{[[.aniframe_metadata}
+\alias{$<-.aniframe_metadata}
+\alias{[[<-.aniframe_metadata}
 \title{Flat resolution for \code{$} and \code{[[} on the classed metadata object}
 \usage{
 \method{$}{aniframe_metadata}(x, name)
 
 \method{[[}{aniframe_metadata}(x, i, ...)
+
+\method{$}{aniframe_metadata}(x, name) <- value
+
+\method{[[}{aniframe_metadata}(x, i, ...) <- value
 }
 \arguments{
 \item{x}{An \code{aniframe_metadata} object.}
 
 \item{name, i}{The entry to read.}
+
+\item{value}{The value to write.}
 }
 \value{
 The entry's value, or \code{NULL}.

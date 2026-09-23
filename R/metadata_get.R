@@ -27,15 +27,19 @@
 get_metadata <- function(data, fields = NULL) {
   ensure_has_metadata(data)
   ensure_are_metadata_fields(fields)
-  x <- attr(data, "metadata")
+  x <- migrate_metadata_layout(
+    attr(data, "metadata"),
+    anievent = is_anievent(data)
+  )
   if (!is.null(fields) && length(fields) == 1) {
     x <- get_metadata_entry(x, fields)
   } else if (!is.null(fields) && length(fields) > 1) {
+    # A plain list: the selection is not a tree, so `$` must not resolve
+    # through categories.
     x <- stats::setNames(
       lapply(fields, function(field) get_metadata_entry(x, field)),
       fields
     )
-    class(x) <- c("aniframe_metadata", "list")
   } else {
     class(x) <- c("aniframe_metadata", "list")
   }

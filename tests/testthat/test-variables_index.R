@@ -132,15 +132,14 @@ test_that("set_metadata() refuses the index and names its setter", {
 })
 
 test_that("metadata serialised before the field existed reads back as time", {
-  # `variables_index` is optional precisely so that objects written by
-  # earlier versions still validate. They were built when a column named
-  # `time` was mandatory, so that is what they are indexed by.
-  af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
-  md <- get_metadata(af)
-  md[["variables_index"]] <- NULL
+  # Before #109 the index sat in variables_when.
+  af <- legacy_anipoint(variables_when = "time")
+  md <- attr(af, "metadata")
+  md$variables_index <- NULL
+  attr(af, "metadata") <- md
 
-  expect_true(has_all_metadata_fields(md))
-  expect_equal(resolve_index(md), "time")
+  expect_equal(get_index(af), "time")
+  expect_equal(get_variables_when(af), character())
 })
 
 

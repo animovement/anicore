@@ -12,13 +12,13 @@ test_that("get_metadata() returns a single value when fields is a length-1 vecto
   expect_equal(get_metadata(data, "sampling_rate"), 30)
 })
 
-test_that("get_metadata() returns a sub-list when fields has length > 1", {
+test_that("get_metadata() returns a plain list when fields has length > 1", {
   data <- example_anipoint() |>
     set_metadata(sampling_rate = 30, source = "test")
 
   sub <- get_metadata(data, c("sampling_rate", "source"))
 
-  expect_s3_class(sub, "aniframe_metadata")
+  expect_false(inherits(sub, "aniframe_metadata"))
   expect_named(sub, c("sampling_rate", "source"), ignore.order = TRUE)
   expect_equal(sub$sampling_rate, 30)
   expect_equal(sub$source, "test")

@@ -530,7 +530,7 @@ test_that("an anievent does not claim a spatial layout it cannot have", {
   expect_equal(get_handedness(ae), "unknown")
 })
 
-test_that("legacy neutral spatial values are tolerated, real ones refused", {
+test_that("spatial metadata passed to an anievent is dropped", {
   build <- function(metadata) {
     anievent(
       individual = 1L,
@@ -542,13 +542,12 @@ test_that("legacy neutral spatial values are tolerated, real ones refused", {
     )
   }
 
-  # The old spelling of "not applicable" is dropped silently, so readers
-  # written against the flat layout keep working.
   ae <- build(list(unit_space = "none", coordinate_system = "unknown"))
   expect_null(get_metadata(ae, "space"))
 
-  # A real spatial claim has nowhere to go on an anievent.
-  expect_error(build(list(unit_space = "mm")), "space")
+  ae <- build(list(unit_space = "mm", handedness = "unknown", source = "x"))
+  expect_null(get_metadata(ae, "space"))
+  expect_equal(get_metadata(ae, "source"), "x")
 })
 
 test_that("an aniframe keeps its movement defaults", {

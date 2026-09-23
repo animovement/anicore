@@ -13,8 +13,11 @@
 #' @return `data`, with `metadata` attached.
 #' @keywords internal
 write_metadata <- function(data, metadata) {
-  metadata <- migrate_metadata_layout(metadata)
-  ensure_valid_metadata(metadata, space = !is_anievent(data))
+  metadata <- migrate_metadata_layout(metadata, anievent = is_anievent(data))
+  ensure_valid_metadata(
+    metadata,
+    class = if (is_anievent(data)) "anievent" else "anipoint"
+  )
   ensure_valid_variables_event(md_event(metadata))
   attach_metadata(data, metadata)
 }
@@ -186,6 +189,13 @@ set_metadata <- function(data, ..., metadata = NULL) {
   ensure_no_declaration_fields(user_md)
   ensure_no_category_fields(user_md)
   ensure_are_metadata_fields(names(user_md))
+  is_null <- vapply(user_md, is.null, logical(1))
+  if (any(is_null)) {
+    cli::cli_abort(c(
+      "Metadata fields cannot be set to {.code NULL}: {.field {names(user_md)[is_null]}}.",
+      "i" = "Use {.code NA} to mark a field as unknown."
+    ))
+  }
 
   # ------------------------------------------------------------------
   # Convert character values to factors where appropriate
@@ -222,7 +232,10 @@ set_metadata <- function(data, ..., metadata = NULL) {
       list_default_metadata()
     }
   } else {
-    new_md <- migrate_metadata_layout(attr(data, "metadata"))
+    new_md <- migrate_metadata_layout(
+      attr(data, "metadata"),
+      anievent = is_anievent(data)
+    )
   }
 
   # ------------------------------------------------------------------

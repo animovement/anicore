@@ -242,9 +242,8 @@ test_that("the validator enforces space presence by class", {
   md <- unclass(get_metadata(af()))
   no_space <- md[setdiff(names(md), "space")]
 
-  expect_error(ensure_valid_metadata(no_space, space = TRUE), "requires")
-  expect_error(ensure_valid_metadata(md, space = FALSE), "must not carry")
-  expect_no_error(ensure_valid_metadata(no_space, space = FALSE))
+  expect_error(ensure_valid_metadata(no_space, "anipoint"), "requires")
+  expect_error(ensure_valid_metadata(md, "anievent"), "must not carry")
 })
 
 test_that("a missing mandatory leaf fails the type check", {
@@ -280,4 +279,105 @@ test_that("the variables shape is validated", {
 
 test_that("set_metadata() points connections writes at set_connections", {
   expect_error(set_metadata(af(), connections = list()), "set_connections")
+})
+
+# ---- Legacy flat metadata ------------------------------------------------
+
+test_that("category reads work on legacy flat metadata", {
+  af <- legacy_anipoint(sampling_rate = 25)
+  expect_equal(get_metadata(af, "time")$sampling_rate, 25)
+  expect_equal(get_metadata(af)$sampling_rate, 25)
+})
+
+test_that("setters that edit the variables work on legacy flat metadata", {
+  af <- legacy_anipoint(sampling_rate = 25)
+
+  x <- set_index(dplyr::mutate(af, frame = time), "frame")
+  expect_equal(get_index(x), "frame")
+  expect_equal(get_metadata(x, "sampling_rate"), 25)
+
+  x <- set_variables_event(dplyr::mutate(af, b = "a"), state = "b")
+  expect_equal(get_variables_event(x)$state, "b")
+
+  x <- suppressWarnings(set_connections(af, list(c("head", "tail"))))
+  expect_length(get_connections(x), 1)
+})
+
+test_that("migration bumps spec_version", {
+  x <- set_metadata(legacy_anipoint(), source = "new")
+  expect_equal(
+    get_metadata(x, "spec_version"),
+    unclass(list_default_metadata())$spec_version
+  )
+})
+
+test_that("a pre-#73 anievent with spatial fields migrates and stays writable", {
+  ae <- legacy_anievent()
+  expect_null(get_metadata(ae, "space"))
+
+  ae <- set_metadata(ae, source = "q")
+  expect_equal(get_metadata(ae, "source"), "q")
+  expect_false("space" %in% names(unclass(attr(ae, "metadata"))))
+})
+
+test_that("to_anievent() works from an anipoint with legacy metadata", {
+  af <- legacy_anipoint(sampling_rate = 25)
+  af <- set_variables_event(dplyr::mutate(af, b = "r"), state = "b")
+  expect_equal(get_metadata(to_anievent(af), "sampling_rate"), 25)
+})
+
+# ---- Writes through the metadata object ----------------------------------
+
+test_that("$<- and [[<- on the metadata object write into the tree", {
+  md <- get_metadata(af())
+  md$sampling_rate <- 99
+  md[["unit_space"]] <- factor("mm", levels = levels(md$unit_space))
+
+  x <- set_metadata(af(), metadata = md)
+  expect_equal(get_metadata(x, "sampling_rate"), 99)
+  expect_equal(get_unit_space(x), "mm")
+  expect_error(md$not_a_field <- 1, "not a metadata field")
+})
+
+test_that("a selection mixing a category and a field resolves by name", {
+  x <- set_metadata(af(), sampling_rate = 30)
+  expect_equal(get_metadata(x, c("space", "sampling_rate"))$sampling_rate, 30)
+})
+
+test_that("set_metadata() refuses NULL", {
+  expect_error(set_metadata(af(), sampling_rate = NULL), "NULL")
+})
+
+test_that("get_coordinate_system() is NA on an anievent", {
+  expect_identical(get_coordinate_system(ae()), NA_character_)
+})
+
+# ---- Schema ---------------------------------------------------------------
+
+test_that("the validator rejects entries outside the schema", {
+  md <- unclass(get_metadata(af()))
+
+  bad <- md
+  bad$bogus <- list()
+  expect_error(ensure_valid_metadata(bad), "Unknown metadata")
+
+  bad <- md
+  bad$time$foo <- 1
+  expect_error(ensure_valid_metadata(bad), "Unknown")
+
+  bad <- md
+  bad$variables$when$interval <- c("start", "stop")
+  expect_error(ensure_valid_metadata(bad), "Unknown slot")
+
+  bad <- md
+  bad$variables$when$keys <- "time"
+  expect_error(ensure_valid_metadata(bad), "cannot also be")
+
+  bad <- md
+  bad$structure <- "x"
+  expect_error(ensure_valid_metadata(bad), "structure")
+
+  ev <- unclass(get_metadata(ae()))
+  ev$variables$where <- list(position = "x")
+  expect_error(ensure_valid_metadata(ev, "anievent"), "Unknown variable role")
 })
