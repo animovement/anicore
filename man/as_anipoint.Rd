@@ -57,7 +57,9 @@ numeric; it may be called anything.}
 
 \item{root}{For an \code{\link[=as_anisegment]{as_anisegment()}} frame: an anipoint holding the root
 point's trajectory, such as the frame the segments came from. The other
-points are rebuilt by walking the structure's segments outward from it.}
+points are rebuilt by walking the structure's segments outward from it,
+so edits to the segments (such as constant lengths) carry into the
+positions.}
 }
 \value{
 An anipoint object

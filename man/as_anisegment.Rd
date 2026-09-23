@@ -27,7 +27,10 @@ those over the remaining keys are kept. A \code{confidence} column becomes the
 lower of the two endpoints' values; other undeclared columns are
 dropped.
 
-\code{\link[=as_anipoint]{as_anipoint()}} inverts the conversion given the root point's trajectory.
+\code{\link[=as_anipoint]{as_anipoint()}} rebuilds positions from the segments, anchored at the
+root point's trajectory. That is useful after editing the segments — for
+example holding each segment's length constant — since every point but
+the root then moves to agree with them.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1) |>
@@ -35,8 +38,10 @@ af <- example_anipoint(n_obs = 3, n_individuals = 1) |>
 seg <- as_anisegment(af)
 seg
 
-# Round trip, given the root's trajectory
-back <- as_anipoint(seg, root = af)
+# Hold each segment's length constant, then rebuild the positions
+rigid <- seg |>
+  dplyr::mutate(length = stats::median(length))
+rebuilt <- as_anipoint(rigid, root = af)
 
 }
 \seealso{

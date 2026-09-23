@@ -118,13 +118,20 @@ seg |>
   head()
 ```
 
-Positions are rebuilt by walking the segments outward from the
-structure's `root`, which needs the root point's trajectory:
+Editing the segments and rebuilding the positions carries the edit into
+every point but the root. Holding each segment at its median length makes
+the body rigid:
 
 ```{r}
-back <- as_anipoint(seg, root = skeleton)
-back
+rigid <- seg |>
+  dplyr::mutate(length = stats::median(length)) |>
+  as_anipoint(root = skeleton)
+rigid
 ```
+
+The rebuild walks the segments outward from the structure's `root`, so it
+needs the root point's trajectory; `root` can be the frame the segments
+came from.
 
 ## From segments to joints
 
