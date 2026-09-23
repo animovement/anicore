@@ -105,10 +105,8 @@ ensure_valid_axis_roles <- function(axes) {
 
 #' The axis roles of an anipoint, and the columns carrying them
 #'
-#' Where [get_variables_where()] gives the column names, this gives what
-#' each of them *means*. Index by role to write a transformation that does
-#' not care what the columns are called:
-#' `data[[get_axes(data)[["x"]]]]`.
+#' The `where$position` slot. Index by role to write a transformation that
+#' does not care what the columns are called: `data[[get_axes(data)[["x"]]]]`.
 #'
 #' @param data An anipoint object.
 #'
@@ -125,8 +123,7 @@ ensure_valid_axis_roles <- function(axes) {
 #' get_axes(renamed)
 #' get_metadata(renamed, "coordinate_system")
 #'
-#' @seealso [set_axes()] to change it, [get_variables_where()] for the
-#'   columns without their roles.
+#' @seealso [set_variables()] to change it.
 #' @export
 get_axes <- function(data) {
   ensure_is_anipoint(data)
@@ -188,47 +185,4 @@ warn_shadowed_axis_roles <- function(axes, columns) {
   }
 
   invisible(TRUE)
-}
-
-
-#' Declare which column carries which axis role
-#'
-#' The mapping decides the `coordinate_system` and is what spatial
-#' transformations index by, so — like the `variables_*` declarations — it
-#' is not reachable through [set_metadata()] and has its own setter, which
-#' restructures the frame too.
-#'
-#' The direction is role to column, the same way round as [get_axes()]
-#' returns it and as [dplyr::rename()] reads, so `set_axes(af, get_axes(af))`
-#' does nothing.
-#'
-#' @param data An anipoint object.
-#' @param axes Named character vector: names are axis roles, values are the
-#'   columns carrying them. The roles must form a coordinate system, and
-#'   every column must exist in `data`.
-#'
-#' @return `data`, re-declared and restructured.
-#'
-#' @examples
-#' df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
-#' af <- as_anipoint(df, variables_where = c("u", "v"))
-#' get_metadata(af, "coordinate_system")
-#'
-#' af <- set_axes(af, c(x = "u", y = "v"))
-#' get_axes(af)
-#' get_metadata(af, "coordinate_system")
-#'
-#' @seealso [get_axes()]
-#' @export
-set_axes <- function(data, axes) {
-  ensure_is_anipoint(data)
-  ensure_variables_character(axes)
-  if (!has_axis_roles(axes)) {
-    cli::cli_abort(c(
-      "{.arg axes} must name an axis role for every column.",
-      "i" = "For example {.code c(x = \"u\", y = \"v\")}.",
-      "i" = "To declare spatial columns without roles, use {.fn set_variables_where}."
-    ))
-  }
-  declare_variables(data, "where", axes)
 }

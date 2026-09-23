@@ -32,7 +32,7 @@ test_that("dropping a declared spatial column is caught", {
   dropped <- dplyr::select(make_flat_af(), -x)
 
   expect_true(is_aniframe(dropped))
-  expect_equal(get_variables_where(dropped), c("x", "y"))
+  expect_equal(get_variables(dropped, "where"), c("x", "y"))
   expect_error(validate_anipoint(dropped), "x")
 })
 

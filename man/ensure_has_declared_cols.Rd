@@ -11,7 +11,7 @@ ensure_has_declared_cols(data, cols, role)
 
 \item{cols}{Character vector of declared column names.}
 
-\item{role}{One of \code{"what"}, \code{"when"}, \code{"where"}.}
+\item{role}{One of \code{"what"}, \code{"when"}, \code{"where"}, \code{"event"}.}
 }
 \value{
 \code{TRUE}, invisibly.

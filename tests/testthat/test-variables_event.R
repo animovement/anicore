@@ -39,7 +39,7 @@ test_that("legacy metadata missing variables_event still reads and writes", {
   attr(af, "metadata") <- md
 
   expect_equal(
-    get_variables_event(af),
+    get_variables(af)$event,
     list(state = character(), point = character())
   )
   expect_no_error(set_metadata(af, source = "x"))
@@ -70,44 +70,53 @@ test_that("normalise_variables_event passes non-list input through untouched", {
 
 # ---- set / get ---------------------------------------------------------
 
-test_that("set_variables_event declares both sides and reads back", {
-  af <- set_variables_event(event_af(), state = "behaviour", point = "call")
+test_that("set_variables declares both event slots sides and reads back", {
+  af <- set_variables(
+    event_af(),
+    event = list(state = "behaviour", point = "call")
+  )
 
   expect_equal(
-    get_variables_event(af),
+    get_variables(af)$event,
     list(state = "behaviour", point = "call")
   )
 })
 
-test_that("set_variables_event replaces the named side, leaving the other", {
+test_that("set_variables replaces the named event slot, leaving the other", {
   # Otherwise the other side's columns would silently stop being encoded.
   af <- event_af() |>
     dplyr::mutate(did_stuff = factor("yes")) |>
-    set_variables_event(state = "behaviour", point = "call")
+    set_variables(event = list(state = "behaviour", point = "call"))
 
-  swapped <- set_variables_event(af, state = "did_stuff")
-  expect_equal(get_variables_event(swapped)$state, "did_stuff")
-  expect_equal(get_variables_event(swapped)$point, "call")
+  swapped <- set_variables(af, event = list(state = "did_stuff"))
+  expect_equal(get_variables(swapped)$event$state, "did_stuff")
+  expect_equal(get_variables(swapped)$event$point, "call")
 
-  swapped_point <- set_variables_event(af, point = character())
-  expect_equal(get_variables_event(swapped_point)$state, "behaviour")
-  expect_length(get_variables_event(swapped_point)$point, 0)
+  swapped_point <- set_variables(af, event = list(point = character()))
+  expect_equal(get_variables(swapped_point)$event$state, "behaviour")
+  expect_length(get_variables(swapped_point)$event$point, 0)
 })
 
 test_that("clearing a side is explicit, and naming neither is a no-op", {
-  af <- set_variables_event(event_af(), state = "behaviour", point = "call")
+  af <- set_variables(
+    event_af(),
+    event = list(state = "behaviour", point = "call")
+  )
 
-  expect_equal(get_variables_event(set_variables_event(af)), {
-    get_variables_event(af)
+  expect_equal(get_variables(set_variables(af, event = list()))$event, {
+    get_variables(af)$event
   })
 
-  cleared <- set_variables_event(af, state = character(), point = character())
-  expect_length(get_variables_event(cleared)$state, 0)
-  expect_length(get_variables_event(cleared)$point, 0)
+  cleared <- set_variables(
+    af,
+    event = list(state = character(), point = character())
+  )
+  expect_length(get_variables(cleared)$event$state, 0)
+  expect_length(get_variables(cleared)$event$point, 0)
 })
 
-test_that("get_variables_event returns both sides on an undeclared frame", {
-  declared <- get_variables_event(event_af())
+test_that("get_variables returns both event slots on an undeclared frame", {
+  declared <- get_variables(event_af())$event
 
   expect_named(declared, c("state", "point"))
   expect_length(declared$state, 0)
@@ -117,46 +126,49 @@ test_that("get_variables_event returns both sides on an undeclared frame", {
 test_that("multiple state columns are kept in the order given", {
   af <- event_af() |>
     dplyr::mutate(posture = factor("upright")) |>
-    set_variables_event(state = c("behaviour", "posture"))
+    set_variables(event = list(state = c("behaviour", "posture")))
 
-  expect_equal(get_variables_event(af)$state, c("behaviour", "posture"))
+  expect_equal(get_variables(af)$event$state, c("behaviour", "posture"))
 })
 
 # ---- add / remove ------------------------------------------------------
 
-test_that("add_variables_event appends to one side, leaving the other", {
+test_that("add_variables appends to one event slot, leaving the other", {
   af <- event_af() |>
-    set_variables_event(state = "behaviour") |>
-    add_variables_event(point = "call")
+    set_variables(event = list(state = "behaviour")) |>
+    add_variables(event = list(point = "call"))
 
-  expect_equal(get_variables_event(af)$state, "behaviour")
-  expect_equal(get_variables_event(af)$point, "call")
+  expect_equal(get_variables(af)$event$state, "behaviour")
+  expect_equal(get_variables(af)$event$point, "call")
 })
 
-test_that("add_variables_event appends within a side without restating", {
+test_that("add_variables appends within an event slot without restating", {
   af <- event_af() |>
     dplyr::mutate(posture = factor("upright")) |>
-    set_variables_event(state = "behaviour") |>
-    add_variables_event(state = "posture")
+    set_variables(event = list(state = "behaviour")) |>
+    add_variables(event = list(state = "posture"))
 
-  expect_equal(get_variables_event(af)$state, c("behaviour", "posture"))
+  expect_equal(get_variables(af)$event$state, c("behaviour", "posture"))
 })
 
-test_that("remove_variables_event drops from whichever side holds it", {
-  af <- set_variables_event(event_af(), state = "behaviour", point = "call")
+test_that("remove_variables drops an event column from whichever side holds it", {
+  af <- set_variables(
+    event_af(),
+    event = list(state = "behaviour", point = "call")
+  )
 
-  no_state <- remove_variables_event(af, "behaviour")
-  expect_length(get_variables_event(no_state)$state, 0)
-  expect_equal(get_variables_event(no_state)$point, "call")
+  no_state <- remove_variables(af, event = "behaviour")
+  expect_length(get_variables(no_state)$event$state, 0)
+  expect_equal(get_variables(no_state)$event$point, "call")
 
-  no_point <- remove_variables_event(af, "call")
-  expect_equal(get_variables_event(no_point)$state, "behaviour")
-  expect_length(get_variables_event(no_point)$point, 0)
+  no_point <- remove_variables(af, event = "call")
+  expect_equal(get_variables(no_point)$event$state, "behaviour")
+  expect_length(get_variables(no_point)$event$point, 0)
 })
 
 test_that("removing a declaration leaves the column in place", {
-  af <- set_variables_event(event_af(), state = "behaviour")
-  dropped <- remove_variables_event(af, "behaviour")
+  af <- set_variables(event_af(), event = list(state = "behaviour"))
+  dropped <- remove_variables(af, event = "behaviour")
 
   expect_true("behaviour" %in% names(dropped))
 })
@@ -165,22 +177,25 @@ test_that("removing a declaration leaves the column in place", {
 
 test_that("declaring a column that does not exist errors", {
   expect_error(
-    set_variables_event(event_af(), state = "grooming"),
+    set_variables(event_af(), event = list(state = "grooming")),
     "Event variable"
   )
   expect_error(
-    set_variables_event(event_af(), state = "grooming"),
+    set_variables(event_af(), event = list(state = "grooming")),
     "grooming"
   )
   expect_error(
-    add_variables_event(event_af(), point = "whistle"),
+    add_variables(event_af(), event = list(point = "whistle")),
     "not found in data"
   )
 })
 
 test_that("a column cannot be both state and point", {
   expect_error(
-    set_variables_event(event_af(), state = "behaviour", point = "behaviour"),
+    set_variables(
+      event_af(),
+      event = list(state = "behaviour", point = "behaviour")
+    ),
     "both a state and a point"
   )
 })
@@ -188,31 +203,40 @@ test_that("a column cannot be both state and point", {
 test_that("a non-character declaration errors", {
   af <- event_af()
 
-  expect_error(add_variables_event(af, state = 1), "must be a character")
-  expect_error(add_variables_event(af, point = 1), "must be a character")
-  expect_error(remove_variables_event(af, 1), "must be a character")
   expect_error(
-    set_variables_event(af, state = 1:3),
-    "must be character vectors"
+    add_variables(af, event = list(state = 1)),
+    "must be a character"
+  )
+  expect_error(
+    add_variables(af, event = list(point = 1)),
+    "must be a character"
+  )
+  expect_error(
+    remove_variables(af, event = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    set_variables(af, event = list(state = 1:3)),
+    "must be a character vector"
   )
 })
 
 test_that("either side can be declared on its own (#76)", {
   # The other side is empty because it already was, not because it's cleared.
-  state_only <- set_variables_event(event_af(), state = "behaviour")
-  expect_equal(get_variables_event(state_only)$state, "behaviour")
-  expect_equal(get_variables_event(state_only)$point, character())
+  state_only <- set_variables(event_af(), event = list(state = "behaviour"))
+  expect_equal(get_variables(state_only)$event$state, "behaviour")
+  expect_equal(get_variables(state_only)$event$point, character())
 
-  point_only <- set_variables_event(event_af(), point = "call")
-  expect_equal(get_variables_event(point_only)$state, character())
-  expect_equal(get_variables_event(point_only)$point, "call")
+  point_only <- set_variables(event_af(), event = list(point = "call"))
+  expect_equal(get_variables(point_only)$event$state, character())
+  expect_equal(get_variables(point_only)$event$point, "call")
 })
 
 test_that("NA entries are read as none rather than erroring (#76)", {
-  af <- set_variables_event(event_af(), state = "behaviour", point = NA)
+  af <- set_variables(event_af(), event = list(state = "behaviour", point = NA))
 
-  expect_equal(get_variables_event(af)$state, "behaviour")
-  expect_equal(get_variables_event(af)$point, character())
+  expect_equal(get_variables(af)$event$state, "behaviour")
+  expect_equal(get_variables(af)$event$point, character())
 })
 
 # ---- Class boundaries --------------------------------------------------
@@ -220,22 +244,31 @@ test_that("NA entries are read as none rather than erroring (#76)", {
 test_that("an anievent cannot carry an event declaration", {
   ae <- mini_ae()
 
-  expect_error(set_variables_event(ae, state = "label"), "does not have")
-  expect_error(get_variables_event(ae), "channel")
+  expect_error(
+    set_variables(ae, event = list(state = "label")),
+    "has no event variables"
+  )
+  expect_null(get_variables(ae)$event)
 })
 
 test_that("the setters reject objects that are neither class", {
   df <- data.frame(time = 1:3, x = 1:3, y = 1:3, behaviour = "REM")
 
-  expect_error(set_variables_event(df, state = "behaviour"), "not an anipoint")
-  expect_error(get_variables_event(df), "not an anipoint")
-  expect_error(add_variables_event(df, state = "behaviour"), "not an anipoint")
-  expect_error(remove_variables_event(df, "behaviour"), "not an anipoint")
+  expect_error(
+    set_variables(df, event = list(state = "behaviour")),
+    "not an aniframe"
+  )
+  expect_error(get_variables(df)$event, "not an aniframe")
+  expect_error(
+    add_variables(df, event = list(state = "behaviour")),
+    "not an aniframe"
+  )
+  expect_error(remove_variables(df, event = "behaviour"), "not an aniframe")
 })
 
 # ---- set_metadata refuses it -------------------------------------------
 
-test_that("set_metadata refuses variables_event, naming its setter", {
+test_that("set_metadata refuses variables_event, pointing at set_variables", {
   af <- event_af()
 
   expect_error(
@@ -244,7 +277,7 @@ test_that("set_metadata refuses variables_event, naming its setter", {
   )
   expect_error(
     set_metadata(af, variables_event = list(state = "behaviour")),
-    "set_variables_event"
+    "`set_variables\\(\\)`"
   )
 })
 
@@ -272,7 +305,7 @@ test_that("tbl_sum.anipoint surfaces state and point variables in the header", {
     behaviour = factor(c("REM", "REM", "wake", "wake")),
     call = factor(c(NA, "alarm", NA, NA))
   )
-  af <- set_variables_event(af, state = "behaviour", point = "call")
+  af <- set_variables(af, event = list(state = "behaviour", point = "call"))
 
   header <- pillar::tbl_sum(af)
   expect_true("State event variables" %in% names(header))
@@ -293,7 +326,7 @@ test_that("tbl_sum.anipoint omits state/point rows when variables_event is empty
 
 test_that("to_anievent reads a declaration made through the setter", {
   ae <- event_af() |>
-    set_variables_event(state = "behaviour") |>
+    set_variables(event = list(state = "behaviour")) |>
     to_anievent()
 
   expect_s3_class(ae, "anievent")
@@ -302,6 +335,6 @@ test_that("to_anievent reads a declaration made through the setter", {
 })
 
 test_that("a declared event column passes validate_anipoint", {
-  af <- set_variables_event(event_af(), state = "behaviour")
+  af <- set_variables(event_af(), event = list(state = "behaviour"))
   expect_silent(validate_anipoint(af))
 })

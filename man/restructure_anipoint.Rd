@@ -9,6 +9,7 @@ restructure_anipoint(
   variables_what,
   variables_when,
   variables_where,
+  orientation = NULL,
   strict = TRUE
 )
 }
@@ -17,6 +18,8 @@ restructure_anipoint(
 
 \item{variables_what, variables_when, variables_where}{The declaration
 to apply.}
+
+\item{orientation}{\code{where$orientation}; \code{NULL} keeps the current one.}
 }
 \value{
 \code{data}, restructured, with the declaration recorded.

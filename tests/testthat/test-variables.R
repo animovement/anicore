@@ -30,16 +30,19 @@ mini_ae <- function() {
 
 # ---- set_metadata() refuses the structural fields ----------------------
 
-test_that("set_metadata refuses each structural field, naming its setter", {
+test_that("set_metadata refuses each structural field, pointing at set_variables", {
   af <- flat_af()
 
   expect_error(
     set_metadata(af, variables_what = "id"),
     "cannot write"
   )
-  expect_error(set_metadata(af, variables_what = "id"), "set_variables_what")
-  expect_error(set_metadata(af, variables_when = "time"), "set_variables_when")
-  expect_error(set_metadata(af, variables_where = "x"), "set_variables_where")
+  for (field in c("variables_what", "variables_when", "variables_where")) {
+    expect_error(
+      rlang::exec(set_metadata, af, !!field := "x"),
+      "`set_variables\\(\\)`"
+    )
+  }
 })
 
 test_that("set_metadata refuses them through a partial metadata list too", {
@@ -60,7 +63,7 @@ test_that("a complete metadata object can still be restored wholesale", {
   restored <- set_metadata(rebuilt, metadata = md)
 
   expect_equal(get_metadata(restored), md)
-  expect_equal(get_variables_what(restored), "keypoint")
+  expect_equal(get_variables(restored, "what"), "keypoint")
   expect_equal(get_metadata(restored, "sampling_rate"), 30)
 })
 
@@ -83,7 +86,7 @@ test_that("the dplyr methods still round-trip structural metadata", {
   af <- id_af()
   out <- dplyr::filter(af, x > 0)
 
-  expect_equal(get_variables_what(out), "keypoint")
+  expect_equal(get_variables(out, "what"), "keypoint")
   expect_equal(get_metadata(out), get_metadata(af))
 })
 
@@ -93,36 +96,36 @@ test_that("declaring an identity column groups, retypes and relocates it", {
   # The reprex from #82: mutate() then declare.
   af <- flat_af() |>
     dplyr::mutate(id = "hi") |>
-    add_variables_what("id")
+    add_variables(what = "id")
 
-  expect_equal(get_variables_what(af), "id")
+  expect_equal(get_variables(af, "what"), "id")
   expect_equal(dplyr::group_vars(af), "id")
   expect_s3_class(af$id, "factor")
   expect_equal(names(af)[1], "id")
 })
 
-test_that("add_variables_what appends without restating what is there", {
+test_that("add_variables appends without restating what is there", {
   af <- id_af() |>
     dplyr::mutate(id = "hi") |>
-    add_variables_what("id")
+    add_variables(what = "id")
 
-  expect_equal(get_variables_what(af), c("keypoint", "id"))
+  expect_equal(get_variables(af, "what"), c("keypoint", "id"))
   expect_setequal(dplyr::group_vars(af), c("keypoint", "id"))
 })
 
-test_that("set_variables_what replaces the declaration wholesale", {
+test_that("set_variables replaces the declaration wholesale", {
   af <- id_af() |>
     dplyr::mutate(id = "hi") |>
-    set_variables_what("id")
+    set_variables(what = "id")
 
-  expect_equal(get_variables_what(af), "id")
+  expect_equal(get_variables(af, "what"), "id")
   expect_equal(dplyr::group_vars(af), "id")
 })
 
-test_that("remove_variables_what drops from the declaration and regroups", {
-  af <- remove_variables_what(id_af(), "keypoint")
+test_that("remove_variables drops from the declaration and regroups", {
+  af <- remove_variables(id_af(), what = "keypoint")
 
-  expect_length(get_variables_what(af), 0)
+  expect_length(get_variables(af, "what"), 0)
   expect_false(dplyr::is_grouped_df(af))
   # Dropping the declaration doesn't drop the column.
   expect_true("keypoint" %in% names(af))
@@ -131,7 +134,7 @@ test_that("remove_variables_what drops from the declaration and regroups", {
 test_that("adding an identity column keeps the other roles intact", {
   before <- get_metadata(id_af())
   after <- get_metadata(
-    dplyr::mutate(id_af(), id = "hi") |> add_variables_what("id")
+    dplyr::mutate(id_af(), id = "hi") |> add_variables(what = "id")
   )
 
   before <- unclass(before)
@@ -150,13 +153,12 @@ test_that("adding an identity column keeps the other roles intact", {
 # ---- Declaring position ------------------------------------------------
 
 test_that("declaring a third spatial column refreshes coordinate_system", {
-  # coordinate_system is derived, so writing variables_where alone left it
-  # stale (#82).
+  # coordinate_system is derived, so declaring position must refresh it (#82).
   af <- flat_af() |>
     dplyr::mutate(z = 0) |>
-    add_variables_where("z")
+    add_variables(where = "z")
 
-  expect_equal(get_variables_where(af), c("x", "y", "z"))
+  expect_equal(get_variables(af, "where"), c("x", "y", "z"))
   expect_equal(
     as.character(get_metadata(af, "coordinate_system")),
     "cartesian_3d"
@@ -165,9 +167,9 @@ test_that("declaring a third spatial column refreshes coordinate_system", {
 })
 
 test_that("removing a spatial column refreshes coordinate_system downwards", {
-  af <- remove_variables_where(flat_af(), "y")
+  af <- remove_variables(flat_af(), where = "y")
 
-  expect_equal(get_variables_where(af), "x")
+  expect_equal(get_variables(af, "where"), "x")
   expect_equal(
     as.character(get_metadata(af, "coordinate_system")),
     "cartesian_1d"
@@ -177,7 +179,7 @@ test_that("removing a spatial column refreshes coordinate_system downwards", {
 test_that("declared spatial columns are coerced to numeric", {
   af <- flat_af() |>
     dplyr::mutate(z = "0") |>
-    add_variables_where("z")
+    add_variables(where = "z")
 
   expect_true(is.numeric(af$z))
 })
@@ -187,24 +189,24 @@ test_that("declared spatial columns are coerced to numeric", {
 test_that("declaring a temporal grouping column groups and orders by it", {
   af <- flat_af() |>
     dplyr::mutate(session = rep(c("b", "a"), each = 3)) |>
-    add_variables_when("session")
+    add_variables(when = "session")
 
   # `time` stays last: rows sort by session, then by time within it.
-  expect_equal(get_variables_when(af), "session")
+  expect_equal(get_variables(af, "when", "keys"), "session")
   expect_equal(dplyr::group_vars(af), "session")
   expect_s3_class(af$session, "factor")
   expect_equal(as.character(af$session), c("a", "a", "a", "b", "b", "b"))
 })
 
-test_that("remove_variables_when drops the temporal context and ungroups", {
+test_that("remove_variables on when drops the temporal context and ungroups", {
   af <- flat_af() |>
     dplyr::mutate(session = rep(c("b", "a"), each = 3)) |>
-    add_variables_when("session")
+    add_variables(when = "session")
 
-  dropped <- remove_variables_when(af, "session")
+  dropped <- remove_variables(af, when = "session")
 
   # Nothing left but the index, which lives in its own field.
-  expect_equal(get_variables_when(dropped), character(0))
+  expect_equal(get_variables(dropped, "when", "keys"), character(0))
   expect_false(dplyr::is_grouped_df(dropped))
   expect_true("session" %in% names(dropped))
 })
@@ -212,13 +214,13 @@ test_that("remove_variables_when drops the temporal context and ungroups", {
 # ---- Validation --------------------------------------------------------
 
 test_that("declaring a column that does not exist errors", {
-  expect_error(add_variables_what(flat_af(), "nope"), "not found in data")
-  expect_error(set_variables_where(flat_af(), c("x", "z")), "z")
+  expect_error(add_variables(flat_af(), what = "nope"), "not found in data")
+  expect_error(set_variables(flat_af(), where = c("x", "z")), "z")
 })
 
 test_that("the error points at create-then-declare", {
   expect_error(
-    add_variables_what(flat_af(), "id"),
+    add_variables(flat_af(), what = "id"),
     "Create the column first"
   )
 })
@@ -226,30 +228,51 @@ test_that("the error points at create-then-declare", {
 test_that("a non-character declaration errors", {
   af <- flat_af()
 
-  expect_error(set_variables_what(af, 1), "must be a character vector")
-  expect_error(add_variables_what(af, 1), "must be a character vector")
-  expect_error(remove_variables_what(af, 1), "must be a character vector")
-  expect_error(add_variables_when(af, 1), "must be a character vector")
-  expect_error(remove_variables_when(af, 1), "must be a character vector")
-  expect_error(add_variables_where(af, 1), "must be a character vector")
-  expect_error(remove_variables_where(af, 1), "must be a character vector")
+  expect_error(
+    set_variables(af, what = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    add_variables(af, what = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    remove_variables(af, what = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    add_variables(af, when = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    remove_variables(af, when = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    add_variables(af, where = 1),
+    "must be a named list of slots or a character vector"
+  )
+  expect_error(
+    remove_variables(af, where = 1),
+    "must be a named list of slots or a character vector"
+  )
 })
 
 test_that("the setters reject objects that are neither class", {
   df <- data.frame(time = 1:3, x = 1:3, y = 1:3)
 
-  expect_error(set_variables_what(df, "x"), "not an aniframe")
-  expect_error(get_variables_what(df), "not an aniframe")
-  expect_error(get_variables_when(df), "not an aniframe")
-  expect_error(get_variables_where(df), "not an aniframe")
-  expect_error(add_variables_what(df, "x"), "not an aniframe")
-  expect_error(remove_variables_what(df, "x"), "not an aniframe")
-  expect_error(add_variables_when(df, "x"), "not an aniframe")
-  expect_error(remove_variables_when(df, "x"), "not an aniframe")
-  expect_error(add_variables_where(df, "x"), "not an aniframe")
-  expect_error(remove_variables_where(df, "x"), "not an aniframe")
-  expect_error(set_variables_when(df, "x"), "not an aniframe")
-  expect_error(set_variables_where(df, "x"), "not an aniframe")
+  expect_error(set_variables(df, what = "x"), "not an aniframe")
+  expect_error(get_variables(df, "what"), "not an aniframe")
+  expect_error(get_variables(df, "when", "keys"), "not an aniframe")
+  expect_error(get_variables(df, "where"), "not an aniframe")
+  expect_error(add_variables(df, what = "x"), "not an aniframe")
+  expect_error(remove_variables(df, what = "x"), "not an aniframe")
+  expect_error(add_variables(df, when = "x"), "not an aniframe")
+  expect_error(remove_variables(df, when = "x"), "not an aniframe")
+  expect_error(add_variables(df, where = "x"), "not an aniframe")
+  expect_error(remove_variables(df, where = "x"), "not an aniframe")
+  expect_error(set_variables(df, when = "x"), "not an aniframe")
+  expect_error(set_variables(df, where = "x"), "not an aniframe")
 })
 
 # ---- anievent ----------------------------------------------------------
@@ -257,29 +280,29 @@ test_that("the setters reject objects that are neither class", {
 test_that("the setters work on an anievent", {
   ae <- mini_ae() |>
     dplyr::mutate(observation = c("b", "b", "a")) |>
-    add_variables_when("observation")
+    add_variables(when = "observation")
 
-  expect_true("observation" %in% get_variables_when(ae))
+  expect_true("observation" %in% get_variables(ae, "when", "keys"))
   expect_s3_class(ae, "anievent")
   # Ordered by identity, then temporal context, then start.
   expect_equal(as.character(ae$observation), c("b", "b", "a"))
 })
 
 test_that("declaring identity on an anievent relocates and retypes", {
-  ae <- set_variables_what(mini_ae(), "individual")
+  ae <- set_variables(mini_ae(), what = "individual")
 
-  expect_equal(get_variables_what(ae), "individual")
+  expect_equal(get_variables(ae, "what"), "individual")
   expect_equal(names(ae)[1], "individual")
 })
 
 test_that("an anievent refuses spatial variables", {
   ae <- dplyr::mutate(mini_ae(), x = 1)
 
-  expect_error(set_variables_where(ae, "x"), "no spatial variables")
+  expect_error(set_variables(ae, where = "x"), "has no where variables")
 })
 
 test_that("an anievent is never grouped by a declaration", {
-  ae <- set_variables_what(mini_ae(), "individual")
+  ae <- set_variables(mini_ae(), what = "individual")
   expect_false(dplyr::is_grouped_df(ae))
 })
 
@@ -289,7 +312,7 @@ test_that("declaring reaches the same state as constructing with it", {
   # The two routes used to differ in column order, type and grouping (#82).
   declared <- flat_af() |>
     dplyr::mutate(id = "hi") |>
-    add_variables_what("id")
+    add_variables(what = "id")
 
   constructed <- as_anipoint(
     dplyr::mutate(dplyr::as_tibble(flat_af()), id = "hi"),

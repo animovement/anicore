@@ -1,7 +1,7 @@
 #' Custom tibble summary for anipoint
 #'
 #' @description
-#' One row per `variables_what` and non-index `variables_when` column, plus
+#' One row per key column (see [get_keys()]), plus
 #' event variables, sampling rate and the time interval.
 #'
 #' @param x An anipoint object

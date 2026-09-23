@@ -86,25 +86,48 @@ test_that("a clash with an axis already declared is caught too", {
 
 # Turning an axis over ----
 
-test_that("reversing an axis reflects it around its extent", {
-  af <- set_axis_extents(frame_uv(), c(y = 10))
+test_that("reflect_axis() reflects an axis around its extent", {
+  af <- set_metadata(frame_uv(), axis_extents = c(y = 10))
   af <- set_axis_directions(af, c(x = "right", y = "up"))
 
-  result <- set_axis_directions(af, c(y = "down"))
+  result <- reflect_axis(af, "y")
 
   expect_equal(result$v, c(10, 5, 0))
   expect_equal(result$u, c(1, 2, 3))
+  expect_equal(get_axis_directions(result), c(x = "right", y = "down"))
 })
 
 test_that("an axis with no extent is negated instead", {
   # World coordinates are measured from the origin, so the mirror is `-v`.
   af <- set_axis_directions(frame_uv(), c(x = "right", y = "up"))
 
-  expect_equal(set_axis_directions(af, c(y = "down"))$v, c(0, -5, -10))
+  expect_equal(reflect_axis(af, "y")$v, c(0, -5, -10))
+})
+
+test_that("reflect_axis() leaves an undeclared direction undeclared", {
+  result <- reflect_axis(frame_uv(), "y")
+
+  expect_equal(result$v, c(0, -5, -10))
+  expect_length(get_axis_directions(result), 0)
+})
+
+test_that("reflect_axis() takes one linear axis role", {
+  expect_error(reflect_axis(frame_uv(), "phi"))
+  expect_error(reflect_axis(frame_uv(), c("x", "y")))
+})
+
+test_that("turning an axis over with set_axis_directions() leaves the values alone", {
+  af <- set_metadata(frame_uv(), axis_extents = c(y = 10))
+  af <- set_axis_directions(af, c(x = "right", y = "up"))
+
+  result <- set_axis_directions(af, c(y = "down"))
+
+  expect_equal(result$v, c(0, 5, 10))
+  expect_equal(get_axis_directions(result), c(x = "right", y = "down"))
 })
 
 test_that("declaring a direction the axis did not have reflects nothing", {
-  af <- set_axis_extents(frame_uv(), c(y = 10))
+  af <- set_metadata(frame_uv(), axis_extents = c(y = 10))
 
   expect_equal(set_axis_directions(af, c(y = "up"))$v, c(0, 5, 10))
 })
@@ -124,7 +147,7 @@ test_that("an angular frame moves its angles instead of a column", {
   pol <- set_axis_directions(pol, c(x = "right", y = "up"))
 
   expect_equal(
-    set_axis_directions(pol, c(y = "down"))$phi,
+    reflect_axis(pol, "y")$phi,
     -c(0, 1, 2) %% (2 * pi)
   )
 })
@@ -132,29 +155,44 @@ test_that("an angular frame moves its angles instead of a column", {
 # Extents ----
 
 test_that("extents are recorded against the axis role", {
-  af <- set_axis_extents(frame_uv(), c(x = 1920, y = 1080))
+  af <- set_metadata(frame_uv(), axis_extents = c(x = 1920, y = 1080))
 
-  expect_equal(get_axis_extents(af), c(x = 1920, y = 1080))
+  expect_equal(get_metadata(af, "axis_extents"), c(x = 1920, y = 1080))
 })
 
 test_that("an extent must be positive and finite", {
-  expect_error(set_axis_extents(frame_uv(), c(y = 0)), "positive and finite")
   expect_error(
-    set_axis_extents(frame_uv(), c(y = -1080)),
+    set_metadata(frame_uv(), axis_extents = c(y = 0)),
     "positive and finite"
   )
-  expect_error(set_axis_extents(frame_uv(), c(y = Inf)), "positive and finite")
+  expect_error(
+    set_metadata(frame_uv(), axis_extents = c(y = -1080)),
+    "positive and finite"
+  )
+  expect_error(
+    set_metadata(frame_uv(), axis_extents = c(y = Inf)),
+    "positive and finite"
+  )
 })
 
 test_that("extents must be numbers named by role", {
-  expect_error(set_axis_extents(frame_uv(), c(y = "1080")), "must be a numeric")
-  expect_error(set_axis_extents(frame_uv(), 1080), "must name an axis role")
-  expect_error(set_axis_extents(frame_uv(), c(phi = 6.28)), "points anywhere")
+  expect_error(
+    set_metadata(frame_uv(), axis_extents = c(y = "1080")),
+    "must be a numeric"
+  )
+  expect_error(
+    set_metadata(frame_uv(), axis_extents = 1080),
+    "must name an axis role"
+  )
+  expect_error(
+    set_metadata(frame_uv(), axis_extents = c(phi = 6.28)),
+    "points anywhere"
+  )
 })
 
 test_that("an extent the data runs past is worth saying so about", {
   expect_warning(
-    set_axis_extents(frame_uv(v = c(0, 5, 2000)), c(y = 1080)),
+    set_metadata(frame_uv(v = c(0, 5, 2000)), axis_extents = c(y = 1080)),
     "less than the largest"
   )
 })
@@ -164,20 +202,23 @@ test_that("the warning is silenced with the package option", {
   on.exit(options(previous), add = TRUE)
 
   expect_no_warning(
-    set_axis_extents(frame_uv(v = c(0, 5, 2000)), c(y = 1080))
+    set_metadata(frame_uv(v = c(0, 5, 2000)), axis_extents = c(y = 1080))
   )
 })
 
 test_that("an axis with no column is not measured against the data", {
-  expect_no_warning(set_axis_extents(frame_uv(), c(z = 1)))
+  expect_no_warning(set_metadata(frame_uv(), axis_extents = c(z = 1)))
 })
 
 test_that("extents follow the spatial unit they are lengths in", {
   # Otherwise the frame would claim a height in a unit it no longer uses.
-  af <- set_axis_extents(frame_uv(), c(y = 1080))
+  af <- set_metadata(frame_uv(), axis_extents = c(y = 1080))
 
   expect_equal(
-    get_axis_extents(set_unit_space(af, "mm", calibration_factor = 10)),
+    get_metadata(
+      convert_unit_space(af, "mm", calibration_factor = 10),
+      "axis_extents"
+    ),
     c(y = 10800)
   )
 })
@@ -188,7 +229,7 @@ test_that("a frame is constructed with neither declared", {
   af <- frame_uv()
 
   expect_length(get_axis_directions(af), 0)
-  expect_length(get_axis_extents(af), 0)
+  expect_length(get_metadata(af, "axis_extents"), 0)
 })
 
 test_that("the accessors reject a plain data frame", {
@@ -200,13 +241,13 @@ test_that("the accessors reject a plain data frame", {
 
 # The reflection helper's own guards ----
 
-test_that("reflect_axis() takes one column name and one finite reference", {
+test_that("reflect_column() takes one column name and one finite reference", {
   af <- frame_uv()
 
-  expect_error(reflect_axis(af, c("u", "v"), 10), "single column name")
-  expect_error(reflect_axis(af, "u", c(1, 2)), "single finite")
-  expect_error(reflect_axis(af, "u", Inf), "single finite")
-  expect_error(reflect_axis(af, "nope", 10), "not found in data")
+  expect_error(reflect_column(af, c("u", "v"), 10), "single column name")
+  expect_error(reflect_column(af, "u", c(1, 2)), "single finite")
+  expect_error(reflect_column(af, "u", Inf), "single finite")
+  expect_error(reflect_column(af, "nope", 10), "not found in data")
 })
 
 test_that("an extent is not measured against a column that is not there", {

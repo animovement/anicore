@@ -94,23 +94,19 @@ names(get_metadata(data, "space"))
 `set_metadata()` validates the input — factor fields are checked
 against their permitted levels, and unknown fields are rejected.
 
-For fields whose update has side effects on the data columns (or on
-related fields), prefer the dedicated setters listed below.
+`set_*` functions only declare: they record a fact about the data and
+never change a value. Operations that change values have their own
+verbs and update the metadata to match:
 
-| Setter                | Touches                                                        |
-|-----------------------|----------------------------------------------------------------|
-| `set_unit_space()`    | converts `x`/`y`/`z` between length units                      |
-| `set_unit_time()`     | converts the index column between time units                   |
-| `set_unit_angle()`    | converts `phi`/`theta` (auto) and any extra `cols` you supply  |
-| `set_sampling_rate()` | flips `unit_time` from frames to seconds and rescales the index |
-| `set_index()`         | changes which column the frame is indexed by, and re-orders it |
-| `set_axes()`          | declares which column carries which axis role                  |
-| `set_axis_directions()` | says which way each axis points, reflecting one turned over |
-| `set_axis_extents()`  | says how far each axis runs, which a reflection turns around   |
-| `set_handedness()`    | says whether the frame is right- or left-handed                |
+| Function                | Does                                                          |
+|-------------------------|---------------------------------------------------------------|
+| `convert_unit_space()`  | rescales the length axes to another unit                      |
+| `convert_unit_time()`   | rescales the index to another unit, using `sampling_rate` from frames |
+| `convert_unit_angle()`  | converts `phi`/`theta` (and any `cols`) between rad and deg   |
+| `reflect_axis()`        | turns an axis over, reflecting its column                     |
 
-The temporal setters follow the frame's own declaration rather than a
-column called `time` — see
+`convert_unit_time()` follows the frame's own index rather than a column
+called `time` — see
 [the index](aniframe-structure.html#the-index).
 
 ## Declaring the slot vocabulary
@@ -139,23 +135,23 @@ setters that do the whole job:
 data |> set_metadata(variables_what = "id")
 ```
 
-The three structural roles have the same four verbs as `connections`:
-`get_variables_*()`, `set_variables_*()`, `add_variables_*()` and
-`remove_variables_*()`. `variables_index` has only two — `get_index()`
-and `set_index()` — because a frame has exactly one index, leaving
-nothing for `add_` and `remove_` to do. The column has to exist before
-it can be declared, so the order is always create-then-declare:
+The category has one family of verbs: `get_variables()`,
+`set_variables()`, `add_variables()` and `remove_variables()`, each taking
+a role and, for the setters, a list of slots or a character vector for the
+role's main slot. `set_index()` and `get_keys()` are shorthands. The
+column has to exist before it can be declared, so the order is always
+create-then-declare:
 
 ```{r}
 tagged <- data |>
   dplyr::mutate(id = "trial_1") |>
-  add_variables_what("id")
+  add_variables(what = "id")
 
-get_variables_what(tagged)
+get_variables(tagged, "what")
 dplyr::group_vars(tagged)
 ```
 
-`add_variables_*()` appends to the declaration, so you don't have to
+`add_variables()` appends to the declaration, so you don't have to
 restate what is already there — forgetting to would quietly demote an
 existing identity variable and regroup the frame without it.
 
@@ -164,11 +160,11 @@ Declaring a spatial column refreshes the fields derived from it:
 ```{r}
 data |>
   dplyr::mutate(z = 0) |>
-  add_variables_where("z") |>
+  add_variables(where = "z") |>
   get_metadata("coordinate_system")
 ```
 
-`variables_event` is the fourth role, and the one that doesn't change
+`event` is the fourth role, and the one that doesn't change
 the frame's shape: it declares which columns carry per-frame event
 labels, split into interval-valued `state` columns and instantaneous
 `point` columns. `to_anievent()` reads it to know what to encode.
@@ -176,8 +172,8 @@ labels, split into interval-valued `state` columns and instantaneous
 ```{r}
 data |>
   dplyr::mutate(behaviour = factor("rest")) |>
-  set_variables_event(state = "behaviour") |>
-  get_variables_event()
+  set_variables(event = list(state = "behaviour")) |>
+  get_variables("event", "state")
 ```
 
 ## Which way the axes point
@@ -193,11 +189,10 @@ opposed pairs, read from where the recording was made: `right`/`left`
 across the view, `up`/`down` within it, and `back`/`forward` toward and
 away from the viewer.
 
-Turning an axis to its opposite reflects that column, so the data ends up
-expressed the way you just declared. An axis runs from zero to its
-`axis_extents` value, so the reflection is `extent - old` — and an axis
-with no declared extent is centred on its origin instead, so turning it
-over negates it.
+`set_axis_directions()` only declares. To turn an axis over and keep
+the data describing the same scene, use `reflect_axis()`: an axis runs
+from zero to its `axis_extents` value, so the reflection is
+`extent - old`, and an axis with no declared extent is negated.
 
 ```{r}
 img <- anipoint(
@@ -205,12 +200,13 @@ img <- anipoint(
   x = c(0, 10, 20, 30),
   y = c(50, 100, 150, 200)
 ) |>
-  set_axis_extents(c(y = 1080)) |>
+  set_metadata(axis_extents = c(y = 1080)) |>
   set_axis_directions(c(x = "right", y = "down"))
 
 img$y
-img <- set_axis_directions(img, c(y = "up"))
-img$y # reflected: 1080 - original y
+img <- reflect_axis(img, "y")
+img$y # 1080 - original y
+get_axis_directions(img)
 ```
 
 ### What follows from the directions
@@ -246,33 +242,33 @@ A frame can also state the convention without spelling the axes out,
 which is how most 3D recordings are described:
 
 ```{r}
-set_handedness(img) |> get_handedness() # right-handed by default
+set_metadata(img, handedness = "right") |> get_handedness()
 ```
 
 ## Units
 
-Spatial, temporal, and angular units each have their own setter.
-Conversions between standard units are automatic; conversions from
-unknown / `frame` / `px` units require an explicit calibration factor
-(or, for time, a `sampling_rate`).
+Declare a unit with `set_metadata()`; convert values with
+`convert_unit_*()`. Factors between standard units are derived;
+converting from `px` or `unknown` needs a `calibration_factor`, and from
+`frame` a declared `sampling_rate`.
 
 ```{r}
 data <- example_anipoint(n_dims = 2) |>
   set_metadata(unit_space = "mm")
 
-data_cm <- set_unit_space(data, to_unit = "cm")
+data_cm <- convert_unit_space(data, to_unit = "cm")
 get_metadata(data_cm, "unit_space")
 ```
 
 ```{r}
-data <- example_anipoint() # default unit_time = "frame"
-data_s <- set_sampling_rate(data, sampling_rate = 30)
-get_metadata(data_s, "unit_time") # now "s"
+data <- example_anipoint() |> # default unit_time = "frame"
+  set_metadata(sampling_rate = 30)
+data_s <- convert_unit_time(data, "s")
 range(data_s$time) # frames divided by fps
 ```
 
 Spatial angular columns (`phi`, `theta`) are converted automatically
-by `set_unit_angle()` whenever they're present. Pass `cols` only for
+by `convert_unit_angle()` whenever they're present. Pass `cols` only for
 non-spatial angular columns (e.g. heading direction).
 
 ```{r}
@@ -281,6 +277,6 @@ pol <- anipoint(
   rho = c(1, 1, 1), phi = c(0, pi / 2, pi)
 )
 pol$phi
-pol_deg <- set_unit_angle(pol, to_unit = "deg")
+pol_deg <- convert_unit_angle(pol, to_unit = "deg")
 pol_deg$phi
 ```

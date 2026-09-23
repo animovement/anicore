@@ -13,10 +13,10 @@ raw_df <- data.frame(
   speed = c(1, 2, 3) # not an angle
 )
 
-test_that("set_unit_angle converts rad → deg correctly", {
+test_that("convert_unit_angle converts rad → deg correctly", {
   anif <- make_test_aniframe(raw_df, unit = "rad")
 
-  out <- set_unit_angle(
+  out <- convert_unit_angle(
     anif,
     cols = c("head_left", "head_right"),
     to_unit = "deg"
@@ -29,7 +29,7 @@ test_that("set_unit_angle converts rad → deg correctly", {
   expect_equal(out$speed, raw_df$speed)
 })
 
-test_that("set_unit_angle converts deg → rad correctly", {
+test_that("convert_unit_angle converts deg → rad correctly", {
   deg_df <- data.frame(
     time = c(0, 1, 2),
     x = c(1, 1, 1),
@@ -40,7 +40,7 @@ test_that("set_unit_angle converts deg → rad correctly", {
   )
   anif <- make_test_aniframe(deg_df, unit = "deg")
 
-  out <- set_unit_angle(
+  out <- convert_unit_angle(
     anif,
     cols = c("head_left", "head_right"),
     to_unit = "rad"
@@ -56,7 +56,7 @@ test_that("no conversion occurs when target unit already set", {
   anif <- make_test_aniframe(raw_df, unit = "rad")
 
   expect_message(
-    out <- set_unit_angle(
+    out <- convert_unit_angle(
       anif,
       cols = c("head_left", "head_right"),
       to_unit = "rad"
@@ -74,7 +74,7 @@ test_that("invalid target unit triggers an error", {
   anif <- make_test_aniframe(raw_df, unit = "rad")
 
   expect_error(
-    set_unit_angle(anif, cols = c("head_left"), to_unit = "turns"),
+    convert_unit_angle(anif, cols = c("head_left"), to_unit = "turns"),
     "Angular unit can only be"
   )
 })
@@ -83,7 +83,7 @@ test_that("missing columns raise an informative error", {
   anif <- make_test_aniframe(raw_df, unit = "rad")
 
   expect_error(
-    set_unit_angle(anif, cols = c("nonexistent"), to_unit = "deg"),
+    convert_unit_angle(anif, cols = c("nonexistent"), to_unit = "deg"),
     "All provided columns must be in the data."
   )
 })
@@ -95,14 +95,14 @@ test_that("non‑numeric columns raise an informative error", {
   anif <- make_test_aniframe(bad_df, unit = "rad")
 
   expect_error(
-    set_unit_angle(anif, cols = c("head_left"), to_unit = "deg"),
+    convert_unit_angle(anif, cols = c("head_left"), to_unit = "deg"),
     "All provided columns must be numeric."
   )
 })
 
 # ---- Spatial angular columns (phi, theta) are auto-converted (#21) ----
 
-test_that("set_unit_angle auto-converts phi for polar data (rad -> deg)", {
+test_that("convert_unit_angle auto-converts phi for polar data (rad -> deg)", {
   df <- data.frame(
     time = 1:3,
     rho = 1:3,
@@ -110,14 +110,14 @@ test_that("set_unit_angle auto-converts phi for polar data (rad -> deg)", {
   )
   anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
-  out <- set_unit_angle(anif, to_unit = "deg")
+  out <- convert_unit_angle(anif, to_unit = "deg")
 
   expect_equal(get_metadata(out, "unit_angle") |> as.character(), "deg")
   expect_equal(out$phi, c(0, 90, 180))
   expect_equal(out$rho, df$rho) # rho is not angular
 })
 
-test_that("set_unit_angle auto-converts phi and z-agnostic for cylindrical (rad -> deg)", {
+test_that("convert_unit_angle auto-converts phi and z-agnostic for cylindrical (rad -> deg)", {
   df <- data.frame(
     time = 1:3,
     rho = 1:3,
@@ -126,13 +126,13 @@ test_that("set_unit_angle auto-converts phi and z-agnostic for cylindrical (rad 
   )
   anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
-  out <- set_unit_angle(anif, to_unit = "deg")
+  out <- convert_unit_angle(anif, to_unit = "deg")
 
   expect_equal(out$phi, c(0, 45, 90))
   expect_equal(out$z, df$z) # z is spatial, not angular
 })
 
-test_that("set_unit_angle auto-converts phi and theta for spherical (rad -> deg)", {
+test_that("convert_unit_angle auto-converts phi and theta for spherical (rad -> deg)", {
   df <- data.frame(
     time = 1:3,
     rho = 1:3,
@@ -141,13 +141,13 @@ test_that("set_unit_angle auto-converts phi and theta for spherical (rad -> deg)
   )
   anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
-  out <- set_unit_angle(anif, to_unit = "deg")
+  out <- convert_unit_angle(anif, to_unit = "deg")
 
   expect_equal(out$phi, c(0, 90, 180))
   expect_equal(out$theta, c(0, 45, 90))
 })
 
-test_that("set_unit_angle round-trips deg -> rad for spatial angular columns", {
+test_that("convert_unit_angle round-trips deg -> rad for spatial angular columns", {
   df <- data.frame(
     time = 1:3,
     rho = 1:3,
@@ -156,15 +156,15 @@ test_that("set_unit_angle round-trips deg -> rad for spatial angular columns", {
   )
   anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
-  out <- set_unit_angle(anif, to_unit = "deg") |>
-    set_unit_angle(to_unit = "rad")
+  out <- convert_unit_angle(anif, to_unit = "deg") |>
+    convert_unit_angle(to_unit = "rad")
 
   expect_equal(out$phi, df$phi)
   expect_equal(out$theta, df$theta)
   expect_equal(get_metadata(out, "unit_angle") |> as.character(), "rad")
 })
 
-test_that("set_unit_angle combines spatial auto-detect with user cols", {
+test_that("convert_unit_angle combines spatial auto-detect with user cols", {
   df <- data.frame(
     time = 1:3,
     rho = 1:3,
@@ -173,17 +173,17 @@ test_that("set_unit_angle combines spatial auto-detect with user cols", {
   )
   anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
-  out <- set_unit_angle(anif, to_unit = "deg", cols = "heading")
+  out <- convert_unit_angle(anif, to_unit = "deg", cols = "heading")
 
   expect_equal(out$phi, c(0, 90, 180))
   expect_equal(out$heading, rad_to_deg(c(0, pi / 4, pi / 3)))
 })
 
-test_that("set_unit_angle is a no-op for non-angular spatial cols (cartesian)", {
+test_that("convert_unit_angle is a no-op for non-angular spatial cols (cartesian)", {
   df <- data.frame(time = 1:3, x = 1:3, y = 1:3)
   anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
-  out <- set_unit_angle(anif, to_unit = "deg")
+  out <- convert_unit_angle(anif, to_unit = "deg")
 
   # Cartesian columns are not converted; metadata still updates
   expect_equal(out$x, df$x)

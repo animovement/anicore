@@ -32,5 +32,5 @@ get_sampling_interval(af)
 
 }
 \seealso{
-\code{\link[=is_sampling_regular]{is_sampling_regular()}}, \code{\link[=get_sampling_rate]{get_sampling_rate()}}
+\code{\link[=is_sampling_regular]{is_sampling_regular()}}
 }

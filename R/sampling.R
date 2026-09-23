@@ -73,7 +73,7 @@ compute_sampling_interval <- function(data) {
 #' af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 #' get_sampling_interval(af)
 #'
-#' @seealso [is_sampling_regular()], [get_sampling_rate()]
+#' @seealso [is_sampling_regular()]
 #' @export
 get_sampling_interval <- function(data) {
   ensure_is_aniframe(data)

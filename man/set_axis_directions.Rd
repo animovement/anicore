@@ -13,43 +13,28 @@ set_axis_directions(data, directions)
 \code{right}, \code{left}, \code{up}, \code{down}, \code{back} or \code{forward}. \code{NA} clears an axis.}
 }
 \value{
-The anipoint, with reflected coordinates for any axis turned to
-its opposite and the new directions recorded.
+The anipoint, with the new directions recorded.
 }
 \description{
 Records the direction of one or more axes, keyed by axis role. Roles not
-named keep the direction they had, so flipping one axis leaves the rest
-alone.
-
-Turning an axis to its opposite reflects that column around the axis
-extent, so the data ends up expressed in the direction being declared.
-Any other change is a re-description and leaves the values untouched.
+named keep the direction they had. This only declares: the values are left
+alone. To turn an axis over and keep the data describing the same scene,
+use \code{\link[=reflect_axis]{reflect_axis()}}.
 }
 \details{
 Directions are read from where the recording was made: \code{right}/\code{left}
 across the view, \code{up}/\code{down} within it, \code{back}/\code{forward} toward and away
-from the viewer. No two axes may point along the same pair.
-
-An axis runs from zero to its extent, so turning it over gives
-\code{new = extent - old}. An axis with no declared extent is centred on its
-origin instead, and turning it over negates it. Declare one with
-\code{\link[=set_axis_extents]{set_axis_extents()}} for data that is measured from a corner, such as
-video.
-
-On a frame that stores angles there is no column to reflect, but \code{phi}
-and \code{theta} are measured from the axes and are recomputed instead.
+from the viewer. No two axes may point along the same pair. Three declared
+directions fix the handedness, which is recorded too.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
-af <- set_axis_extents(af, c(y = 1080))
 af <- set_axis_directions(af, c(x = "right", y = "down"))
-
-# Turning y over reflects it
-af <- set_axis_directions(af, c(y = "up"))
 get_axis_directions(af)
+get_angle_direction(af)
 
 }
 \seealso{
-\code{\link[=get_axis_directions]{get_axis_directions()}}, \code{\link[=set_axis_extents]{set_axis_extents()}},
+\code{\link[=get_axis_directions]{get_axis_directions()}}, \code{\link[=reflect_axis]{reflect_axis()}},
 \code{\link[=get_angle_direction]{get_angle_direction()}}
 }

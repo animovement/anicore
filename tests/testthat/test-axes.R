@@ -11,12 +11,12 @@ test_that("an unnamed declaration reads the column name as the role", {
   )
 })
 
-test_that("get_variables_where() still returns bare column names", {
+test_that("get_variables() still returns bare column names for where", {
   # The accessor strips names, so callers still get bare columns.
   af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
 
-  expect_equal(get_variables_where(af), c("x", "y"))
-  expect_null(names(get_variables_where(af)))
+  expect_equal(get_variables(af, "where"), c("x", "y"))
+  expect_null(names(get_variables(af, "where")))
 })
 
 test_that("axes can be carried by columns named anything", {
@@ -25,7 +25,7 @@ test_that("axes can be carried by columns named anything", {
   af <- as_anipoint(df, variables_where = c(x = "u", y = "v"))
 
   expect_equal(get_axes(af), c(x = "u", y = "v"))
-  expect_equal(get_variables_where(af), c("u", "v"))
+  expect_equal(get_variables(af, "where"), c("u", "v"))
   # This used to degrade to "unknown", which every spatial function refused.
   expect_equal(
     as.character(get_metadata(af, "coordinate_system")),
@@ -51,9 +51,9 @@ test_that("an axis extent is keyed by role, whatever the column is called", {
   df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 5, 0))
 
   af <- as_anipoint(df, variables_where = c(x = "u", y = "v"))
-  af <- set_axis_extents(af, c(y = 5))
+  af <- set_metadata(af, axis_extents = c(y = 5))
 
-  expect_equal(get_axis_extents(af), c(y = 5))
+  expect_equal(get_metadata(af, "axis_extents"), c(y = 5))
 })
 
 test_that("an unrecognised role is rejected by name", {
@@ -94,15 +94,15 @@ test_that("an unnamed declaration that matches nothing still warns rather than a
     "Could not infer coordinate system"
   )
   expect_equal(as.character(get_metadata(af, "coordinate_system")), "unknown")
-  expect_equal(get_variables_where(af), c("u", "v"))
+  expect_equal(get_variables(af, "where"), c("u", "v"))
   expect_equal(get_axes(af), stats::setNames(character(), character()))
 })
 
-test_that("set_variables_where() accepts a role mapping", {
+test_that("set_variables() accepts a role mapping for where", {
   df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
   af <- suppressWarnings(as_anipoint(df, variables_where = c("u", "v")))
 
-  result <- set_variables_where(af, c(x = "u", y = "v"))
+  result <- set_variables(af, where = c(x = "u", y = "v"))
 
   expect_equal(get_axes(result), c(x = "u", y = "v"))
   expect_equal(
@@ -122,14 +122,14 @@ test_that("list_axis_role_sets() and infer_coordinate_system() agree", {
 
 # Length-unit conversion resolves roles to columns ----
 
-test_that("set_unit_space() converts the length axes of a renamed frame", {
+test_that("convert_unit_space() converts the length axes of a renamed frame", {
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c(x = "u", y = "v")
   )
 
   result <- expect_no_warning(
-    set_unit_space(af, "mm", calibration_factor = 10)
+    convert_unit_space(af, "mm", calibration_factor = 10)
   )
 
   expect_equal(result$u, c(10, 20, 30))
@@ -137,14 +137,14 @@ test_that("set_unit_space() converts the length axes of a renamed frame", {
   expect_equal(as.character(get_metadata(result, "unit_space")), "mm")
 })
 
-test_that("set_unit_space() converts rho but not phi on a renamed polar frame", {
+test_that("convert_unit_space() converts rho but not phi on a renamed polar frame", {
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", r = c(1, 2, 3), a = c(0, 1, 2)),
     variables_where = c(rho = "r", phi = "a")
   )
 
   result <- expect_no_warning(
-    set_unit_space(af, "mm", calibration_factor = 10)
+    convert_unit_space(af, "mm", calibration_factor = 10)
   )
 
   expect_equal(result$r, c(10, 20, 30))
@@ -160,9 +160,8 @@ test_that("variables_where stays a plain vector when the roles are known", {
     variables_where = c(x = "u", y = "v")
   )
 
-  expect_null(names(get_variables_where(af)))
-  expect_equal(get_variables_where(af), c("u", "v"))
-  expect_equal(get_variables_where(af), c("u", "v"))
+  expect_null(names(get_variables(af, "where")))
+  expect_equal(get_variables(af, "where"), c("u", "v"))
   expect_equal(get_axes(af), c(x = "u", y = "v"))
 })
 
@@ -172,7 +171,7 @@ test_that("selecting by variables_where does not rename the columns", {
     variables_where = c(x = "u", y = "v")
   )
 
-  where_cols <- get_variables_where(af)
+  where_cols <- get_variables(af, "where")
   bare <- dplyr::ungroup(dplyr::as_tibble(af))
 
   expect_equal(
@@ -185,39 +184,44 @@ test_that("selecting by variables_where does not rename the columns", {
   expect_equal(names(picked$out), c("u", "v"))
 })
 
-test_that("set_axes() declares the mapping and refreshes coordinate_system", {
+test_that("set_variables() declares the mapping and refreshes coordinate_system", {
   af <- suppressWarnings(as_anipoint(
     data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c("u", "v")
   ))
   expect_equal(as.character(get_metadata(af, "coordinate_system")), "unknown")
 
-  result <- set_axes(af, c(x = "u", y = "v"))
+  result <- set_variables(af, where = c(x = "u", y = "v"))
 
   expect_equal(get_axes(result), c(x = "u", y = "v"))
   expect_equal(
     as.character(get_metadata(result, "coordinate_system")),
     "cartesian_2d"
   )
-  expect_equal(get_variables_where(result), c("u", "v"))
+  expect_equal(get_variables(result, "where"), c("u", "v"))
 })
 
-test_that("set_axes() round-trips its own getter", {
+test_that("set_variables() round-trips get_axes()", {
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c(x = "u", y = "v")
   )
 
-  expect_equal(get_metadata(set_axes(af, get_axes(af))), get_metadata(af))
+  expect_equal(
+    get_metadata(set_variables(af, where = get_axes(af))),
+    get_metadata(af)
+  )
 })
 
-test_that("set_axes() requires a role for every column", {
+test_that("set_variables() rejects roles that form no coordinate system", {
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
-  expect_error(set_axes(af, c("x", "y")), "must name an axis role")
-  expect_error(set_axes(af, c(x = "x", banana = "y")), "not recognised")
   expect_error(
-    set_axes(af, c(x = "x", theta = "y")),
+    set_variables(af, where = c(x = "x", banana = "y")),
+    "not recognised"
+  )
+  expect_error(
+    set_variables(af, where = c(x = "x", theta = "y")),
     "do not form a coordinate system"
   )
 })
@@ -225,7 +229,7 @@ test_that("set_axes() requires a role for every column", {
 test_that("set_metadata() refuses axes and names its setter", {
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
-  expect_error(set_metadata(af, axes = c(x = "x")), "set_axes")
+  expect_error(set_metadata(af, axes = c(x = "x")), "set_variables")
 })
 
 test_that("re-declaring another role keeps the axis mapping", {
@@ -240,7 +244,7 @@ test_that("re-declaring another role keeps the axis mapping", {
     variables_where = c(x = "u", y = "v")
   )
 
-  result <- add_variables_when(af, "session")
+  result <- add_variables(af, when = "session")
 
   expect_equal(get_axes(result), c(x = "u", y = "v"))
   expect_equal(
@@ -262,60 +266,60 @@ test_that("metadata serialised before the field existed still resolves its axes"
 test_that("an anievent has no axes", {
   ae <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     dplyr::mutate(b = factor(rep(c("r", "w"), each = 2))) |>
-    set_variables_event(state = "b") |>
+    set_variables(event = list(state = "b")) |>
     to_anievent()
 
   # No `where` role, and no `space` category at all (#118)
-  expect_length(get_variables_where(ae), 0)
+  expect_length(get_variables(ae, "where"), 0)
   expect_null(get_metadata(ae, "space"))
 })
 
-# add_/remove_variables_where() carry the roles ----
+# add_/remove_variables() carry the roles ----
 
-test_that("add_variables_where() keeps the roles already declared", {
+test_that("add_variables() keeps the roles already declared", {
   # `union()` on bare columns dropped the names, reducing the frame to
   # `unknown` on every addition (#109).
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", x = 1:3, y = 1:3, u = 1:3)
   )
 
-  result <- add_variables_where(af, c(z = "u"))
+  result <- add_variables(af, where = c(z = "u"))
 
   expect_equal(get_axes(result), c(x = "x", y = "y", z = "u"))
   expect_equal(get_coordinate_system(result), "cartesian_3d")
 })
 
-test_that("add_variables_where() keeps the roles of a renamed frame", {
+test_that("add_variables() keeps the roles of a renamed frame", {
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", uu = 1:3, vv = 1:3, ww = 1:3),
     variables_where = c(x = "uu", y = "vv")
   )
 
-  result <- add_variables_where(af, c(z = "ww"))
+  result <- add_variables(af, where = c(z = "ww"))
 
   expect_equal(get_axes(result), c(x = "uu", y = "vv", z = "ww"))
   expect_equal(get_coordinate_system(result), "cartesian_3d")
 })
 
-test_that("add_variables_where() supersedes an existing role", {
+test_that("add_variables() supersedes an existing role", {
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", uu = 1:3, vv = 1:3, ww = 1:3),
     variables_where = c(x = "uu", y = "vv")
   )
 
-  result <- add_variables_where(af, c(y = "ww"))
+  result <- add_variables(af, where = c(y = "ww"))
 
   expect_equal(get_axes(result), c(x = "uu", y = "ww"))
   expect_equal(get_coordinate_system(result), "cartesian_2d")
 })
 
-test_that("remove_variables_where() keeps the roles of what is left", {
+test_that("remove_variables() keeps the roles of what is left", {
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", uu = 1:3, vv = 1:3),
     variables_where = c(x = "uu", y = "vv")
   )
 
-  result <- remove_variables_where(af, "vv")
+  result <- remove_variables(af, where = "vv")
 
   expect_equal(get_axes(result), c(x = "uu"))
   expect_equal(get_coordinate_system(result), "cartesian_1d")
@@ -334,7 +338,7 @@ test_that("removing an axis down to an incoherent set warns rather than aborts",
   )
 
   expect_warning(
-    result <- remove_variables_where(af, "rho"),
+    result <- remove_variables(af, where = "rho"),
     "anispace"
   )
   expect_equal(get_coordinate_system(result), "unknown")
@@ -398,7 +402,7 @@ test_that("aniframe.quiet silences the shadowing warning", {
   expect_no_warning(as_anipoint(df, variables_where = c(x = "u", y = "v")))
 })
 
-test_that("set_axes() warns on shadowing too", {
+test_that("set_variables() warns on shadowing too", {
   df <- data.frame(
     time = 1:3,
     individual = "a",
@@ -408,21 +412,24 @@ test_that("set_axes() warns on shadowing too", {
   )
   af <- suppressWarnings(as_anipoint(df, variables_where = c("u", "v")))
 
-  expect_warning(set_axes(af, c(rho = "u", phi = "v")), "also has a column")
+  expect_warning(
+    set_variables(af, where = c(rho = "u", phi = "v")),
+    "also has a column"
+  )
 })
 
 # Turning an axis over resolves it by role ----
 
-test_that("set_axis_directions() reflects the y axis of a renamed frame", {
+test_that("reflect_axis() reflects the y axis of a renamed frame", {
   # The flip used to reach for a literal `y` column (#109).
   af <- as_anipoint(
     data.frame(individual = "a", time = 1:3, u = c(1, 2, 3), v = c(0, 5, 10)),
     variables_where = c(x = "u", y = "v")
   )
-  af <- set_axis_extents(af, c(y = 10))
+  af <- set_metadata(af, axis_extents = c(y = 10))
   af <- set_axis_directions(af, c(x = "right", y = "up"))
 
-  result <- set_axis_directions(af, c(y = "down"))
+  result <- reflect_axis(af, "y")
 
   expect_equal(result$v, c(10, 5, 0))
   expect_equal(get_axis_directions(result)[["y"]], "down")
@@ -436,7 +443,7 @@ test_that("an angular frame has its angles recomputed rather than left stale", {
   )
   pol <- set_axis_directions(pol, c(x = "right", y = "up"))
 
-  result <- set_axis_directions(pol, c(y = "down"))
+  result <- reflect_axis(pol, "y")
 
   expect_equal(result$phi, (-c(0, 1, 2)) %% (2 * pi))
   expect_equal(result$rho, c(1, 2, 3))

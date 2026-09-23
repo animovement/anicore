@@ -23,5 +23,5 @@ get_axis_directions(af)
 
 }
 \seealso{
-\code{\link[=set_axis_directions]{set_axis_directions()}}, \code{\link[=get_axis_extents]{get_axis_extents()}}
+\code{\link[=set_axis_directions]{set_axis_directions()}}, \code{\link[=reflect_axis]{reflect_axis()}}
 }

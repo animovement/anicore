@@ -55,6 +55,7 @@ strip_animovement_class <- function(data) {
 #' @param data An anipoint object.
 #' @param variables_what,variables_when,variables_where The declaration
 #'   to apply.
+#' @param orientation `where$orientation`; `NULL` keeps the current one.
 #'
 #' @return `data`, restructured, with the declaration recorded.
 #' @keywords internal
@@ -63,6 +64,7 @@ restructure_anipoint <- function(
   variables_what,
   variables_when,
   variables_where,
+  orientation = NULL,
   strict = TRUE
 ) {
   cls <- class(data)
@@ -131,10 +133,16 @@ restructure_anipoint <- function(
   )
 
   md <- migrate_metadata_layout(md)
+  where <- list(position = position)
+  orientation <- orientation %||% md$variables$where$orientation
+  if (length(orientation) > 0L) {
+    ensure_has_declared_cols(bare, unname(orientation), "where")
+    where$orientation <- orientation
+  }
   md$variables <- list(
     what = list(keys = variables_what),
     when = list(index = index, keys = variables_when),
-    where = list(position = position),
+    where = where,
     event = md_event(md) %||% list(state = character(), point = character())
   )
   md <- md_field_set(

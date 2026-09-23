@@ -118,102 +118,94 @@ test_that("turning the depth axis over leaves an x-y frame's data alone", {
 
 # Stating the convention without spelling out the axes ----
 
-test_that("handedness can be stated on its own", {
-  af <- set_handedness(frame_2d(), "left")
+test_that("handedness can be declared on its own", {
+  af <- set_metadata(frame_2d(), handedness = "left")
 
   expect_equal(get_handedness(af), "left")
   expect_length(get_axis_directions(af), 0)
 })
 
-test_that("right-handed is what set_handedness() defaults to", {
-  expect_equal(get_handedness(set_handedness(frame_2d())), "right")
-})
-
-test_that("a stated handedness settles the sense two axes leave open", {
+test_that("a declared handedness settles the sense two axes leave open", {
   af <- set_axis_directions(frame_2d(), c(x = "right", y = "down"))
 
   expect_equal(get_angle_direction(af), "clockwise")
   expect_equal(
-    get_angle_direction(set_handedness(af, "right")),
+    get_angle_direction(set_metadata(af, handedness = "right")),
     "counter_clockwise"
   )
-  expect_equal(get_angle_direction(set_handedness(af, "left")), "clockwise")
+  expect_equal(
+    get_angle_direction(set_metadata(af, handedness = "left")),
+    "clockwise"
+  )
 })
 
-test_that("stating a handedness completes the third axis", {
+test_that("declaring a handedness does not invent a third axis", {
   af <- set_axis_directions(frame_2d(), c(x = "right", y = "down"))
 
   expect_equal(
-    get_axis_directions(set_handedness(af, "right"))[["z"]],
-    "forward"
+    get_axis_directions(set_metadata(af, handedness = "right")),
+    c(x = "right", y = "down")
   )
-  expect_equal(get_axis_directions(set_handedness(af, "left"))[["z"]], "back")
 })
 
-test_that("declared axes are read in preference to a stated handedness", {
+test_that("declared axes are read in preference to a declared handedness", {
   # The directions say more, so the stored handedness is brought into line.
-  af <- set_handedness(frame_2d(), "left")
+  af <- set_metadata(frame_2d(), handedness = "left")
   af <- set_axis_directions(af, c(x = "right", y = "up", z = "back"))
 
   expect_equal(get_handedness(af), "right")
   expect_equal(as.character(get_metadata(af, "handedness")), "right")
 })
 
-test_that("turning the handedness over reverses the depth axis", {
-  af <- set_axis_directions(frame_2d(), c(x = "right", y = "up", z = "back"))
-
-  expect_equal(
-    get_axis_directions(set_handedness(af, "left"))[["z"]],
-    "forward"
-  )
-  expect_equal(get_axis_directions(set_handedness(af, "left"))[["x"]], "right")
-})
-
-test_that("asking for the handedness a frame already has changes nothing", {
-  af <- set_axis_directions(frame_2d(), c(x = "right", y = "up", z = "back"))
-
-  expect_equal(set_handedness(af, "right"), af)
-})
-
 test_that("handedness must be one of the two", {
-  expect_error(set_handedness(frame_2d(), "widdershins"), "must be one of")
-  expect_error(set_handedness(frame_2d(), c("right", "left")), "must be one of")
-})
-
-# Asking for a sense of rotation ----
-
-test_that("set_angle_direction() determines the axis that is missing", {
-  af <- set_axis_directions(frame_2d(), c(x = "right"))
-
-  expect_equal(
-    get_axis_directions(set_angle_direction(af, "counter_clockwise"))[["y"]],
-    "up"
-  )
-  expect_equal(
-    get_axis_directions(set_angle_direction(af, "clockwise"))[["y"]],
-    "down"
+  expect_error(
+    set_metadata(frame_2d(), handedness = "widdershins"),
+    "can only be"
   )
 })
 
-test_that("set_angle_direction() turns the vertical axis over", {
+# Turning an axis over flips the orientation ----
+
+test_that("reflecting the depth axis turns the handedness over", {
+  af <- set_axis_directions(frame_2d(), c(x = "right", y = "up", z = "back"))
+
+  result <- reflect_axis(af, "z")
+
+  expect_equal(
+    get_axis_directions(result),
+    c(x = "right", y = "up", z = "forward")
+  )
+  expect_equal(get_handedness(result), "left")
+  expect_equal(result$x, af$x)
+  expect_equal(result$y, af$y)
+})
+
+test_that("reflecting an axis flips a handedness declared on its own", {
+  af <- set_metadata(frame_2d(), handedness = "right")
+
+  expect_equal(get_handedness(reflect_axis(af, "y")), "left")
+})
+
+test_that("reflecting the vertical axis reverses the angle direction", {
   af <- set_axis_directions(frame_2d(), c(x = "right", y = "down"))
-  af <- set_axis_extents(af, c(y = 10))
+  af <- set_metadata(af, axis_extents = c(y = 10))
 
-  result <- set_angle_direction(af, "counter_clockwise")
+  result <- reflect_axis(af, "y")
 
   expect_equal(get_axis_directions(result)[["y"]], "up")
+  expect_equal(get_angle_direction(result), "counter_clockwise")
   expect_equal(result$y, c(10, 5, 0))
 })
 
-test_that("set_angle_direction() needs an axis to work from", {
-  expect_error(
-    set_angle_direction(frame_2d(), "clockwise"),
-    "Not enough axes"
-  )
+test_that("an unknown handedness stays unknown when an axis is reflected", {
+  expect_equal(get_handedness(reflect_axis(frame_2d(), "y")), "unknown")
 })
 
-test_that("angle direction must be one of the two", {
-  expect_error(set_angle_direction(frame_2d(), "sideways"), "must be one of")
+test_that("angle direction is derived, not declared", {
+  expect_error(
+    set_metadata(frame_2d(), angle_direction = "clockwise"),
+    "not a metadata field"
+  )
 })
 
 # An anievent has no orientation at all ----
@@ -221,7 +213,7 @@ test_that("angle direction must be one of the two", {
 test_that("an anievent claims neither", {
   ae <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     dplyr::mutate(b = factor(rep(c("r", "w"), each = 2))) |>
-    set_variables_event(state = "b") |>
+    set_variables(event = list(state = "b")) |>
     to_anievent()
 
   expect_equal(get_handedness(ae), "unknown")
@@ -231,7 +223,6 @@ test_that("an anievent claims neither", {
 # The derivations on their own ----
 
 test_that("a stated handedness settles the sense when no z is declared", {
-  # Unreachable via `set_handedness()`, but stored metadata can carry it.
   expect_equal(
     derive_angle_direction(c(x = "right", y = "down"), "right"),
     "counter_clockwise"
@@ -252,17 +243,5 @@ test_that("parallel axes give no handedness", {
   expect_equal(
     derive_handedness(c(x = "right", y = "left", z = "up")),
     "unknown"
-  )
-})
-
-test_that("solving says so when no direction gives the answer", {
-  expect_error(
-    solve_axis_direction(
-      c(x = "right"),
-      "y",
-      "widdershins",
-      derive_angle_direction
-    ),
-    "No direction"
   )
 })

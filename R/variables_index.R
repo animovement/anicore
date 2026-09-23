@@ -1,18 +1,8 @@
-# The index is kept out of `variables_when`, which is exactly what the frame
-# groups by (#109).
-
 #' The column an anipoint is indexed by
 #'
-#' Exactly one column, of any name, holding the position of each row
-#' within its temporal context. It is declared separately from
-#' `variables_when`, which holds the context itself — session, trial,
-#' observation — and which, with `variables_what`, is what the frame is
-#' grouped by. The index is never a grouping variable.
-#'
-#' An [anievent()] has none: a bout spans an interval rather than sitting
-#' at a point, so it is delimited by `start` and `stop`, which are
-#' declared temporal columns. Its `variables_index` is `NA`, and asking
-#' for it here is an error rather than a guess.
+#' Exactly one column, of any name, holding the position of each row within
+#' its temporal context: the `when$index` slot. It is never a grouping column.
+#' An [anievent()] has none, since a bout spans the `start`/`stop` interval.
 #'
 #' @param data An anipoint object.
 #'
@@ -22,15 +12,15 @@
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_index(af)
 #'
-#' @seealso [set_index()] to change it, [get_variables_when()] for the
-#'   full set of temporal columns.
+#' @seealso [set_index()] to change it, [get_variables()] for the other
+#'   temporal columns.
 #' @export
 get_index <- function(data) {
   if (is_anievent(data)) {
     cli::cli_abort(c(
       "An {.cls anievent} has no index column.",
       "i" = "A bout spans an interval, delimited by {.field start} and {.field stop}.",
-      "i" = "Read them with {.fn get_variables_when}."
+      "i" = "Read them with {.code get_variables(data, \"when\", \"interval\")}."
     ))
   }
   ensure_is_anipoint(data)
@@ -61,17 +51,9 @@ resolve_index <- function(md) {
 
 #' Declare which column an anipoint is indexed by
 #'
-#' Changing the index changes the order the rows come in, so — like the
-#' `variables_*` declarations — it is not reachable through
-#' [set_metadata()] and has its own setter, which does the restructuring
-#' too.
-#'
-#' If the column was declared as temporal context it stops being so: a
-#' variable cannot be both the position within a context and part of it.
-#' The column the frame was previously indexed by becomes an ordinary
-#' undeclared column rather than being promoted to a grouping variable —
-#' which, holding one value per row, would put every row in its own
-#' group.
+#' Shorthand for `set_variables(data, when = list(index = column))`. The
+#' frame is re-sorted. A column that was a `when` key stops being one; the
+#' previous index becomes an undeclared column rather than a key.
 #'
 #' @param data An anipoint object.
 #' @param column Length-one character vector naming the index column. It
@@ -90,16 +72,8 @@ set_index <- function(data, column) {
   ensure_is_anipoint(data)
   ensure_valid_index(data, column)
 
-  md <- get_metadata(data)
-  md$variables$when$index <- column
-  data <- attach_metadata(data, md)
-
-  # The old index is not promoted to a grouping variable (one group per row).
-  declare_variables(
-    data,
-    "when",
-    setdiff(get_variables(data, "when"), column)
-  )
+  # The old index is not promoted to a key (one group per row).
+  set_variables(data, when = list(index = column))
 }
 
 

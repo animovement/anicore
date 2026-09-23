@@ -124,7 +124,7 @@ to_anievent.anipoint <- function(
   if (is.null(ve) || (length(ve$state) == 0 && length(ve$point) == 0)) {
     cli::cli_abort(c(
       "The {.cls anipoint} has no event columns declared.",
-      "i" = "Declare them with {.fn set_variables_event} before conversion."
+      "i" = "Declare them with {.code set_variables(data, event = list(state = ))} before conversion."
     ))
   }
 

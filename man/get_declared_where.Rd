@@ -7,13 +7,13 @@
 get_declared_where(data)
 }
 \arguments{
-\item{data}{An aniframe or anievent object.}
+\item{data}{An aniframe.}
 }
 \value{
 Named character vector, or a bare one when no roles are known.
 }
 \description{
-Re-declaring from \code{get_variables()} would lose the axis roles and reduce
+Re-declaring from the bare columns would lose the axis roles and reduce
 the frame to \code{unknown} (#109).
 }
 \keyword{internal}

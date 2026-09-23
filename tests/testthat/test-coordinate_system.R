@@ -140,7 +140,7 @@ test_that("an undeclared column does not decide the coordinate system", {
   )
   expect_true(is_spherical(af))
 
-  reduced <- suppressWarnings(remove_variables_where(af, "rho"))
+  reduced <- suppressWarnings(remove_variables(af, where = "rho"))
 
   expect_equal(get_coordinate_system(reduced), "unknown")
   expect_false(is_spherical(reduced))
@@ -157,7 +157,7 @@ test_that("the guards report what the frame is in, and what to do", {
     data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c("u", "v")
   ))
-  expect_error(ensure_is_cartesian(unknown), "set_axes")
+  expect_error(ensure_is_cartesian(unknown), "set_variables")
 })
 
 test_that("get_coordinate_system() reads the derived field", {

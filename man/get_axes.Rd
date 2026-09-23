@@ -15,10 +15,8 @@ Named character vector: names are axis roles (\code{x}, \code{y}, \code{z},
 for a frame whose coordinate system is \code{"unknown"}.
 }
 \description{
-Where \code{\link[=get_variables_where]{get_variables_where()}} gives the column names, this gives what
-each of them \emph{means}. Index by role to write a transformation that does
-not care what the columns are called:
-\code{data[[get_axes(data)[["x"]]]]}.
+The \code{where$position} slot. Index by role to write a transformation that
+does not care what the columns are called: \code{data[[get_axes(data)[["x"]]]]}.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
@@ -31,6 +29,5 @@ get_metadata(renamed, "coordinate_system")
 
 }
 \seealso{
-\code{\link[=set_axes]{set_axes()}} to change it, \code{\link[=get_variables_where]{get_variables_where()}} for the
-columns without their roles.
+\code{\link[=set_variables]{set_variables()}} to change it.
 }

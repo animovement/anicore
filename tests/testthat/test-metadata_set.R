@@ -258,3 +258,10 @@ test_that("set_metadata converts datetime values to POSIXct", {
   expect_true(is.na(get_metadata(data_na, "start_datetime")))
   expect_s3_class(get_metadata(data_na, "start_datetime"), "POSIXct")
 })
+
+test_that("a factor field refuses more than one value", {
+  expect_error(
+    set_metadata(example_anipoint(), handedness = c("right", "left")),
+    "can only be"
+  )
+})

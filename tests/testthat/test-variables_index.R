@@ -4,8 +4,8 @@ test_that("a frame with no declaration is indexed by time", {
   af <- anipoint(individual = "a", time = 1:3, x = c(1, 2, 3), y = c(0, 1, 0))
 
   expect_equal(get_index(af), "time")
-  # `variables_when` is the temporal *context*, and this frame has none.
-  expect_equal(get_variables_when(af), character(0))
+  # The when keys are the temporal *context*, and this frame has none.
+  expect_equal(get_variables(af, "when", "keys"), character(0))
 })
 
 test_that("a frame can be indexed by a column that is not called time", {
@@ -20,7 +20,7 @@ test_that("a frame can be indexed by a column that is not called time", {
 
   expect_equal(get_index(af), "frame")
   # The index is declared separately, never as temporal context.
-  expect_false("frame" %in% get_variables_when(af))
+  expect_false("frame" %in% get_variables(af, "when", "keys"))
   # No column literally named `time` is required any more.
   expect_false("time" %in% names(af))
 })
@@ -93,8 +93,8 @@ test_that("as_anipoint() aborts when the declared index is absent", {
   expect_error(as_anipoint(df, index = "nope"), "not found in data")
 })
 
-test_that("variables_when never contains the index", {
-  # Older frames list the index in `variables_when`; grouping by it would put
+test_that("the when keys never contain the index", {
+  # Older frames list the index among the when keys; grouping by it would put
   # every row in its own group, so construction normalises it out.
   af <- as_anipoint(data.frame(
     time = 1:4,
@@ -104,8 +104,9 @@ test_that("variables_when never contains the index", {
     y = 1:4
   ))
 
-  expect_false(get_index(af) %in% get_variables_when(af))
-  expect_equal(get_variables_when(af), "session")
+  expect_false(get_index(af) %in% get_variables(af, "when", "keys"))
+  expect_equal(get_variables(af, "when", "keys"), "session")
+  expect_setequal(get_variables(af, "when"), c("time", "session"))
   expect_setequal(dplyr::group_vars(af), c("individual", "session"))
 })
 
@@ -117,7 +118,7 @@ test_that("setting a new index does not promote the old one to a grouping variab
 
   expect_equal(dplyr::group_vars(result), "individual")
   expect_equal(dplyr::n_groups(result), 1L)
-  expect_false("time" %in% get_variables_when(result))
+  expect_false("time" %in% get_variables(result, "when", "keys"))
 })
 
 test_that("set_metadata() refuses the index and names its setter", {
@@ -137,7 +138,7 @@ test_that("metadata serialised before the field existed reads back as time", {
   attr(af, "metadata") <- md
 
   expect_equal(get_index(af), "time")
-  expect_equal(get_variables_when(af), character())
+  expect_equal(get_variables(af, "when", "keys"), character())
 })
 
 # The index is exactly one column ----
@@ -176,27 +177,27 @@ test_that("anipoint() can declare an index too", {
 
 # Everything temporal follows the index, not the name `time` ----
 
-test_that("set_unit_time() converts the index column", {
+test_that("convert_unit_time() converts the index column", {
   af <- as_anipoint(
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   ) |>
     set_metadata(unit_time = "frame")
 
-  result <- set_unit_time(af, "s", calibration_factor = 1 / 30)
+  result <- convert_unit_time(af, "s", calibration_factor = 1 / 30)
 
   expect_equal(result$frame, c(1, 2, 3) / 30)
   expect_equal(as.character(get_metadata(result, "unit_time")), "s")
 })
 
-test_that("set_sampling_rate() rescales the index column", {
+test_that("convert_unit_time() rescales the index column by the declared rate", {
   af <- as_anipoint(
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   ) |>
-    set_metadata(unit_time = "frame")
+    set_metadata(unit_time = "frame", sampling_rate = 30)
 
-  result <- set_sampling_rate(af, 30)
+  result <- convert_unit_time(af, "s")
 
   expect_equal(result$frame, c(1, 2, 3) / 30)
   expect_equal(get_metadata(result, "sampling_rate"), 30)
@@ -213,7 +214,7 @@ test_that("to_anievent() delimits bouts by the host frame's index", {
     ),
     index = "frame"
   ) |>
-    set_variables_event(state = "behaviour")
+    set_variables(event = list(state = "behaviour"))
 
   ae <- to_anievent(af)
 
@@ -233,7 +234,7 @@ test_that("an anievent declares no index", {
       behaviour = c("rest", "rest", "walk", "walk")
     )
   ) |>
-    set_variables_event(state = "behaviour") |>
+    set_variables(event = list(state = "behaviour")) |>
     to_anievent()
 
   # The `when` role carries an interval instead of an index (#118)
@@ -315,7 +316,7 @@ test_that("declaring the missing variable resolves the duplication", {
   expect_warning(validate_anipoint(af), "not uniquely identified")
 
   expect_no_warning(
-    warn_duplicate_observations(add_variables_what(af, "keypoint"))
+    warn_duplicate_observations(add_variables(af, what = "keypoint"))
   )
 })
 
@@ -331,7 +332,8 @@ test_that("the temporal context counts towards the key", {
     )
   )
 
-  expect_equal(get_variables_when(af), "session")
+  expect_equal(get_variables(af, "when", "keys"), "session")
+  expect_setequal(get_variables(af, "when"), c("time", "session"))
   expect_no_warning(warn_duplicate_observations(af))
 })
 

@@ -30,8 +30,8 @@ same channel), has a **type** — either `"state"` (durative) or
 `"point"` (instant) — and carries a **label** identifying which event
 it is. Each event has a **start** and a **stop** time (identical for
 point events). Just like an `anipoint`, the event is *performed by
-something* (identity columns, declared via `variables_what`) at *some
-time* (temporal-grouping columns, declared via `variables_when`).
+something* (identity columns, the `what` keys) at *some
+time* (temporal-grouping columns, the `when` keys).
 
 Both classes inherit from the abstract `aniframe` parent, which carries
 the shared substrate — so `get_metadata()`, `set_metadata()`, the dplyr
@@ -121,7 +121,7 @@ ae_multi <- anievent(
   start = c(3, 14, 1, 7),
   stop = c(9, 19, 5, 12)
 )
-get_variables_when(ae_multi)
+get_variables(ae_multi, "when")
 ae_multi
 ```
 
@@ -137,9 +137,9 @@ observation-level offset table; the class itself just carries the key.
 `anievent` declares the unit of its `start`/`stop` values just like
 an `anipoint` declares the unit of its
 [index column](aniframe-structure.html#the-index) (`"frame"`,
-`"ms"`, `"s"`, `"m"`, `"h"`, …). `set_unit_time()` and
-`set_sampling_rate()` dispatch on both classes — on an anievent they
-scale `start` and `stop` instead of the index:
+`"ms"`, `"s"`, `"m"`, `"h"`, …). `convert_unit_time()` works on both
+classes — on an anievent it scales `start` and `stop` instead of the
+index:
 
 ```{r}
 ae_frames <- anievent(
@@ -149,7 +149,9 @@ ae_frames <- anievent(
   start = c(30, 150),
   stop = c(60, 300)
 )
-ae_seconds <- set_sampling_rate(ae_frames, sampling_rate = 30)
+ae_seconds <- ae_frames |>
+  set_metadata(sampling_rate = 30) |>
+  convert_unit_time("s")
 ae_seconds
 ```
 
@@ -178,9 +180,9 @@ Type only becomes load-bearing at conversion / plotting / metric time:
 Those operations live in companion packages (`animetric`, `anivis`)
 and will accept type declarations at call time. On the `anipoint`
 side the distinction can be recorded explicitly with
-`set_variables_event(state = ..., point = ...)`, but the `anievent`
+`set_variables(event = list(state = ..., point = ...))`, but the `anievent`
 class itself does not enforce it — an anievent has no
-`variables_event` of its own, since its events are already encoded in
+`event` role of its own, since its events are already encoded in
 `channel` and `label`.
 
 ## Modifiers
@@ -297,7 +299,7 @@ The channel name always comes from the column name. Use `state` vs
 
 ### From an `anipoint`
 
-If you already have an `anipoint` with `variables_event` declared in
+If you already have an `anipoint` with an `event` role declared in
 metadata, `to_anievent()` reads everything from there:
 
 ```{r}
@@ -311,7 +313,7 @@ af <- anipoint(
     levels = c("REM", "wake")
   )
 )
-af <- set_variables_event(af, state = "behaviour")
+af <- set_variables(af, event = list(state = "behaviour"))
 to_anievent(af)
 ```
 

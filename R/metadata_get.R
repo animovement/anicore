@@ -94,7 +94,7 @@ ensure_are_metadata_fields <- function(fields, call = rlang::caller_env()) {
     cli::cli_abort(
       c(
         "{.val {redirected}} {?is/are} not flat metadata field{?s} any more.",
-        "i" = "The variable declaration is read with {.fn get_variables_what} and friends, {.fn get_index} and {.fn get_axes}; connections with {.fn get_connections}."
+        "i" = "The variable declaration is read with {.fn get_variables}, {.fn get_index} and {.fn get_axes}; connections with {.fn get_connections}."
       ),
       call = call
     )

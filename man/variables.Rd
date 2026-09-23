@@ -2,97 +2,81 @@
 % Please edit documentation in R/variables.R
 \name{variables}
 \alias{variables}
-\alias{get_variables_what}
-\alias{get_variables_when}
-\alias{get_variables_where}
-\alias{set_variables_what}
-\alias{set_variables_when}
-\alias{set_variables_where}
-\alias{add_variables_what}
-\alias{add_variables_when}
-\alias{add_variables_where}
-\alias{remove_variables_what}
-\alias{remove_variables_when}
-\alias{remove_variables_where}
-\title{Declare which columns carry identity, time and position}
+\alias{get_variables}
+\alias{set_variables}
+\alias{add_variables}
+\alias{remove_variables}
+\title{Read and declare which columns carry identity, time, position and events}
 \usage{
-get_variables_what(data)
+get_variables(data, role = NULL, slot = NULL)
 
-get_variables_when(data)
+set_variables(data, what = NULL, when = NULL, where = NULL, event = NULL)
 
-get_variables_where(data)
+add_variables(data, what = NULL, when = NULL, where = NULL, event = NULL)
 
-set_variables_what(data, variables)
-
-set_variables_when(data, variables)
-
-set_variables_where(data, variables)
-
-add_variables_what(data, variables)
-
-add_variables_when(data, variables)
-
-add_variables_where(data, variables)
-
-remove_variables_what(data, variables)
-
-remove_variables_when(data, variables)
-
-remove_variables_where(data, variables)
+remove_variables(data, what = NULL, when = NULL, where = NULL, event = NULL)
 }
 \arguments{
-\item{data}{An aniframe or anievent object.}
+\item{data}{An aniframe.}
 
-\item{variables}{Character vector of column names.}
+\item{role}{Role to read, or \code{NULL} for the whole category.}
+
+\item{slot}{Slot within \code{role}, or \code{NULL} for the union of its slots.}
+
+\item{what, when, where, event}{A named list of slots, or a character vector
+for the role's main slot.}
 }
 \value{
-For the setters, \code{data} restructured and re-declared. For the
-getters, a character vector of column names.
+\code{get_variables()}: the whole category; the columns of a role,
+unnamed; or one slot as stored. The setters: \code{data}, restructured.
 }
 \description{
-\code{variables_what}, \code{variables_when} and \code{variables_where} name the
-columns that carry, respectively, entity identity, temporal position
-and spatial position. They are the frame's structure rather than a
-description of it: \code{\link[=as_anipoint]{as_anipoint()}} uses them to coerce column types,
-order columns and rows, group the frame, and derive
-\code{coordinate_system}.
-
-These functions declare them \emph{and} restructure the frame to match, so
-the two cannot drift apart. \code{\link[=set_metadata]{set_metadata()}} refuses these three
-fields for that reason.
+The \code{variables} metadata category says which columns play which role.
+Each role is a list of named slots:
 \itemize{
-\item \verb{set_variables_*()} replaces the declaration.
-\item \verb{add_variables_*()} appends to it — the common case, and one that
-avoids the footgun of having to restate the existing variables.
-\item \verb{remove_variables_*()} drops from it.
-\item \verb{get_variables_*()} reads it.
+\item \code{what}: \code{keys}, the identity columns.
+\item \code{when}: \code{keys}, the temporal context (session, trial), plus \code{index} on
+an anipoint or \code{interval} (\code{start}, \code{stop}) on an anievent.
+\item \code{where}: \code{position}, axis role to column (anipoint only).
+\item \code{event}: \code{state} and \code{point}, the per-frame event columns (anipoint
+only).
 }
 
-The column must exist before it can be declared, so the order is
-always create-then-declare:
+The frame is grouped by the \code{keys} of \code{what} and \code{when}; see \code{\link[=get_keys]{get_keys()}}.
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{data |>
-  dplyr::mutate(id = "hi") |>
-  add_variables_what("id")
-}\if{html}{\out{</div>}}
+Declaring restructures the frame to match — columns are retyped,
+reordered and regrouped, and \code{coordinate_system} is re-derived — so the
+metadata and the frame cannot drift apart. A column must exist before it
+is declared.
+\itemize{
+\item \code{set_variables()} replaces the slots it is given and leaves the rest.
+\item \code{add_variables()} appends to them.
+\item \code{remove_variables()} drops columns from them.
+}
+
+Each role argument takes a named list of slots, or a character vector for
+the role's main slot: \code{keys} for \code{what} and \code{when}, \code{position} for
+\code{where}. In \code{remove_variables()} a character vector drops the columns
+from every slot of the role.
 }
 \examples{
-af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+get_variables(af, "what")
+get_variables(af, "where", "position")
 
 # Declaring an identity column groups the frame by it
 af |>
   dplyr::mutate(id = "a") |>
-  add_variables_what("id") |>
+  add_variables(what = "id") |>
   dplyr::group_vars()
 
-# Declaring a third spatial column refreshes coordinate_system
-af |>
-  dplyr::mutate(z = 0) |>
-  add_variables_where("z") |>
+# Axis roles map to columns of any name
+df <- data.frame(time = 1:3, u = c(1, 2, 3), v = c(0, 1, 0))
+as_anipoint(df, variables_where = c("u", "v")) |>
+  set_variables(where = c(x = "u", y = "v")) |>
   get_metadata("coordinate_system")
 
 }
 \seealso{
-\code{\link[=validate_anipoint]{validate_anipoint()}}, which reports a frame whose metadata
-has drifted out of sync by some other route.
+\code{\link[=get_keys]{get_keys()}}, \code{\link[=get_index]{get_index()}}, \code{\link[=set_index]{set_index()}}, \code{\link[=get_axes]{get_axes()}}
 }
