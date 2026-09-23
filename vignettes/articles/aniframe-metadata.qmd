@@ -36,7 +36,7 @@ This article covers the metadata attribute and the functions that read
 and update it. For the data-column structure see
 [The aniframe data structure](aniframe-structure.html); for
 connections, which live in the `structure` category, see
-[Connections](aniframe-connections.html).
+[Structures](structures.html).
 
 ## The metadata attribute
 

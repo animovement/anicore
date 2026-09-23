@@ -43,8 +43,8 @@ ensure_no_declaration_fields <- function(user_md) {
           variables_where = ,
           variables_event = ,
           axes = "set_variables",
-          structure = "set_connections",
-          connections = "set_connections"
+          structure = ,
+          connections = "set_structure"
         )
       },
       character(1)

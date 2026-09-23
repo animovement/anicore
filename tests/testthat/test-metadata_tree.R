@@ -182,7 +182,7 @@ test_that("resolve_axes() handles every position shape", {
   expect_equal(resolve_axes(md), c(rho = "rho", phi = "phi"))
 })
 
-test_that("get_connections() answers empty on legacy flat metadata", {
+test_that("get_structure() answers empty on legacy flat metadata", {
   data <- af()
   legacy <- unclass(get_metadata(data))
   legacy <- c(
@@ -199,7 +199,7 @@ test_that("get_connections() answers empty on legacy flat metadata", {
   )
   data <- attach_metadata(data, legacy)
 
-  expect_equal(get_connections(data), list())
+  expect_equal(get_structure(data), list())
 })
 
 test_that("unit_angle is absent on an anievent", {
@@ -208,7 +208,7 @@ test_that("unit_angle is absent on an anievent", {
 
 test_that("the flat variables names are refused with a redirect", {
   expect_error(get_metadata(af(), "variables_what"), "get_variables")
-  expect_error(get_metadata(af(), "connections"), "get_connections")
+  expect_error(get_metadata(af(), "connections"), "get_structure")
 })
 
 test_that("set_metadata() refuses axes with a pointer at set_variables", {
@@ -277,8 +277,8 @@ test_that("the variables shape is validated", {
   expect_error(ensure_valid_metadata_variables(bad), "character vector")
 })
 
-test_that("set_metadata() points connections writes at set_connections", {
-  expect_error(set_metadata(af(), connections = list()), "set_connections")
+test_that("set_metadata() points connections writes at set_structure", {
+  expect_error(set_metadata(af(), connections = list()), "set_structure")
 })
 
 # ---- Legacy flat metadata ------------------------------------------------
@@ -299,8 +299,8 @@ test_that("setters that edit the variables work on legacy flat metadata", {
   x <- set_variables(dplyr::mutate(af, b = "a"), event = list(state = "b"))
   expect_equal(get_variables(x)$event$state, "b")
 
-  x <- suppressWarnings(set_connections(af, list(c("head", "tail"))))
-  expect_length(get_connections(x), 1)
+  x <- set_structure(af, anistructure(segments = list(c("head", "neck"))))
+  expect_length(get_structure(x), 1)
 })
 
 test_that("migration bumps spec_version", {

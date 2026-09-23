@@ -2,7 +2,7 @@
 % Please edit documentation in R/metadata_print.R
 \name{print_metadata_structure}
 \alias{print_metadata_structure}
-\title{Render the structure category: one line per keyed variable}
+\title{Render the structure category: one line per structure}
 \usage{
 print_metadata_structure(structure)
 }
@@ -10,6 +10,6 @@ print_metadata_structure(structure)
 \item{structure}{The structure list.}
 }
 \description{
-Render the structure category: one line per keyed variable
+Render the structure category: one line per structure
 }
 \keyword{internal}

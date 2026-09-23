@@ -255,6 +255,9 @@ md_where_position <- function(md) {
 #' @keywords internal
 migrate_metadata_layout <- function(md, anievent = NULL) {
   if (is_nested_metadata(md)) {
+    if (!all(vapply(md[["structure"]], is_anistructure, logical(1)))) {
+      md[["structure"]] <- migrate_structure_category(md[["structure"]])
+    }
     return(md)
   }
   md <- unclass(md)
@@ -272,7 +275,7 @@ migrate_metadata_layout <- function(md, anievent = NULL) {
     out[[category]] <- md[intersect(fields, names(md))]
   }
   out$variables <- variables
-  out$structure <- md[["connections"]] %||% list()
+  out$structure <- migrate_structure_category(md[["connections"]])
 
   if (anievent) {
     out$space <- NULL

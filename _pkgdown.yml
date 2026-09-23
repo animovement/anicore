@@ -16,7 +16,7 @@ articles:
     contents:
       - articles/aniframe-structure
       - articles/aniframe-metadata
-      - articles/aniframe-connections
+      - articles/structures
       - articles/anievent-structure
 
 reference:
@@ -85,16 +85,17 @@ reference:
       - convert_unit_angle
       - reflect_axis
 
-  - title: "Connections"
+  - title: "Structures"
     desc: >
-      Manage connections between identity or temporal variables (e.g.
-      skeleton edges between keypoints, or social-network edges between
-      individuals). Stored in the `structure` metadata category.
+      Points, the segments between them, and joints, over the levels of an
+      identity or temporal variable. A frame can hold several named
+      structures.
     contents:
-      - set_connections
-      - get_connections
-      - add_connections
-      - remove_connections
+      - anistructure
+      - example_structure
+      - validate_anistructure
+      - is_anistructure
+      - structures
 
   - title: "Spatial checks"
     desc: |

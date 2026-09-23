@@ -1,0 +1,105 @@
+---
+title: "Structures"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(anicore)
+```
+
+## What a structure is
+
+An `anistructure` records how the levels of one variable relate. The
+common case is a **skeleton** over `keypoint`, but the same class holds
+a team, a colony or a social network over `individual`. It has three
+parts:
+
+- **points**: the members.
+- **segments**: directed links between two points, with an optional
+  expected `length`.
+- **joints**: ordered pairs of segments, with angular limits per degree
+  of freedom.
+
+Each part beyond the points is optional. A structure with points alone
+is a roster; with segments it is a graph; with joints it is a
+constrained skeleton.
+
+```{r}
+leg <- anistructure(
+  segments = data.frame(
+    segment = c("thigh", "shin"),
+    from = c("hip", "knee"),
+    to = c("knee", "ankle")
+  ),
+  joints = data.frame(joint = "knee", a = "thigh", b = "shin", min = 0, max = 2.5),
+  root = "hip"
+)
+leg
+```
+
+Segments point one way. Run limbs from the root outward, and paired
+segments (left to right) the same way, so joint angles come out with the
+clinical convention: 0 when two segments are aligned.
+
+## Attaching structures to a frame
+
+A structure is a template: it names no variable until it is attached.
+`set_structure()` binds it to a variable and stores it under a name,
+which defaults to the variable:
+
+```{r}
+af <- example_anipoint(n_individuals = 4) |>
+  set_structure(example_structure())
+
+get_structure(af, "keypoint")
+```
+
+## Several structures over one variable
+
+A frame can hold any number of named structures, and several may span
+the same variable. A structure's points are its members, so a subset of
+the levels makes a sub-group, and groups may overlap:
+
+```{r}
+af <- af |>
+  set_structure(
+    anistructure(points = c("1", "2", "3", "4")),
+    variable = "individual",
+    name = "team"
+  ) |>
+  set_structure(
+    anistructure(segments = list(c("1", "2"), c("2", "3"))),
+    variable = "individual",
+    name = "defence"
+  )
+
+names(get_structure(af))
+get_structure(af, "defence")
+```
+
+`remove_structure()` drops one by name.
+
+Membership is fixed for the frame: a player who changes role partway
+through needs a separate frame, or a column recording the role.
+
+## Catching typos
+
+Points that don't appear in the data are kept with a warning, since
+they may be recorded in another file:
+
+```{r}
+#| warning: true
+example_anipoint(n_keypoints = 5) |>
+  set_structure(anistructure(segments = list(c("head", "necc"))))
+```

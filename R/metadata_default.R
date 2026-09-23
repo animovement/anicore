@@ -25,12 +25,10 @@
 #'   index), `where$position` (the axis-role mapping; names are roles,
 #'   values are columns), `event$state` + `event$point`. The frame groups
 #'   by `c(what$keys, when$keys)` and nothing else. These slots are
-#'   reached through the `*_variables_*()` accessors, [get_index()] and
-#'   [get_axes()], never by flat name — `keys` appears under two roles.
-#' * `structure` — relationships between levels of a variable, keyed by
-#'   that variable (typically `keypoint` for skeletons). Today this holds
-#'   the connection tables managed via [set_connections()]; it is where
-#'   an `anistructure` will live.
+#'   reached through [get_variables()], [get_index()] and [get_axes()],
+#'   never by flat name — `keys` appears under two roles.
+#' * `structure` — named [anistructure()]s, each relating the levels of
+#'   one variable; see [set_structure()].
 #' * `spec_version` — named list of semantic version strings, one per
 #'   class, versioning the full data contract independently of the
 #'   package version.
