@@ -34,6 +34,8 @@
 
 ## Added
 
+* A segment frame, `anisegment` (#154): `as_anisegment()` turns an anipoint into one row per segment of a structure, with its `length` and a unit direction (`ux`, `uy`, `uz`), a `segment` key in place of the structure's variable, and a `confidence` that is the lower of the two endpoints'. `as_anipoint(seg, root = )` rebuilds the positions from the root point's trajectory. Metadata, variables, structures, dplyr verbs, `convert_unit_space()` (which rescales `length`) and `convert_unit_time()` all work on it.
+
 * Orientation can be declared alongside position (#46): `set_variables(x, where = list(orientation = c(yaw = "heading")))` for a 2D frame, or the roles `qw`, `qx`, `qy`, `qz` of a unit quaternion for a 3D one. The roles are checked against the frame's dimensionality, quaternions must have unit norm, `reflect_axis()` reflects orientation with the positions, and `convert_unit_angle()` converts `yaw`.
 
 * `convert_inf_to_na()`, the sibling of `convert_nan_to_na()`, for sources that mark a missing observation with an infinity rather than a `NaN`. TRex is one — its own documentation masks `np.inf` out before plotting, and its `missing` flag is 1 in exactly those frames. Left in place an `Inf` propagates through arithmetic silently, so one untracked frame turns a mean or a speed into `Inf` rather than into a missing value (animovement/aniread#116).

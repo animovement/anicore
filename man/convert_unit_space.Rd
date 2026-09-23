@@ -7,7 +7,7 @@
 convert_unit_space(data, to_unit, calibration_factor = NULL)
 }
 \arguments{
-\item{data}{An anipoint.}
+\item{data}{An anipoint, or an anisegment, whose \code{length} is rescaled.}
 
 \item{to_unit}{Target unit, one of the levels of \code{unit_space} in
 \code{\link[=list_default_metadata]{list_default_metadata()}}.}
