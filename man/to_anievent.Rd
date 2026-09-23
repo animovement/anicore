@@ -4,7 +4,7 @@
 \alias{to_anievent}
 \alias{to_anievent.anievent}
 \alias{to_anievent.data.frame}
-\alias{to_anievent.aniframe}
+\alias{to_anievent.anipoint}
 \title{Encode per-frame data into an anievent}
 \usage{
 to_anievent(data, ...)
@@ -22,7 +22,7 @@ to_anievent(data, ...)
   ...
 )
 
-\method{to_anievent}{aniframe}(
+\method{to_anievent}{anipoint}(
   data,
   variables_what = NULL,
   variables_when = NULL,
@@ -58,7 +58,7 @@ grouping columns (e.g. \code{observation}, \code{session}, \code{trial}). Bare
 names (tidyselect). Like identity, these isolate bouts.}
 
 \item{metadata}{Optional list of metadata attached to the result.
-For an aniframe input, fields like \code{unit_time} and
+For an anipoint input, fields like \code{unit_time} and
 \code{sampling_rate} are propagated automatically; \code{metadata}
 overrides those.}
 }

@@ -7,7 +7,7 @@
 compute_sampling_gaps(data)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 }
 \value{
 Numeric vector of gaps, empty when there are none to take.

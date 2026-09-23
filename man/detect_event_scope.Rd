@@ -9,7 +9,7 @@ detect_event_scope(data, event_col, candidate_cols, time_col = "time")
 \description{
 Returns the minimal subset of \code{candidate_cols} that the value of
 \code{event_col} varies across (given \code{time_col}). Used by
-\code{to_anievent.aniframe()} to drop redundant identity columns —
+\code{to_anievent.anipoint()} to drop redundant identity columns —
 e.g. a \code{behaviour} column that is constant across \code{keypoint}
 for each \verb{(individual, time)} drops \code{keypoint} from the resulting
 anievent's grouping.

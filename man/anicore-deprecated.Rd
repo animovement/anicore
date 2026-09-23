@@ -27,7 +27,7 @@ The replacement function's value.
 \description{
 The position-grain frame is now called \code{anipoint}; \code{aniframe} names the
 abstract parent class shared with \link[=is_anievent]{anievent}. These
-aliases forward to their replacements and warn once per session.
+aliases forward to their replacements.
 }
 \seealso{
 \code{\link[=anipoint]{anipoint()}}, \code{\link[=as_anipoint]{as_anipoint()}}, \code{\link[=example_anipoint]{example_anipoint()}},

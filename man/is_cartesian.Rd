@@ -2,12 +2,12 @@
 % Please edit documentation in R/coordinate_system.R
 \name{is_cartesian}
 \alias{is_cartesian}
-\title{Test whether an aniframe uses a Cartesian coordinate system}
+\title{Test whether an anipoint uses a Cartesian coordinate system}
 \usage{
 is_cartesian(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \value{
 A logical value.

@@ -3,17 +3,14 @@
 \name{set_sampling_rate}
 \alias{set_sampling_rate}
 \alias{set_sampling_rate.aniframe}
-\alias{set_sampling_rate.anievent}
-\title{Set the sampling rate of an aniframe or anievent}
+\title{Set the sampling rate of an anipoint or anievent}
 \usage{
 set_sampling_rate(data, sampling_rate)
 
 \method{set_sampling_rate}{aniframe}(data, sampling_rate)
-
-\method{set_sampling_rate}{anievent}(data, sampling_rate)
 }
 \arguments{
-\item{data}{An aniframe or anievent.}
+\item{data}{An anipoint or anievent.}
 
 \item{sampling_rate}{Numeric value in Hz (samples per second).}
 }
@@ -30,7 +27,7 @@ metadata is updated.
 }
 \examples{
 \dontrun{
-# aniframe in frames -> seconds at 30 fps
+# anipoint in frames -> seconds at 30 fps
 data_s <- set_sampling_rate(data, sampling_rate = 30)
 
 # anievent: same call shape

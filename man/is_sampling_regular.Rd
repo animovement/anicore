@@ -7,7 +7,7 @@
 is_sampling_regular(data, tolerance = 1e-06)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{tolerance}{Relative tolerance: a gap counts as equal to the
 interval when it differs by no more than \code{tolerance * interval}.

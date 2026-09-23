@@ -7,7 +7,7 @@
 ensure_is_cartesian_1d(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \description{
 Internal guard for 1-D Cartesian checks

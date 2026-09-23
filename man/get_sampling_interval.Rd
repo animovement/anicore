@@ -7,7 +7,7 @@
 get_sampling_interval(data)
 }
 \arguments{
-\item{data}{An aniframe object.
+\item{data}{An anipoint object.
 
 Refreshed whenever the frame is re-declared, so like
 \code{coordinate_system} it can lag raw dplyr edits. \code{\link[=is_sampling_regular]{is_sampling_regular()}}

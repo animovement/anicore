@@ -2,7 +2,7 @@
 % Please edit documentation in R/aniframe_print.R
 \name{format_time_interval}
 \alias{format_time_interval}
-\title{Build the "Time" interval row for the aniframe print summary}
+\title{Build the "Time" interval row for the anipoint print summary}
 \usage{
 format_time_interval(x, md)
 }

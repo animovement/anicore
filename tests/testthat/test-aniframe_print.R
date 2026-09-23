@@ -1,4 +1,4 @@
-# Test outline for tbl_sum.aniframe():
+# Test outline for tbl_sum.anipoint():
 #
 # Behaviour:
 #   - includes "Individuals" only when the individual column is present

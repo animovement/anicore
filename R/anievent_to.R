@@ -30,7 +30,7 @@
 #'   grouping columns (e.g. `observation`, `session`, `trial`). Bare
 #'   names (tidyselect). Like identity, these isolate bouts.
 #' @param metadata Optional list of metadata attached to the result.
-#'   For an aniframe input, fields like `unit_time` and
+#'   For an anipoint input, fields like `unit_time` and
 #'   `sampling_rate` are propagated automatically; `metadata`
 #'   overrides those.
 #' @param ... Passed to methods.
@@ -112,7 +112,7 @@ to_anievent.data.frame <- function(
 
 #' @rdname to_anievent
 #' @export
-to_anievent.aniframe <- function(
+to_anievent.anipoint <- function(
   data,
   variables_what = NULL,
   variables_when = NULL,
@@ -123,7 +123,7 @@ to_anievent.aniframe <- function(
   ve <- md_event(md)
   if (is.null(ve) || (length(ve$state) == 0 && length(ve$point) == 0)) {
     cli::cli_abort(c(
-      "The {.cls aniframe} has no event columns declared.",
+      "The {.cls anipoint} has no event columns declared.",
       "i" = "Populate {.field variables_event$state} and/or {.field variables_event$point} in metadata before conversion."
     ))
   }

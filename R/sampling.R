@@ -21,7 +21,7 @@
 #' restarts in each group. A frame that is perfectly regular within every
 #' track looks wildly irregular pooled.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return Numeric vector of gaps, empty when there are none to take.
 #' @keywords internal
@@ -56,7 +56,7 @@ compute_sampling_gaps <- function(data) {
 #' The median gap, which is unmoved by a few dropped frames in a way the
 #' mean is not.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return Numeric scalar, or `NA` when the frame has no gaps to measure.
 #' @keywords internal
@@ -81,7 +81,7 @@ compute_sampling_interval <- function(data) {
 #' each group, so pooling them would measure the restarts rather than the
 #' sampling.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' Refreshed whenever the frame is re-declared, so like
 #' `coordinate_system` it can lag raw dplyr edits. [is_sampling_regular()]
@@ -112,7 +112,7 @@ get_sampling_interval <- function(data) {
 #' because dropping rows changes the answer and a stored logical would go
 #' on claiming the old one.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param tolerance Relative tolerance: a gap counts as equal to the
 #'   interval when it differs by no more than `tolerance * interval`.
 #'   Timestamps are rarely exactly equal, so comparing them with `==` says
@@ -158,7 +158,7 @@ is_sampling_regular <- function(data, tolerance = 1e-6) {
 #' time unit -- on a frame-indexed recording the rate is the conversion
 #' rather than a claim the gaps can contradict.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return `TRUE`, invisibly.
 #' @keywords internal

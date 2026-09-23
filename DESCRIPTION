@@ -21,6 +21,7 @@ Depends:
 Imports:
     cli,
     dplyr,
+    lifecycle,
     rlang,
     pillar,
     anytime,
