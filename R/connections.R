@@ -106,10 +106,7 @@ set_connections <- function(data, connections, variable = "keypoint") {
 #' @export
 get_connections <- function(data, variable = NULL) {
   ensure_is_anipoint(data)
-  current <- get_metadata(data, "structure")
-  if (is.null(current)) {
-    current <- list()
-  }
+  current <- get_metadata(data, "structure") %||% list()
 
   if (is.null(variable)) {
     return(current)
