@@ -46,7 +46,9 @@ frame_class <- function(data) {
 #' * `what`: `keys`, the identity columns.
 #' * `when`: `keys`, the temporal context (session, trial), plus `index` on
 #'   an anipoint or `interval` (`start`, `stop`) on an anievent.
-#' * `where`: `position`, axis role to column (anipoint only).
+#' * `where`: `position`, axis role to column, and optionally
+#'   `orientation`: `yaw` in 2D or a unit quaternion `qw`, `qx`, `qy`, `qz`
+#'   in 3D (anipoint only).
 #' * `event`: `state` and `point`, the per-frame event columns (anipoint
 #'   only).
 #'

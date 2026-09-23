@@ -37,7 +37,9 @@ Each role is a list of named slots:
 \item \code{what}: \code{keys}, the identity columns.
 \item \code{when}: \code{keys}, the temporal context (session, trial), plus \code{index} on
 an anipoint or \code{interval} (\code{start}, \code{stop}) on an anievent.
-\item \code{where}: \code{position}, axis role to column (anipoint only).
+\item \code{where}: \code{position}, axis role to column, and optionally
+\code{orientation}: \code{yaw} in 2D or a unit quaternion \code{qw}, \code{qx}, \code{qy}, \code{qz}
+in 3D (anipoint only).
 \item \code{event}: \code{state} and \code{point}, the per-frame event columns (anipoint
 only).
 }

@@ -250,6 +250,33 @@ is_polar(pol)
 is_cartesian_2d(cart)
 ```
 
+## Orientation
+
+Position says where an entity is; orientation says which way it faces.
+It is declared next to position, in the `where` role's `orientation`
+slot, with the same pattern: a closed set of roles mapped to columns of
+any name. A 2D frame uses `yaw`, measured from `x` toward `y` in
+`unit_angle`; a 3D frame uses a unit quaternion, `qw`, `qx`, `qy`, `qz`
+(Hamilton convention, scalar first), which has none of the gimbal lock or
+wraparound of Euler angles.
+
+```{r}
+fly <- example_anipoint(n_keypoints = 1, n_individuals = 1, n_obs = 3) |>
+  dplyr::mutate(heading = c(0, 0.1, 0.2)) |>
+  set_variables(where = list(orientation = c(yaw = "heading")))
+
+get_variables(fly, "where", "orientation")
+```
+
+Declared orientation follows the frame: `reflect_axis()` reflects it with
+the positions, and `convert_unit_angle()` converts `yaw`.
+
+Orientation records measured or asserted state, such as a body axis from
+FicTrac, a rigid body from motion capture, or a fitted ellipse. The
+direction of travel is a different quantity, derived from displacement,
+and the two disagree exactly when it matters: side-slip, backing up,
+drift. Keep derived travel direction in an ordinary column.
+
 ## Where to next?
 
 - [The metadata attribute](aniframe-metadata.html) — units, axis
