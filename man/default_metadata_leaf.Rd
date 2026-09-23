@@ -13,7 +13,6 @@ default_metadata_leaf(field)
 The field's default value, or \code{NULL} for an unknown field.
 }
 \description{
-The single place \code{\link[=set_metadata]{set_metadata()}} and the validator look up a field's
-expected type and factor levels.
+The default value of one flat-addressable metadata field
 }
 \keyword{internal}

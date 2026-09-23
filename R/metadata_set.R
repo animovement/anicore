@@ -1,11 +1,6 @@
 #' Validate a complete metadata list and attach it
 #'
-#' The write path shared by [set_metadata()] and the internal callers
-#' that legitimately write structural fields — the constructors and the
-#' variable setters. Unlike [set_metadata()] it applies no field-level
-#' policy: the caller has already decided what the metadata should be.
-#' Metadata still in the legacy flat layout is migrated to the category
-#' tree here, so a write is what upgrades an old serialised object.
+#' No field-level policy; migrates legacy flat metadata on write.
 #'
 #' @param data An aniframe or anievent object.
 #' @param metadata A complete metadata list.
@@ -25,21 +20,8 @@ write_metadata <- function(data, metadata) {
 
 #' Refuse the metadata fields that have their own setters
 #'
-#' [set_metadata()] writes the metadata list and nothing else, which is
-#' what makes it safe to use everywhere. The variable declaration needs
-#' more than that: it names columns, so the names have to be checked
-#' against the frame, and for the three structural roles the frame has to
-#' be retyped, reordered, regrouped and its derived fields refreshed.
-#' Writing it — as an old flat field, or as the `variables` or
-#' `structure` category — is therefore refused, and the dedicated
-#' setters do the job instead.
-#'
-#' Restoring a **complete** metadata object is a different operation, and
-#' is allowed — [set_metadata()] hands it to [write_metadata()] before
-#' this check runs. Rebuilding a frame and putting its metadata back is
-#' the round-trip the class-preserving methods perform internally, and
-#' downstream packages do it too — `animetric::summarise_keypoints()`
-#' recomputes a frame and restores the metadata it captured beforehand.
+#' Complete metadata objects bypass this check, so wholesale restores still
+#' work (used internally and downstream, e.g. `animetric`).
 #'
 #' @param user_md The metadata the caller supplied.
 #'
@@ -65,9 +47,7 @@ ensure_no_declaration_fields <- function(user_md) {
       character(1)
     )
     cli::cli_abort(c(
-      # Message strings are code, not comments, so they must stay ASCII:
-      # R CMD check warns on non-ASCII in R sources, and CI errors on
-      # warnings.
+      # Keep ASCII: R CMD check warns on non-ASCII sources.
       "{.fn set_metadata} cannot write {.field {offending}} directly.",
       "i" = "{cli::qty(offending)}{?This entry declares/These entries declare} which columns carry identity, time, position and events, or how levels connect. Writing {cli::qty(offending)}{?it/them} here would leave the metadata naming columns the frame may not have, and the frame ordered and grouped as it was before.",
       "i" = "Use {.fn {unique(setters)}} instead, which validate the columns exist and restructure the frame to match.",
@@ -81,11 +61,7 @@ ensure_no_declaration_fields <- function(user_md) {
 
 #' Refuse writes addressed to a category
 #'
-#' Nested writes were considered and rejected on #118: field names are
-#' unique across the categories, so a flat write is unambiguous, and a
-#' category write would hand `set_metadata()` a merge policy it should
-#' not have. (`variables` and `structure` are refused with their own
-#' message by [ensure_no_declaration_fields()].)
+#' Field names are unique across categories, so flat writes suffice (#118).
 #'
 #' @param user_md The metadata the caller supplied.
 #'
@@ -157,12 +133,8 @@ as_metadata_factor <- function(value, field) {
 #'
 #' @export
 set_metadata <- function(data, ..., metadata = NULL) {
-  # ------------------------------------------------------------------
-  # Process the inputs
-  # ------------------------------------------------------------------
   dot_args <- list(...)
 
-  # Ensure that the user provides input with *either* ... or a metadata list
   if (!is.null(metadata) && !rlang::is_empty(dot_args)) {
     cli::cli_abort(
       "Metadata input can only be provided as either name-value pairs *or* a list through the {.arg metadata} parameter, not both."
@@ -176,16 +148,11 @@ set_metadata <- function(data, ..., metadata = NULL) {
     user_md <- list()
   }
 
-  # ------------------------------------------------------------------
-  # A complete metadata object is a wholesale replacement
-  # ------------------------------------------------------------------
+  # A complete metadata object is a wholesale replacement.
   if (has_all_metadata_fields(user_md)) {
     return(write_metadata(data, user_md))
   }
 
-  # ------------------------------------------------------------------
-  # Refuse the entries that have their own setters, and categories
-  # ------------------------------------------------------------------
   ensure_no_declaration_fields(user_md)
   ensure_no_category_fields(user_md)
   ensure_are_metadata_fields(names(user_md))
@@ -197,9 +164,6 @@ set_metadata <- function(data, ..., metadata = NULL) {
     ))
   }
 
-  # ------------------------------------------------------------------
-  # Convert character values to factors where appropriate
-  # ------------------------------------------------------------------
   for (n in names(user_md)) {
     default_val <- default_metadata_leaf(n)
     if (is.factor(default_val)) {
@@ -214,7 +178,6 @@ set_metadata <- function(data, ..., metadata = NULL) {
       }
     } else if (is_class(default_val, "POSIXct")) {
       if (length(user_md[[n]]) == 1 && is.na(user_md[[n]])) {
-        # Convert NA to POSIXct NA to maintain correct class
         user_md[[n]] <- as.POSIXct(NA_character_)
       } else {
         user_md[[n]] <- anytime::anytime(user_md[[n]])
@@ -222,9 +185,6 @@ set_metadata <- function(data, ..., metadata = NULL) {
     }
   }
 
-  # ------------------------------------------------------------------
-  # Does the data have metadata or not?
-  # ------------------------------------------------------------------
   if (!has_metadata(data)) {
     new_md <- if (is_anievent(data)) {
       list_default_metadata("anievent")
@@ -238,9 +198,6 @@ set_metadata <- function(data, ..., metadata = NULL) {
     )
   }
 
-  # ------------------------------------------------------------------
-  # Write each field into its category and attach
-  # ------------------------------------------------------------------
   for (n in names(user_md)) {
     new_md <- md_field_set(new_md, n, user_md[[n]])
   }

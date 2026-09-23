@@ -13,7 +13,6 @@ ensure_has_index(data)
 \code{TRUE}, invisibly.
 }
 \description{
-Which column that is comes from the frame's own declaration; \code{time} is
-its default, not a requirement (#109).
+Ensure the index column is present and numeric
 }
 \keyword{internal}

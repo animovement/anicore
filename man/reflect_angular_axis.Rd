@@ -15,14 +15,7 @@ reflect_angular_axis(data, role)
 \code{data}, with the angles it stores measured the other way.
 }
 \description{
-No column carries the role, so there is nothing to reflect -- but the
-angles are measured from it, and a frame left claiming a direction its
-angles do not agree with is the failure this is here to prevent.
-}
-\details{
-Turning \code{x} over reflects \code{phi} about the vertical, turning \code{y} over
-reflects it about the horizontal, and turning \code{z} over reflects \code{theta}
-about the equator. Anything else leaves the data alone: the direction is
-then a fact about the space rather than about the columns.
+\code{x} reflects \code{phi} about the vertical, \code{y} about the horizontal, \code{z}
+reflects \code{theta} about the equator; anything else leaves the data alone.
 }
 \keyword{internal}

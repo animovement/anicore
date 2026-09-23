@@ -7,8 +7,6 @@
 normalise_event_values(x, col_name)
 }
 \description{
-Logical → column name on TRUE, \code{NA} on FALSE. Factor / character →
-character. Lets a single kernel handle both binary (logical) and
-multi-level (factor / character) inputs.
+Logical becomes the column name on TRUE, \code{NA} on FALSE.
 }
 \keyword{internal}

@@ -53,9 +53,6 @@ as_anipoint <- function(
 ) {
   defaults <- list_default_metadata()
 
-  # An explicit index wins; otherwise keep what the frame already declares,
-  # falling back to "time" for a frame — or a serialised object — with no
-  # declaration at all.
   if (!is.null(index)) {
     ensure_index_name(index)
   }
@@ -67,12 +64,8 @@ as_anipoint <- function(
     }) %||%
     "time"
 
-  # A frame that already declares a role keeps it. Casting an anipoint
-  # that has been given a custom identity -- `id`, say -- used to re-run
-  # detection, find no recognised name, inject `keypoint = "centroid"`
-  # and overwrite the declaration with it (#96). Declarations whose
-  # columns have since been dropped fall through to detection, so a cast
-  # still repairs a frame rather than erroring on it.
+  # Keep existing declarations so a re-cast doesn't overwrite a custom
+  # identity with `keypoint = "centroid"` (#96).
   variables_when <- variables_when %||%
     get_declared_if_present(data, "variables_when")
   variables_what <- variables_what %||%
@@ -80,31 +73,20 @@ as_anipoint <- function(
   variables_where <- variables_where %||%
     get_declared_if_present(data, "variables_where")
 
-  # Resolve variables_when: detect from data if not specified
   if (is.null(variables_when)) {
-    # Recognised temporal variable names (time is always required)
     recognised_when <- c("observation", "session", "trial", "time")
-
-    # Only include recognised when variables that are present in data
     variables_when <- recognised_when[recognised_when %in% names(data)]
   }
 
-  # `variables_when` is the temporal *context* — which session, which
-  # trial. The index is the position within that context and is declared
-  # separately, so detection's `time` drops out here.
   variables_when <- setdiff(variables_when, index)
 
-  # Resolve variables_what: detect from data if not specified
   if (is.null(variables_what)) {
     data <- add_default_identity(data)
-
-    # Only include recognised what variables that are present in data
     variables_what <- list_recognised_variables_what()[
       list_recognised_variables_what() %in% names(data)
     ]
   }
 
-  # For spatial variables: detect from data if not specified
   if (is.null(variables_where)) {
     variables_where <- detect_variables_where(data)
     if (is.null(variables_where)) {
@@ -118,15 +100,10 @@ as_anipoint <- function(
     }
   }
 
-  # Attach class and metadata first, then let the shared restructure do
-  # the rest: validate, standardise types, relocate, arrange, regroup,
-  # and derive `coordinate_system`. Construction and re-declaration go
-  # through the same code so they cannot drift apart (#82).
   data <- new_anipoint(data)
   data <- set_metadata(data, metadata = metadata)
 
-  # `index` is a declaration, so `set_metadata()` refuses it — it goes on
-  # directly, before the restructure that reads it back.
+  # `set_metadata()` refuses declarations, so the index is attached directly.
   md <- get_metadata(data)
   md$variables$when$index <- index
   data <- attach_metadata(data, md)
@@ -144,20 +121,7 @@ as_anipoint <- function(
 
 #' Add a default identity variable when the data has none
 #'
-#' An anipoint needs **at least one identity (`what`) variable** — the
-#' columns that together say which entity a row belongs to, and which the
-#' frame is grouped by. When auto-detection finds none of the recognised
-#' names in the data, one is added so that rule holds.
-#'
-#' The column added is `keypoint = "centroid"`. It is not a claim about
-#' the data: it does not mean the frame holds pose or skeleton data, only
-#' that it has a single unnamed entity. A more neutral default
-#' (`individual = "all"`) was considered and rejected in #77 — the name
-#' stays as it is.
-#'
-#' This applies only to the auto-detection path. An explicit
-#' `variables_what = character(0)` is a deliberate declaration of "no
-#' identity variables" and is left alone.
+#' Adds `keypoint = "centroid"` (kept over alternatives in #77).
 #'
 #' @param data Data frame to complete.
 #'
@@ -175,11 +139,8 @@ add_default_identity <- function(data) {
 
 #' Detect spatial variables from data
 #'
-#' Polar-family detection runs first so that cylindrical data (`rho`, `phi`,
-#' `z`) and spherical data (`rho`, `phi`, `theta`) are not mis-classified as
-#' Cartesian on account of their `z` column. The `rho` + `phi` pair is the
-#' signature of a polar-family system; `z` then distinguishes cylindrical
-#' from polar, and `theta` distinguishes spherical.
+#' Polar-family runs first so cylindrical data isn't taken as Cartesian
+#' because of its `z` column.
 #'
 #' @param data Data frame to check.
 #' @return Character vector of detected spatial variable names, or NULL if none found.
@@ -212,11 +173,6 @@ detect_variables_where <- function(data) {
 
 #' A role the data already declares, when its columns are still there
 #'
-#' Casting an object that is already an anipoint should not re-derive
-#' what it has been told. It does fall back to detection when the
-#' declared columns are gone, so a cast still repairs a frame whose
-#' metadata has drifted rather than erroring on it.
-#'
 #' @param data Data frame, possibly carrying metadata.
 #' @param field One of the `variables_*` metadata fields.
 #'
@@ -229,16 +185,14 @@ get_declared_if_present <- function(data, field) {
 
   role <- sub("^variables_", "", field)
   declared <- if (identical(role, "where")) {
-    # Keep the role mapping: a re-cast must not degrade a frame with
-    # renamed coordinate columns to "unknown" (#109).
+    # Keep the role mapping, or renamed axes degrade to "unknown" (#109).
     get_declared_where(data)
   } else {
     get_variables(data, role)
   }
   declared <- declared[!is.na(declared)]
 
-  # An empty declaration is a deliberate opt-out (`variables_what =
-  # character(0)`), so it is kept as it is rather than re-detected.
+  # An empty `variables_what` is a deliberate opt-out, not re-detected.
   if (length(declared) == 0) {
     return(if (identical(field, "variables_what")) character(0) else NULL)
   }

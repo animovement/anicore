@@ -1,9 +1,6 @@
 #' Custom tibble summary for anievent
 #'
-#' Builds the print header rows shown above an `anievent`. Shows identity
-#' columns (`variables_what`), the unique event channels carried by the
-#' `channel` column, and the standard sampling-rate row inherited from
-#' the metadata substrate.
+#' Print header rows: identity columns, event channels and sampling rate.
 #'
 #' @param x An anievent object.
 #' @param ... Additional arguments (unused).

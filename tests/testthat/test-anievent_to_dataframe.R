@@ -1,5 +1,4 @@
-# Tests for to_anievent.data.frame (RLE encoding from a plain data frame
-# with bare-name tidyselect of state / point / identity columns)
+# to_anievent.data.frame()
 
 test_that("factor state column is run-length-encoded into bouts", {
   df <- dplyr::tibble(

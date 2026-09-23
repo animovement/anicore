@@ -15,15 +15,6 @@ warn_shadowed_axis_roles(axes, columns)
 \code{TRUE}, invisibly.
 }
 \description{
-\code{get_axes(af)[["x"]]} may be \code{"u"} while the frame also has a column
-literally called \code{x}. The frame is not malformed and the mapping is
-right, but \code{.data$x} then returns a real column of real numbers that is
-not the x axis — plausible wrong answers rather than an error, and the
-habit axis roles exist to replace (#119).
-}
-\details{
-A warning, not an error: the state is legal, and a column named \code{x} may
-honestly mean something else. Silence it for a whole loop with
-\code{options(aniframe.quiet = TRUE)}.
+E.g. role \code{x} is column \code{"u"} but a column \code{x} also exists (#119).
 }
 \keyword{internal}

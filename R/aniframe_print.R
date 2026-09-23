@@ -84,11 +84,7 @@ format_plural_title <- function(x) {
 
 #' Build the "Time" interval row for the anipoint print summary
 #'
-#' Returns `NULL` when the interval cannot be expressed in seconds (e.g.
-#' `unit_time = "frame"` with no `sampling_rate`, or `unit_time = "unknown"`).
-#' When `start_datetime` is set in metadata, formats absolute datetimes;
-#' otherwise formats elapsed time as `HH:MM:SS`. Switches to millisecond
-#' precision (`HH:MM:SS.fff`) when the recording is shorter than one second.
+#' `NULL` when the interval cannot be expressed in seconds.
 #'
 #' @keywords internal
 format_time_interval <- function(x, md) {
@@ -146,8 +142,7 @@ format_time_interval <- function(x, md) {
 
 #' Multiplier from a metadata `unit_time` value to seconds
 #'
-#' Returns `NA_real_` when conversion is not possible (e.g. `"frame"` without
-#' a `sampling_rate`, or `"unknown"`).
+#' `NA_real_` when conversion is not possible.
 #'
 #' @keywords internal
 compute_seconds_per_time_unit <- function(unit, sampling_rate) {

@@ -13,10 +13,6 @@ ensure_no_category_fields(user_md)
 \code{TRUE}, invisibly.
 }
 \description{
-Nested writes were considered and rejected on #118: field names are
-unique across the categories, so a flat write is unambiguous, and a
-category write would hand \code{set_metadata()} a merge policy it should
-not have. (\code{variables} and \code{structure} are refused with their own
-message by \code{\link[=ensure_no_declaration_fields]{ensure_no_declaration_fields()}}.)
+Field names are unique across categories, so flat writes suffice (#118).
 }
 \keyword{internal}

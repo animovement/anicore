@@ -13,7 +13,6 @@ legacy_where_position(md)
 Character vector, named by role when roles are known.
 }
 \description{
-\code{axes} is the source of truth where it exists; \code{variables_where}
-carries the columns without roles otherwise.
+\code{axes} wins over \code{variables_where} where it exists.
 }
 \keyword{internal}

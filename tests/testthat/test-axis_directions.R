@@ -7,7 +7,6 @@ frame_uv <- function(v = c(0, 5, 10)) {
   )
 }
 
-
 # Declaring directions ----
 
 test_that("directions are recorded against the axis role", {
@@ -35,7 +34,6 @@ test_that("directions come back in axis order however they went in", {
 
   expect_equal(names(get_axis_directions(af)), c("x", "z"))
 })
-
 
 # What is not a direction ----
 
@@ -86,7 +84,6 @@ test_that("a clash with an axis already declared is caught too", {
   expect_error(set_axis_directions(af, c(y = "left")), "same line")
 })
 
-
 # Turning an axis over ----
 
 test_that("reversing an axis reflects it around its extent", {
@@ -100,8 +97,7 @@ test_that("reversing an axis reflects it around its extent", {
 })
 
 test_that("an axis with no extent is negated instead", {
-  # World coordinates are measured from the origin, not from a corner, so
-  # their mirror is `-v` rather than `extent - v`.
+  # World coordinates are measured from the origin, so the mirror is `-v`.
   af <- set_axis_directions(frame_uv(), c(x = "right", y = "up"))
 
   expect_equal(set_axis_directions(af, c(y = "down"))$v, c(0, -5, -10))
@@ -132,7 +128,6 @@ test_that("an angular frame moves its angles instead of a column", {
     -c(0, 1, 2) %% (2 * pi)
   )
 })
-
 
 # Extents ----
 
@@ -178,8 +173,7 @@ test_that("an axis with no column is not measured against the data", {
 })
 
 test_that("extents follow the spatial unit they are lengths in", {
-  # Converting the coordinates and leaving the extent behind would leave the
-  # frame claiming a height in the unit it no longer uses.
+  # Otherwise the frame would claim a height in a unit it no longer uses.
   af <- set_axis_extents(frame_uv(), c(y = 1080))
 
   expect_equal(
@@ -187,7 +181,6 @@ test_that("extents follow the spatial unit they are lengths in", {
     c(y = 10800)
   )
 })
-
 
 # Construction ----
 
@@ -204,7 +197,6 @@ test_that("the accessors reject a plain data frame", {
   expect_error(get_axis_directions(df), "not an aniframe")
   expect_error(set_axis_directions(df, c(x = "right")), "not an anipoint")
 })
-
 
 # The reflection helper's own guards ----
 

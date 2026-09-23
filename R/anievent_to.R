@@ -147,10 +147,7 @@ to_anievent.anipoint <- function(
   bare <- dplyr::ungroup(dplyr::as_tibble(data))
 
   if (is.null(variables_what)) {
-    # Auto-detect scope on **identity** columns only. Temporal-grouping
-    # columns (observation / session / trial) carry distinct contexts
-    # and must not be merged. Identity columns that are themselves
-    # singletons are protected inside `detect_event_scope()`.
+    # Identity columns only: temporal contexts must never be merged.
     channel_scopes <- list()
     for (col in declared) {
       channel_scopes[[col]] <- detect_event_scope(
@@ -191,10 +188,8 @@ to_anievent.anipoint <- function(
     grouping_when <- setdiff(variables_when, c("start", "stop"))
   }
 
-  # The bouts inherit the host's provenance and clock, and nothing else:
-  # `space` describes the host frame, not the bouts encoded from it (#73),
-  # the variable declaration is rebuilt for the anievent's own columns,
-  # and `structure` is keyed by variables the anievent may not carry.
+  # Only `recording` and `time` carry over; `space` belongs to the host (#73)
+  # and `structure` may name variables the anievent lacks.
   inherited_metadata <- c(
     unclass(md[["recording"]]),
     unclass(md[["time"]])
@@ -214,10 +209,6 @@ to_anievent.anipoint <- function(
 
 
 #' String-keyed kernel shared by `to_anievent` methods
-#'
-#' Walks `state_cols` and `point_cols`, encodes each via the
-#' run-length / point-pick helpers, binds the bouts together, and
-#' casts the result via [as_anievent()].
 #'
 #' @keywords internal
 to_anievent_from_columns <- function(

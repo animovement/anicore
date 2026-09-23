@@ -13,8 +13,6 @@ normalise_axes(variables_where)
 Named character vector: names are roles, values are columns.
 }
 \description{
-An unnamed vector is the historical form, where the column name \emph{is}
-the role; it is read that way, which is what keeps every existing frame
-and every reader's output working untouched.
+In an unnamed vector the column name is the role.
 }
 \keyword{internal}

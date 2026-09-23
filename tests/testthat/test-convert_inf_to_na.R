@@ -1,9 +1,3 @@
-# Tests for convert_inf_to_na()
-#
-# The sibling of convert_nan_to_na(). Sources that mark a missing observation
-# with an infinity need this at read time, because an Inf propagates through
-# arithmetic silently where an NA does not.
-
 test_that("Inf and -Inf become NA in numeric columns", {
   df <- data.frame(x = c(1, Inf, -Inf, 3))
 

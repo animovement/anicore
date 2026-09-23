@@ -1,15 +1,5 @@
-# The metadata category tree (#118)
-#
-# Storage is nested -- recording / time / space / variables / structure,
-# with `spec_version` at the top level -- while access stays flat:
-# `get_metadata(data, "sampling_rate")` resolves the field through the
-# path map below, so downstream call sites never learn the layout.
-#
-# The `variables` category is the exception: `keys` appears under both
-# `what` and `when`, so its slots are not flat-addressable and are
-# reached through the `*_variables_*()` accessors instead. Everything in
-# this file is the single place that knows the layout; every other
-# function reads and writes through it.
+# Metadata is stored nested by category but accessed flat (#118); this file is
+# the only place that knows the layout.
 
 #' The metadata categories
 #'
@@ -22,9 +12,7 @@ list_metadata_categories <- function() {
 
 #' Which category each flat-addressable field lives in
 #'
-#' The `variables` slots are deliberately absent: `keys` appears under
-#' both `what` and `when`, so they are reached through their own
-#' accessors rather than by flat name.
+#' `variables` slots are absent: `keys` is ambiguous between `what` and `when`.
 #'
 #' @return Named character vector, field name to category.
 #' @keywords internal
@@ -62,11 +50,7 @@ is_nested_metadata <- function(md) {
 
 #' Read one flat-addressable field from a metadata list
 #'
-#' Resolves the field through the category map; `spec_version` sits at
-#' the top level. A field whose category the object does not carry (an
-#' anievent has no `space`) gives `NULL`. Metadata still in the legacy
-#' flat layout is read directly, so old serialised objects keep working
-#' until a write migrates them.
+#' Legacy flat metadata is read directly; a missing category gives `NULL`.
 #'
 #' @param md A metadata list.
 #' @param field Length-one character.
@@ -91,12 +75,8 @@ md_field <- function(md, field) {
 
 #' Flat resolution for `$` and `[[` on the classed metadata object
 #'
-#' [get_metadata()] returns a classed object precisely so the storage
-#' layout can change without downstream noticing (#155): `md$sampling_rate`
-#' and `md[["handedness"]]` resolve through the category tree, and a
-#' category name returns the whole category. The old `variables_*` names
-#' are not resolved — the variable declaration is read through its own
-#' accessors.
+#' Fields resolve through the category tree (#155); a category name returns
+#' the whole category.
 #'
 #' @param x An `aniframe_metadata` object.
 #' @param name,i The entry to read.
@@ -158,9 +138,7 @@ set_metadata_entry <- function(md, name, value) {
 
 #' Write one flat-addressable field into a metadata list
 #'
-#' The category is created if the object carries it; writing a `space`
-#' field into metadata that has no `space` category is refused, because
-#' that absence is a statement (#73), not an accident.
+#' Refuses a category the object lacks (e.g. `space` on an anievent, #73).
 #'
 #' @param md A metadata list in the nested layout.
 #' @param field Length-one character.
@@ -192,10 +170,7 @@ md_field_set <- function(md, field, value, call = rlang::caller_env()) {
 }
 
 
-#' The variables category, in canonical list shape
-#'
-#' Legacy flat metadata is translated on the way out, so readers written
-#' against the list shape work on old serialised objects too.
+#' The variables category, in canonical list shape (legacy metadata translated)
 #'
 #' @param md A metadata list.
 #'
@@ -208,7 +183,6 @@ md_variables <- function(md) {
     return(md[["variables"]])
   }
 
-  # Legacy flat layout: reconstruct the list shape from the old fields.
   when_cols <- as.character(md[["variables_when"]] %||% character())
   when_cols <- when_cols[!is.na(when_cols)]
   interval <- intersect(c("start", "stop"), when_cols)
@@ -233,8 +207,7 @@ md_variables <- function(md) {
 
 #' The spatial declaration of a legacy flat metadata list
 #'
-#' `axes` is the source of truth where it exists; `variables_where`
-#' carries the columns without roles otherwise.
+#' `axes` wins over `variables_where` where it exists.
 #'
 #' @param md A metadata list in the legacy flat layout.
 #'
@@ -249,8 +222,6 @@ legacy_where_position <- function(md) {
   declared[!is.na(declared)]
 }
 
-
-# ---- Slot readers -------------------------------------------------------
 
 #' @keywords internal
 md_what_keys <- function(md) {
@@ -281,8 +252,6 @@ md_where_position <- function(md) {
 
 
 #' Migrate a legacy flat metadata list to the category layout
-#'
-#' Already-nested metadata passes through untouched.
 #'
 #' @param md A metadata list, flat or nested.
 #' @param anievent Whether the metadata belongs to an anievent. `NULL`

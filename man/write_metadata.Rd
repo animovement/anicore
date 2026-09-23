@@ -15,11 +15,6 @@ write_metadata(data, metadata)
 \code{data}, with \code{metadata} attached.
 }
 \description{
-The write path shared by \code{\link[=set_metadata]{set_metadata()}} and the internal callers
-that legitimately write structural fields — the constructors and the
-variable setters. Unlike \code{\link[=set_metadata]{set_metadata()}} it applies no field-level
-policy: the caller has already decided what the metadata should be.
-Metadata still in the legacy flat layout is migrated to the category
-tree here, so a write is what upgrades an old serialised object.
+No field-level policy; migrates legacy flat metadata on write.
 }
 \keyword{internal}

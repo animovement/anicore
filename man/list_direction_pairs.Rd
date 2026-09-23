@@ -10,6 +10,6 @@ list_direction_pairs()
 Named character vector, direction to pair.
 }
 \description{
-Two axes pointing along the same pair are parallel, which no frame can be.
+Which opposed pair each direction belongs to
 }
 \keyword{internal}

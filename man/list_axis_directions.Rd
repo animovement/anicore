@@ -2,7 +2,7 @@
 % Please edit documentation in R/axis_directions.R
 \name{list_axis_directions}
 \alias{list_axis_directions}
-\title{The directions an axis can point}
+\title{The directions an axis can point, as seen from the recording viewpoint}
 \usage{
 list_axis_directions()
 }
@@ -10,9 +10,6 @@ list_axis_directions()
 Character vector of the permitted directions.
 }
 \description{
-Six words in three opposed pairs, read from where the recording was made:
-\code{right}/\code{left} across the view, \code{up}/\code{down} within it, and \code{back}/\code{forward}
-toward and away from the viewer. What they correspond to in the world is
-\code{reference_frame}'s to say.
+The directions an axis can point, as seen from the recording viewpoint
 }
 \keyword{internal}

@@ -10,28 +10,8 @@ list_recognised_variables_what()
 Character vector of column names.
 }
 \description{
-The identity (\code{what}) columns auto-detection looks for, shared by
-\code{\link[=as_anipoint]{as_anipoint()}} and \code{\link[=as_anievent]{as_anievent()}}. Only the names present in the data
-are used, and any other column can be declared explicitly via
-\code{variables_what}.
-}
-\details{
-The names are listed coarsest first, which reads naturally for the ones
-that do nest — a \code{subject} has \code{track}s, a track has \code{keypoint}s. \strong{That
-is the order detection emits, not a hierarchy a frame asserts.} Identity
-variables need not nest at all: \code{sex}, \code{treatment} and \code{genotype}
-partition a population without containing one another, and there is no
-sense in which one of them is finer than the next.
-
-So nothing should read a position in \code{variables_what} as meaning a level.
-Where a function needs to know which variable to operate on, it asks —
-\code{animetric::add_centroid()} takes \code{across}, \code{anispace::translate_coords()}
-takes \code{level} — rather than inferring one. The order does still carry
-through to column order and grouping, which is presentation: grouping by
-\verb{(a, b)} and \verb{(b, a)} gives the same groups.
-
-\code{subject} and \code{individual} name the same kind of thing; both are
-recognised because behavioural coding tools (BORIS and its kin) speak
-of subjects where tracking tools speak of individuals.
+Listed coarsest first. This is detection order, not a hierarchy:
+identity variables need not nest, so never read a position in
+\code{variables_what} as a level.
 }
 \keyword{internal}

@@ -1,5 +1,3 @@
-# Tests for the anipoint constructor and the class vector it lays down
-
 test_that("new_anipoint lays down the anipoint and aniframe classes in order", {
   df <- dplyr::tibble(
     time = 1:10,

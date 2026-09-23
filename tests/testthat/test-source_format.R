@@ -1,12 +1,3 @@
-# Tests for the source_format metadata field
-#
-# Covers:
-#   - list_default_metadata() includes source_format, as NA character
-#   - set_metadata() stores and get_metadata() returns it
-#   - metadata missing source_format still passes ensure_valid_metadata(),
-#     so objects serialised before the field existed continue to validate
-#   - a non-character value is rejected
-
 test_that("list_default_metadata() includes source_format as NA character", {
   md <- list_default_metadata()
 

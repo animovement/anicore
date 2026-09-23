@@ -13,7 +13,6 @@ list_metadata_schema(class = c("anipoint", "anievent"))
 A list with \code{space} (logical) and \code{slots} (named list).
 }
 \description{
-\code{space} says whether the class carries the category; \code{slots} lists the
-permitted variable roles and their slots. A new frame class adds a row.
+The metadata layout each frame class must follow
 }
 \keyword{internal}

@@ -13,20 +13,6 @@ add_default_identity(data)
 \code{data}, with an identity column added if it had none.
 }
 \description{
-An anipoint needs \strong{at least one identity (\code{what}) variable} — the
-columns that together say which entity a row belongs to, and which the
-frame is grouped by. When auto-detection finds none of the recognised
-names in the data, one is added so that rule holds.
-}
-\details{
-The column added is \code{keypoint = "centroid"}. It is not a claim about
-the data: it does not mean the frame holds pose or skeleton data, only
-that it has a single unnamed entity. A more neutral default
-(\code{individual = "all"}) was considered and rejected in #77 — the name
-stays as it is.
-
-This applies only to the auto-detection path. An explicit
-\code{variables_what = character(0)} is a deliberate declaration of "no
-identity variables" and is left alone.
+Adds \code{keypoint = "centroid"} (kept over alternatives in #77).
 }
 \keyword{internal}

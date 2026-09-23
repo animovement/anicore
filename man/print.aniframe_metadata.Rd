@@ -15,14 +15,6 @@
 \code{x}, invisibly.
 }
 \description{
-Renders the metadata grouped by category (#118): \code{spec_version} at the
-top, then one section per category. Leaf names and types are padded to
-fixed widths so the values line up, similar to \code{\link[=str]{str()}}. The
-\code{variables} category prints one line per role, its slots inline.
-}
-\details{
-The S3 class is named \code{aniframe_metadata} for historical reasons,
-but the metadata substrate is shared by both \code{\link[=anipoint]{anipoint()}} and
-\code{\link[=anievent]{anievent()}} objects.
+Shared by \code{\link[=anipoint]{anipoint()}} and \code{\link[=anievent]{anievent()}} despite the class name.
 }
 \keyword{internal}

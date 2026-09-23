@@ -7,10 +7,6 @@
 encode_state_bouts(data, col, time_col, group_cols)
 }
 \description{
-Within each \code{group_cols} partition, emit one row per maximal run
-of identical non-\code{NA} (normalised) values in \code{col}. \code{NA} rows
-break runs (so a value sequence like \code{c("REM", NA, "REM")} becomes
-two bouts, not one). \code{start} is the \code{time_col} value at the first
-frame in the run; \code{stop} is the value at the last frame.
+One row per maximal run of identical non-\code{NA} values; \code{NA} breaks runs.
 }
 \keyword{internal}

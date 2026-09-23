@@ -15,7 +15,6 @@ get_metadata_entry(md, field)
 The entry's value, or \code{NULL}.
 }
 \description{
-A category name gives the category; anything else resolves as a flat
-field through \code{md_field()}.
+Resolve one name against the metadata tree
 }
 \keyword{internal}

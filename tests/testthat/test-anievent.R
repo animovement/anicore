@@ -1,24 +1,3 @@
-# Tests for the anievent class
-#
-# Construction:
-#   - anievent() builds an object with the expected class chain
-#   - as_anievent() coerces a data.frame
-#   - as_anievent() on an existing anievent is a no-op
-#   - column type standardisation (channel -> character, label -> factor,
-#     start/stop -> numeric, individual character -> factor)
-#   - metadata defaults: variables_what = "individual",
-#     variables_when = c("start", "stop"), variables_where = character()
-#   - optional modifiers list-column is preserved
-#
-# Validation (validate_anievent):
-#   - rejects missing required columns
-#   - rejects wrong column types
-#   - rejects negative intervals (stop < start)
-#   - rejects malformed modifiers (non-list cell, unnamed entries)
-#
-# Predicates:
-#   - is_anievent / ensure_is_anievent
-
 # ---- Construction --------------------------------------------------------
 
 test_that("anievent() builds an object with the expected class chain", {
@@ -393,7 +372,7 @@ test_that("type auto-derives from start/stop when not supplied", {
   )
   expect_s3_class(ae$type, "factor")
   expect_equal(levels(ae$type), c("state", "point"))
-  # arrange-by-start reorders to (3, 4.5, 14); the start==stop bout sits second
+  # Sorted by start, so the point bout sits second.
   expect_equal(
     as.character(ae$type),
     c("state", "point", "state")
@@ -401,9 +380,8 @@ test_that("type auto-derives from start/stop when not supplied", {
 })
 
 test_that("type auto-derive is per (channel, label) — mixed-duration group is uniformly state", {
-  # (behaviour, REM) has two bouts: one durative (3-9), one single-frame
-  # (14-14). With the "any durative -> state" rule, both stay state.
-  # (call, alarm) is the only point group (start == stop).
+  # REM has a durative and a single-frame bout; any durative bout makes the
+  # whole group state.
   ae <- anievent(
     individual = c(1L, 1L, 1L),
     channel = c("behaviour", "behaviour", "call"),
@@ -411,7 +389,6 @@ test_that("type auto-derive is per (channel, label) — mixed-duration group is 
     start = c(3, 14, 4.5),
     stop = c(9, 14, 4.5)
   )
-  # arrange-by-start reorders rows
   by_key <- split(
     as.character(ae$type),
     paste(ae$channel, as.character(ae$label), sep = "/")
@@ -421,8 +398,7 @@ test_that("type auto-derive is per (channel, label) — mixed-duration group is 
 })
 
 test_that("type override wins over auto-derive", {
-  # All bouts have start == stop, auto-derive would say "point".
-  # Explicit override forces "state".
+  # Every bout has start == stop, so auto-derive alone would say "point".
   ae <- anievent(
     individual = 1L,
     channel = "motif",
@@ -456,7 +432,6 @@ test_that("validate_anievent rejects wrong type levels", {
     start = 1,
     stop = 3
   )
-  # Mutate type to a factor with wrong levels
   ae$type <- factor("state", levels = c("state", "point", "extra"))
   expect_error(
     validate_anievent(ae),
@@ -511,8 +486,8 @@ test_that("is_anievent / ensure_is_anievent work as expected", {
 # ---- Spatial metadata is not applicable to an anievent (#73) ------------
 
 test_that("an anievent does not claim a spatial layout it cannot have", {
-  # Reading a BORIS export used to produce an anievent announcing a
-  # coordinate system, inherited from the movement defaults.
+  # BORIS imports used to announce a coordinate system inherited from the
+  # movement defaults.
   ae <- anievent(
     individual = 1L,
     channel = "behaviour",
@@ -520,8 +495,7 @@ test_that("an anievent does not claim a spatial layout it cannot have", {
     start = c(1, 4),
     stop = c(3, 5)
   )
-  # The absence is spelled as an absent `space` category (#73, #118),
-  # so every spatial field reads as NULL rather than as a neutral value.
+  # An absent `space` category (#118), so every spatial field reads as NULL.
   expect_null(get_metadata(ae, "space"))
   expect_null(get_metadata(ae, "reference_frame"))
   expect_null(get_metadata(ae, "unit_space"))

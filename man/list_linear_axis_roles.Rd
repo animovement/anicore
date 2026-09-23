@@ -2,7 +2,7 @@
 % Please edit documentation in R/axis_directions.R
 \name{list_linear_axis_roles}
 \alias{list_linear_axis_roles}
-\title{The axis roles that can point somewhere}
+\title{The axis roles that can point somewhere (the Cartesian ones)}
 \usage{
 list_linear_axis_roles()
 }
@@ -10,7 +10,6 @@ list_linear_axis_roles()
 Character vector of axis roles.
 }
 \description{
-The Cartesian axes. \code{rho} is a distance and \code{phi} and \code{theta} are angles,
-so none of them has a direction of its own.
+The axis roles that can point somewhere (the Cartesian ones)
 }
 \keyword{internal}

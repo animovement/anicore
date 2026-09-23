@@ -2,7 +2,7 @@
 % Please edit documentation in R/orientation.R
 \name{derive_handedness}
 \alias{derive_handedness}
-\title{Work out handedness from three axis directions}
+\title{Work out handedness from three axis directions (sign of the determinant)}
 \usage{
 derive_handedness(directions)
 }
@@ -13,7 +13,6 @@ derive_handedness(directions)
 One of \code{"right"}, \code{"left"} or \code{"unknown"}.
 }
 \description{
-The sign of the determinant of the three direction vectors: positive is
-the right-handed orientation, the one \code{right}, \code{up} and \code{back} are in.
+Work out handedness from three axis directions (sign of the determinant)
 }
 \keyword{internal}

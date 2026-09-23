@@ -15,9 +15,6 @@ get_declared_if_present(data, field)
 The declared column names, or \code{NULL} to detect instead.
 }
 \description{
-Casting an object that is already an anipoint should not re-derive
-what it has been told. It does fall back to detection when the
-declared columns are gone, so a cast still repairs a frame whose
-metadata has drifted rather than erroring on it.
+A role the data already declares, when its columns are still there
 }
 \keyword{internal}

@@ -13,8 +13,6 @@ new_anipoint(x)
 An anipoint object
 }
 \description{
-Lays down the class vector \code{c("anipoint", "aniframe", ...)}: \code{anipoint}
-is the position-grain frame, \code{aniframe} the abstract parent shared by
-every animovement frame class.
+Create a new anipoint object (internal constructor)
 }
 \keyword{internal}

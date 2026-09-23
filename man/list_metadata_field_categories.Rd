@@ -10,8 +10,6 @@ list_metadata_field_categories()
 Named character vector, field name to category.
 }
 \description{
-The \code{variables} slots are deliberately absent: \code{keys} appears under
-both \code{what} and \code{when}, so they are reached through their own
-accessors rather than by flat name.
+\code{variables} slots are absent: \code{keys} is ambiguous between \code{what} and \code{when}.
 }
 \keyword{internal}

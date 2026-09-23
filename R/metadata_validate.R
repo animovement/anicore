@@ -1,8 +1,5 @@
 #' The metadata layout each frame class must follow
 #'
-#' `space` says whether the class carries the category; `slots` lists the
-#' permitted variable roles and their slots. A new frame class adds a row.
-#'
 #' @param class Frame class name.
 #'
 #' @return A list with `space` (logical) and `slots` (named list).
@@ -114,21 +111,13 @@ ensure_known_metadata_fields <- function(metadata) {
 }
 
 
-# Leaves added after the initial schema. Their absence is tolerated on
-# read so previously serialised objects continue to validate; new objects
-# always have them via `list_default_metadata()`.
+# Added after the initial schema; tolerated as absent so old objects validate.
 list_optional_metadata_fields <- function() {
   c("source_format", "sampling_interval")
 }
 
-# Normalise user-supplied `variables_event` into canonical form. Accepts
-# partial input — supplying only `state` or only `point` is fine, and the
-# missing side defaults to `character()`. `NULL`, empty, and all-`NA`
-# entries collapse to `character()` so callers can write
-# `list(point = "call")` or `list(state = "x", point = NA)` without having
-# to spell out both sides or wrap values in `as.character()`. Genuinely
-# wrong types (e.g. integers) are left untouched for the validator to
-# reject. Stored metadata always carries both entries as character vectors.
+# NULL/empty/all-NA collapse to character(); wrong types are left for the
+# validator to reject.
 normalise_variables_event_entry <- function(v) {
   if (is.null(v) || length(v) == 0L || all(is.na(v))) {
     return(character())
@@ -149,9 +138,6 @@ normalise_variables_event <- function(x) {
   )
 }
 
-# Structural check for the event role: must be a list with character
-# vectors at `$state` and `$point`, and the two sets must not overlap (a
-# column cannot be both state and point).
 ensure_valid_variables_event <- function(x) {
   if (is.null(x)) {
     return(invisible())
@@ -177,9 +163,6 @@ ensure_valid_variables_event <- function(x) {
   invisible()
 }
 
-# ------------------------------------------------------------------
-# Does the object have a "metadata" attribute?
-# ------------------------------------------------------------------
 has_metadata <- function(data) {
   "metadata" %in% names(attributes(data)) |> invisible()
 }
@@ -192,9 +175,6 @@ ensure_has_metadata <- function(data) {
   }
 }
 
-# ------------------------------------------------------------------
-# Is the "metadata" attribute a list?
-# ------------------------------------------------------------------
 is_list <- function(x) {
   is.list(x) && !is.data.frame(x) |> invisible()
 }
@@ -207,14 +187,8 @@ ensure_is_list <- function(x) {
   }
 }
 
-# ------------------------------------------------------------------
-# Are all the necessary categories and leaves present?
-# ------------------------------------------------------------------
-# A complete metadata object has the category tree — `space` optional,
-# since only some classes carry it — plus `spec_version`. A complete
-# *legacy flat* list (all of the old mandatory fields) also counts, so
-# the wholesale-restore path accepts objects serialised before the
-# categories existed; the write path migrates them.
+# A complete legacy flat list also counts, so objects serialised before the
+# categories existed can be restored; the write path migrates them.
 has_all_metadata_fields <- function(metadata) {
   if (is_nested_metadata(metadata)) {
     mandatory_categories <- setdiff(list_metadata_categories(), "space")
@@ -252,9 +226,6 @@ ensure_has_all_metadata_fields <- function(metadata) {
   }
 }
 
-# ------------------------------------------------------------------
-# Are all the leaves of the correct class?
-# ------------------------------------------------------------------
 has_valid_metadata_types <- function(metadata) {
   field_categories <- list_metadata_field_categories()
   for (nm in names(field_categories)) {
@@ -271,7 +242,7 @@ has_valid_metadata_types <- function(metadata) {
     user_val <- metadata[[category]][[nm]]
     default_val <- default_metadata_leaf(nm)
 
-    # Allow NA for any field (NA values can have any class)
+    # NA is accepted whatever its class.
     if (length(user_val) == 1 && is.na(user_val)) {
       next
     }
@@ -290,9 +261,6 @@ ensure_valid_metadata_types <- function(metadata) {
   }
 }
 
-# ------------------------------------------------------------------
-# Is the variables category well-shaped?
-# ------------------------------------------------------------------
 ensure_valid_metadata_variables <- function(
   metadata,
   known_slots = list_metadata_schema("anipoint")$slots

@@ -1,26 +1,3 @@
-# Test outline for example_anipoint():
-#
-# Validation:
-#   - errors when n_keypoints > 11
-#   - errors when n_dims is invalid
-#
-# Default behaviour:
-#   - creates aniframe with default parameters
-#   - has correct dimensions with defaults
-#
-# Keypoint handling:
-#   - uses centroid when n_keypoints is 1
-#   - uses anatomical keypoints when n_keypoints > 1
-#
-# Spatial dimensions:
-#   - creates 1D data with only x
-#   - creates 2D data with x and y
-#   - creates 3D data with x, y, and z
-#
-# Design structure:
-#   - creates correct number of rows
-#   - respects n_trials and n_sessions
-
 test_that("example_anipoint errors when n_keypoints > 11", {
   expect_error(
     example_anipoint(n_keypoints = 12),

@@ -1,8 +1,6 @@
 library(testthat)
 
-# ------------------------------------------------------------------
-# Tests for ensure_has_metadata()
-# ------------------------------------------------------------------
+# ---- Tests for ensure_has_metadata() ----
 
 test_that("Tests for ensure_has_metadata()", {
   x <- example_anipoint()
@@ -14,9 +12,7 @@ test_that("Tests for ensure_has_metadata()", {
   expect_error(ensure_has_metadata(x))
 })
 
-# ------------------------------------------------------------------
-# Tests for ensure_is_list()
-# ------------------------------------------------------------------
+# ---- Tests for ensure_is_list() ----
 
 test_that("Tests for ensure_is_list()", {
   x <- example_anipoint()
@@ -28,9 +24,7 @@ test_that("Tests for ensure_is_list()", {
   expect_error(ensure_is_list(x))
 })
 
-# ------------------------------------------------------------------
-# Tests for ensure_has_all_metadata_fields()
-# ------------------------------------------------------------------
+# ---- Tests for ensure_has_all_metadata_fields() ----
 
 test_that("Tests for ensure_has_all_metadata_fields()", {
   x <- example_anipoint()

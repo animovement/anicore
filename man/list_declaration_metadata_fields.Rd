@@ -10,9 +10,6 @@ list_declaration_metadata_fields()
 Character vector of metadata field names.
 }
 \description{
-Writing any of these has consequences beyond the metadata list — at
-the least the named columns must exist, and for the three structural
-roles the frame is retyped, reordered and regrouped to match — so they
-are reachable only through their own setters.
+Reachable only through their own setters, which restructure the frame.
 }
 \keyword{internal}

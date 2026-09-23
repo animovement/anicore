@@ -10,9 +10,6 @@ list_base_frame_classes()
 Character vector of class names.
 }
 \description{
-The tail of the class vector that belongs to dplyr rather than to
-animovement. \code{NextMethod()} returns these already set correctly, so
-they are never restored from the input — doing so would, for instance,
-re-group the result of an \code{\link[dplyr:ungroup]{dplyr::ungroup()}}.
+Never restored from the input, or e.g. \code{\link[dplyr:ungroup]{dplyr::ungroup()}} would re-group.
 }
 \keyword{internal}

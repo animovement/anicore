@@ -127,9 +127,6 @@ list_default_metadata <- function(class = c("anipoint", "anievent")) {
 
 #' The default value of one flat-addressable metadata field
 #'
-#' The single place [set_metadata()] and the validator look up a field's
-#' expected type and factor levels.
-#'
 #' @param field Length-one character.
 #'
 #' @return The field's default value, or `NULL` for an unknown field.

@@ -1,25 +1,6 @@
-# Axis roles (#109)
-#
-# The coordinate system used to be inferred by matching `variables_where`
-# against a fixed list of names. The name *was* the role, so a frame whose
-# coordinates were called anything else degraded to `unknown` and every
-# spatial function refused it.
-#
-# The `axes` field maps role to column instead: `c(x = "u", y = "v")`. The
-# set of roles stays closed — that is what makes `map_to_polar()` and unit
-# conversion meaningful — while the spelling of the columns is free.
-#
-# It is a field of its own rather than names on `variables_where`, which
-# stays a plain vector. A named character vector is a *rename instruction*
-# to tidyselect, and `variables_where` is read raw and passed to
-# `dplyr::all_of()` downstream, where names would silently rename the
-# columns. `axes` will move into the spatial category in #118.
+# Axes map role to column (#109): roles are a closed set, column names are free.
 
 #' The axis role sets that define each coordinate system
-#'
-#' Closed by design. A transformation between coordinate systems is only
-#' well defined because the roles on each side are known, so an
-#' unrecognised role is rejected rather than accommodated.
 #'
 #' @return Named list mapping a comma-separated sorted role set to the
 #'   coordinate system it defines.
@@ -51,9 +32,7 @@ list_axis_roles <- function() {
 
 #' Normalise a `variables_where` declaration into a role-to-column mapping
 #'
-#' An unnamed vector is the historical form, where the column name *is*
-#' the role; it is read that way, which is what keeps every existing frame
-#' and every reader's output working untouched.
+#' In an unnamed vector the column name is the role.
 #'
 #' @param variables_where Character vector, optionally named by axis role.
 #'
@@ -65,7 +44,6 @@ normalise_axes <- function(variables_where) {
   }
   nms <- names(variables_where)
   if (is.null(nms) || any(nms == "" | is.na(nms))) {
-    # Unnamed, or partially named — the historical reading applies.
     return(stats::setNames(
       as.character(variables_where),
       as.character(variables_where)
@@ -76,11 +54,6 @@ normalise_axes <- function(variables_where) {
 
 
 #' Was this declaration written as an explicit role mapping?
-#'
-#' Explicit roles are validated strictly and an unrecognised one aborts.
-#' A bare vector of column names keeps the older, lenient behaviour of
-#' warning and falling back to `"unknown"`, because that is what readers
-#' and existing frames rely on.
 #'
 #' @param variables_where The declaration as supplied.
 #'
@@ -95,10 +68,6 @@ has_axis_roles <- function(variables_where) {
 
 
 #' Reject roles that no coordinate system defines
-#'
-#' Named by the offending role, at the point of declaration — as opposed
-#' to silently degrading the frame to `"unknown"` and failing later in
-#' whichever spatial function the user reaches for first.
 #'
 #' @param axes A normalised role-to-column mapping.
 #'
@@ -167,10 +136,7 @@ get_axes <- function(data) {
 
 #' Resolve the axis mapping from a metadata list
 #'
-#' Objects serialised before the field existed have no `axes`, but their
-#' `variables_where` was matched against the role names to infer a
-#' coordinate system, so the column name *was* the role. Reading it that
-#' way here keeps those frames working untouched.
+#' An unnamed position vector is read with the column name as the role.
 #'
 #' @param md A metadata list.
 #'
@@ -185,8 +151,6 @@ resolve_axes <- function(md) {
   }
 
   if (is.null(names(position))) {
-    # Columns whose roles are unknown: usable as axes only when their
-    # names themselves name a coordinate system.
     axes <- normalise_axes(position)
     if (identical(infer_coordinate_system(axes), "unknown")) {
       return(empty)
@@ -200,15 +164,7 @@ resolve_axes <- function(md) {
 
 #' Warn when an axis role is carried by one column while another has its name
 #'
-#' `get_axes(af)[["x"]]` may be `"u"` while the frame also has a column
-#' literally called `x`. The frame is not malformed and the mapping is
-#' right, but `.data$x` then returns a real column of real numbers that is
-#' not the x axis — plausible wrong answers rather than an error, and the
-#' habit axis roles exist to replace (#119).
-#'
-#' A warning, not an error: the state is legal, and a column named `x` may
-#' honestly mean something else. Silence it for a whole loop with
-#' `options(aniframe.quiet = TRUE)`.
+#' E.g. role `x` is column `"u"` but a column `x` also exists (#119).
 #'
 #' @param axes A normalised role-to-column mapping.
 #' @param columns The frame's column names.

@@ -13,8 +13,6 @@ drop_spatial_metadata(metadata)
 \code{metadata} without spatial fields.
 }
 \description{
-Readers and older code pass spatial fields (often the old neutral
-spellings, #73); an anievent has no \code{space} category, so they are
-dropped rather than refused.
+Dropped rather than refused, since readers still pass them (#73).
 }
 \keyword{internal}

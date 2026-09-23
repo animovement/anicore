@@ -13,7 +13,6 @@ compute_sampling_interval(data)
 Numeric scalar, or \code{NA} when the frame has no gaps to measure.
 }
 \description{
-The median gap, which is unmoved by a few dropped frames in a way the
-mean is not.
+The median gap, robust to a few dropped frames.
 }
 \keyword{internal}

@@ -26,11 +26,7 @@
 The entry's value, or \code{NULL}.
 }
 \description{
-\code{\link[=get_metadata]{get_metadata()}} returns a classed object precisely so the storage
-layout can change without downstream noticing (#155): \code{md$sampling_rate}
-and \code{md[["handedness"]]} resolve through the category tree, and a
-category name returns the whole category. The old \verb{variables_*} names
-are not resolved — the variable declaration is read through its own
-accessors.
+Fields resolve through the category tree (#155); a category name returns
+the whole category.
 }
 \keyword{internal}

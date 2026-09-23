@@ -1,16 +1,5 @@
-# The index (#109)
-#
-# `variables_when` used to do two jobs at once: name the column the frame
-# is indexed by, and name the surrounding temporal context. The two were
-# told apart by the literal string "time", which forced every frame to
-# have a column of that name and made the distinction unrecoverable
-# downstream without repeating the same literal.
-#
-# `variables_index` names the column instead, and is kept out of
-# `variables_when` entirely, so that field is exactly what the frame
-# groups by. Making it a member would leave `set_index()` promoting the
-# old index to a grouping variable, and every downstream package
-# repeating the same `setdiff` to undo it.
+# The index is kept out of `variables_when`, which is exactly what the frame
+# groups by (#109).
 
 #' The column an anipoint is indexed by
 #'
@@ -51,14 +40,7 @@ get_index <- function(data) {
 
 #' Resolve the index from a metadata list
 #'
-#' Objects serialised before the field existed have no `index`. They were
-#' built when a literal `time` column was mandatory, so that is what they
-#' are indexed by, and defaulting here keeps them working untouched.
-#'
-#' `NA` — how an [anievent()] spells "not applicable" — falls back the
-#' same way. The only path that reaches here with anievent metadata is a
-#' cast to [anipoint()], which needs *some* index; [get_index()] refuses
-#' the anievent before it gets this far.
+#' Missing (pre-#109 objects) or `NA` (anievent) falls back to `"time"`.
 #'
 #' @param md A metadata list.
 #'
@@ -112,11 +94,7 @@ set_index <- function(data, column) {
   md$variables$when$index <- column
   data <- attach_metadata(data, md)
 
-  # If the column was serving as temporal context, it stops: a variable
-  # cannot be both the position within a context and part of the context.
-  # The previous index simply stops being declared — it is not silently
-  # promoted to a grouping variable, which for a column of unique values
-  # would put every row in its own group.
+  # The old index is not promoted to a grouping variable (one group per row).
   declare_variables(
     data,
     "when",
@@ -127,10 +105,7 @@ set_index <- function(data, column) {
 
 #' Ensure a declared index names exactly one column
 #'
-#' Split out from [ensure_valid_index()] because [as_anipoint()] needs it
-#' before the column is looked up, and under its own argument name.
-#' Unchecked, a two-column `index` falls through to [resolve_index()],
-#' which reads anything but a single name as "unset" and answers `"time"`.
+#' Otherwise [resolve_index()] would silently answer `"time"`.
 #'
 #' @param index The proposed index.
 #' @param arg Name of the caller's argument, for the message.

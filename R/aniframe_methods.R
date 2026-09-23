@@ -1,13 +1,5 @@
-# Methods for the aniframe family to preserve class through dplyr
-# operations. `aniframe` is the abstract parent of every animovement
-# frame class, so one method set serves anipoint, anievent and any
-# downstream subclass.
-#
-# Each method captures the incoming class vector *before* dispatch and
-# hands it back to `preserve_animovement_class()`, which restores it. That
-# is what carries subclasses (anipoint, anievent, animetric's
-# `aniframe_kin` and friends) through a pipeline — rebuilding a fixed
-# `aniframe` here would drop them (#81).
+# Each method captures the class vector before dispatch and restores it, so
+# downstream subclasses survive a pipeline (#81).
 
 # ---- dplyr verb methods ----
 
@@ -178,10 +170,7 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
   md <- get_metadata(x)
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
-  # Defensive: tibble's `[[` returns a vector for normal column extracts
-  # and a list (or list element) for list-columns; it doesn't return a
-  # data.frame in any path we've found. Kept in case a future tibble
-  # release changes that.
+  # Defensive: tibble's `[[` does not currently return a data frame.
   if (is.data.frame(x)) {
     # nocov start
     x <- preserve_animovement_class(x, cls, md)

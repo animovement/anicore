@@ -1,9 +1,4 @@
-#' The directions an axis can point
-#'
-#' Six words in three opposed pairs, read from where the recording was made:
-#' `right`/`left` across the view, `up`/`down` within it, and `back`/`forward`
-#' toward and away from the viewer. What they correspond to in the world is
-#' `reference_frame`'s to say.
+#' The directions an axis can point, as seen from the recording viewpoint
 #'
 #' @return Character vector of the permitted directions.
 #' @keywords internal
@@ -12,10 +7,7 @@ list_axis_directions <- function() {
 }
 
 
-#' The axis roles that can point somewhere
-#'
-#' The Cartesian axes. `rho` is a distance and `phi` and `theta` are angles,
-#' so none of them has a direction of its own.
+#' The axis roles that can point somewhere (the Cartesian ones)
 #'
 #' @return Character vector of axis roles.
 #' @keywords internal
@@ -25,8 +17,6 @@ list_linear_axis_roles <- function() {
 
 
 #' Which opposed pair each direction belongs to
-#'
-#' Two axes pointing along the same pair are parallel, which no frame can be.
 #'
 #' @return Named character vector, direction to pair.
 #' @keywords internal
@@ -60,9 +50,7 @@ list_direction_opposites <- function() {
 
 #' Each direction as a unit vector
 #'
-#' In a right-handed basis with `right`, `up` and `back` as the positive
-#' axes — `back` being toward the viewer. [get_angle_direction()] and
-#' [get_handedness()] are read off these.
+#' Right-handed basis; `right`, `up` and `back` (toward viewer) are positive.
 #'
 #' @return Named list of length-3 numeric vectors.
 #' @keywords internal
@@ -183,8 +171,6 @@ set_axis_directions <- function(data, directions) {
 
   data <- set_metadata(data, axis_directions = wanted)
 
-  # Three directions determine the handedness, so the recorded one is not
-  # left saying otherwise.
   settled <- derive_handedness(wanted)
   if (!identical(settled, "unknown")) {
     data <- set_metadata(data, handedness = settled)
@@ -203,16 +189,11 @@ set_axis_directions <- function(data, directions) {
 reflect_axis_role <- function(data, role) {
   axes <- get_axes(data)
   if (!role %in% names(axes)) {
-    # An angle is measured from the axes, so turning one over leaves every
-    # stored angle facing the wrong way. Recomputing them is the whole job,
-    # not a relabelling (#134).
+    # No column carries the role, but stored angles need recomputing (#134).
     return(reflect_angular_axis(data, role))
   }
 
-  # An axis runs from zero to its extent, so its mirror is `extent - v`.
-  # An axis with no declared extent is centred on its origin instead, and
-  # turning it over negates it -- which is what a world-coordinate axis
-  # wants, and what an image axis would get wrong.
+  # Mirror is `extent - v`; without a declared extent, reflect about the origin.
   extents <- get_axis_extents(data)
   reference <- if (role %in% names(extents)) extents[[role]] else 0
 
@@ -246,8 +227,7 @@ merge_axis_map <- function(current, update) {
 #' @keywords internal
 ensure_valid_axis_directions <- function(directions) {
   ensure_named_axis_map(directions, "directions", 'c(x = "right", y = "up")')
-  # An all-`NA` vector arrives logical, and clearing an axis is a fair thing
-  # to ask for.
+  # An all-`NA` vector (clearing axes) arrives as logical.
   if (!is.character(directions) && !all(is.na(directions))) {
     cli::cli_abort(c(
       "{.arg directions} must be a character vector.",
@@ -325,8 +305,6 @@ ensure_named_axis_map <- function(x, arg, example, call = rlang::caller_env()) {
 
 #' Reflect a spatial axis around a reference value
 #'
-#' `reference - data[[axis]]`, which is what turning an axis over amounts to.
-#'
 #' @param data A data frame (typically an anipoint) containing `axis`.
 #' @param axis Name of the column to reflect.
 #' @param reference A single finite value to reflect around.
@@ -354,10 +332,6 @@ reflect_axis <- function(data, axis, reference) {
 
 #' The angular column an axis role is measured against
 #'
-#' Turning a Cartesian axis over moves the angles measured from it. `phi`
-#' runs from `x` toward `y`, so either of those moves it; `theta` is measured
-#' from the pole, so only `z` moves it.
-#'
 #' @return Named character vector, axis role to angular role.
 #' @keywords internal
 list_angular_axis_dependencies <- function() {
@@ -367,14 +341,8 @@ list_angular_axis_dependencies <- function() {
 
 #' Turn an axis over on a frame that stores angles
 #'
-#' No column carries the role, so there is nothing to reflect -- but the
-#' angles are measured from it, and a frame left claiming a direction its
-#' angles do not agree with is the failure this is here to prevent.
-#'
-#' Turning `x` over reflects `phi` about the vertical, turning `y` over
-#' reflects it about the horizontal, and turning `z` over reflects `theta`
-#' about the equator. Anything else leaves the data alone: the direction is
-#' then a fact about the space rather than about the columns.
+#' `x` reflects `phi` about the vertical, `y` about the horizontal, `z`
+#' reflects `theta` about the equator; anything else leaves the data alone.
 #'
 #' @param data An anipoint object.
 #' @param role An axis role.
@@ -389,8 +357,7 @@ reflect_angular_axis <- function(data, role) {
     return(data)
   }
 
-  # `extent - v` is a mirror in a plane that misses the origin, which moves
-  # every point's distance from it. There is no angle that expresses that.
+  # A mirror off the origin changes `rho`, which no angle change can express.
   extents <- get_axis_extents(data)
   if (role %in% names(extents) && extents[[role]] != 0) {
     cli::cli_abort(c(
@@ -403,9 +370,7 @@ reflect_angular_axis <- function(data, role) {
   column <- axes[[angular]]
   ensure_has_column(data, column)
 
-  # `theta` is a colatitude in [0, pi], so its supplement is already in
-  # range; `phi` is a bearing and has to come back onto the range the frame
-  # keeps it in.
+  # A supplemented `theta` stays in [0, pi]; `phi` must be rewrapped.
   is_colatitude <- identical(angular, "theta")
 
   data[[column]] <- reflect_angle(

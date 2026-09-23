@@ -1,20 +1,3 @@
-# Test outline for tbl_sum.anipoint():
-#
-# Behaviour:
-#   - includes "Individuals" only when the individual column is present
-#   - includes "Keypoints" only when the keypoint column is present
-#   - includes "Sessions" / "Trials" only when those columns are present
-#   - includes "Sampling rate" only when set in metadata
-#   - includes "Time" interval (HH:MM:SS) when unit_time is convertible to
-#     seconds (issue #50)
-#   - "Time" interval becomes absolute datetimes when start_datetime is set
-#   - "Time" row is omitted when unit_time = "frame" without sampling_rate
-#     (or unit_time = "unknown")
-#
-# Regression:
-#   - does not warn "Unknown or uninitialised column" when `individual` is
-#     absent (issue #51)
-
 test_that("tbl_sum omits Individuals row when individual column is absent", {
   df <- data.frame(
     time = 1:5,
@@ -128,8 +111,7 @@ test_that("tbl_sum formats Time as absolute datetimes when start_datetime is set
   result <- pillar::tbl_sum(data)
 
   expect_true("Time" %in% names(result))
-  # The expected start datetime is the literal value passed; the end is
-  # 90 seconds later. Format uses "%Y-%m-%d %H:%M:%S" with system tz.
+  # Formatted in the system timezone.
   start_dt <- anytime::anytime("2024-01-15 14:30:00")
   expected <- paste(
     format(start_dt, "%Y-%m-%d %H:%M:%S"),
@@ -159,7 +141,6 @@ test_that("format_seconds_as_hms produces expected fractional (ms) formats", {
 })
 
 test_that("tbl_sum Time row uses millisecond precision when span is sub-second", {
-  # Recording lasts only 88 ms
   df <- data.frame(
     individual = 1L,
     time = c(0, 50, 88),
@@ -185,7 +166,7 @@ test_that("tbl_sum Time row uses integer precision when span >= 1 second", {
 
   result <- pillar::tbl_sum(data)
 
-  # 0 ms .. 1500 ms span = 1.5 s, not sub-second -> integer hms
+  # A 1.5 s span isn't sub-second, so whole seconds.
   expect_equal(unname(result["Time"]), "00:00:00 to 00:00:02")
 })
 
@@ -226,8 +207,7 @@ test_that("format_time_interval returns NULL when time has no finite values", {
 })
 
 test_that("tbl_sum Time row uses sub-second datetime format with start_datetime", {
-  # Sub-second span + start_datetime exercises the "%Y-%m-%d %H:%M:%OS3"
-  # format branch.
+  # Exercises the "%Y-%m-%d %H:%M:%OS3" branch.
   df <- data.frame(
     individual = 1L,
     time = c(0, 22, 88),
@@ -243,6 +223,5 @@ test_that("tbl_sum Time row uses sub-second datetime format with start_datetime"
   result <- pillar::tbl_sum(data)
 
   expect_true("Time" %in% names(result))
-  # Output includes ".XXX" millisecond fragment in both endpoints
   expect_match(unname(result["Time"]), "\\.\\d{3}.* to .*\\.\\d{3}")
 })

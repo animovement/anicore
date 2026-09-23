@@ -1,17 +1,3 @@
-# Test outline for print.aniframe_metadata():
-#
-# Output structure:
-#   - first captured line is non-empty (no leading newline)
-#   - no two consecutive empty lines (no blank lines between entries)
-#   - last line is the trailing newline emitted by cat()
-#
-# Content:
-#   - includes the "animovement metadata" header
-#   - lists every metadata field name
-#   - shows "(character)" / "(factor)" type annotation per field
-#   - empty metadata renders the "No metadata available" message
-#   - multi-element character vectors render comma-separated
-
 capture_md_print <- function(x) {
   old <- Sys.getenv("NO_COLOR", unset = NA)
   Sys.setenv("NO_COLOR" = "1")
@@ -31,10 +17,8 @@ test_that("print has no leading newline and no blank lines between entries", {
 
   out <- capture_md_print(md)
 
-  # First line should be the header (non-empty)
   expect_gt(nchar(out[1]), 0)
 
-  # No two adjacent blank lines
   if (length(out) >= 2) {
     blanks <- nchar(out) == 0
     expect_false(any(blanks[-length(blanks)] & blanks[-1]))

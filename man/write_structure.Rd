@@ -2,7 +2,7 @@
 % Please edit documentation in R/connections.R
 \name{write_structure}
 \alias{write_structure}
-\title{Write the structure category}
+\title{Write the structure category (connections keyed by variable)}
 \usage{
 write_structure(data, structure)
 }
@@ -15,8 +15,6 @@ write_structure(data, structure)
 \code{data}, with the category written.
 }
 \description{
-The storage behind the connection setters: connections live in the
-\code{structure} metadata category, keyed by variable (#118), where an
-\code{anistructure} will live (#154).
+Write the structure category (connections keyed by variable)
 }
 \keyword{internal}

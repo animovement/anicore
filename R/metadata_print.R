@@ -1,13 +1,6 @@
 #' Print method for animovement metadata
 #'
-#' Renders the metadata grouped by category (#118): `spec_version` at the
-#' top, then one section per category. Leaf names and types are padded to
-#' fixed widths so the values line up, similar to [str()]. The
-#' `variables` category prints one line per role, its slots inline.
-#'
-#' The S3 class is named `aniframe_metadata` for historical reasons,
-#' but the metadata substrate is shared by both [anipoint()] and
-#' [anievent()] objects.
+#' Shared by [anipoint()] and [anievent()] despite the class name.
 #'
 #' @param x An `aniframe_metadata` list.
 #' @param ... Unused.

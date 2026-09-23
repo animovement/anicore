@@ -13,9 +13,6 @@ resolve_axes(md)
 Named character vector, empty when no role set applies.
 }
 \description{
-Objects serialised before the field existed have no \code{axes}, but their
-\code{variables_where} was matched against the role names to infer a
-coordinate system, so the column name \emph{was} the role. Reading it that
-way here keeps those frames working untouched.
+An unnamed position vector is read with the column name as the role.
 }
 \keyword{internal}

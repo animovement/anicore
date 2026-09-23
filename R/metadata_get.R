@@ -34,8 +34,7 @@ get_metadata <- function(data, fields = NULL) {
   if (!is.null(fields) && length(fields) == 1) {
     x <- get_metadata_entry(x, fields)
   } else if (!is.null(fields) && length(fields) > 1) {
-    # A plain list: the selection is not a tree, so `$` must not resolve
-    # through categories.
+    # Plain list, so `$` doesn't resolve through categories.
     x <- stats::setNames(
       lapply(fields, function(field) get_metadata_entry(x, field)),
       fields
@@ -48,9 +47,6 @@ get_metadata <- function(data, fields = NULL) {
 
 
 #' Resolve one name against the metadata tree
-#'
-#' A category name gives the category; anything else resolves as a flat
-#' field through `md_field()`.
 #'
 #' @param md A metadata list.
 #' @param field Length-one character.
@@ -83,8 +79,7 @@ ensure_are_metadata_fields <- function(fields, call = rlang::caller_env()) {
   )
   unknown <- setdiff(fields, known)
 
-  # The variables slots are not flat-addressable; point at the accessors
-  # rather than reporting the old field names as simply unknown.
+  # Old flat names get redirected to their accessors.
   variables_fields <- c(
     "variables_what",
     "variables_when",

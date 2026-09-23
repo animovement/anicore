@@ -22,9 +22,6 @@ declaration to apply.}
 \code{data}, restructured, with the declaration recorded.
 }
 \description{
-Dispatches to the per-class restructure. The two classes share the
-metadata substrate but not their layout: an anipoint is grouped and
-ordered by identity then time, an anievent is ordered by identity then
-bout start and is never grouped.
+Restructure a frame to match a declaration
 }
 \keyword{internal}

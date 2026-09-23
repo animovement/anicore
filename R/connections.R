@@ -225,9 +225,7 @@ remove_connections <- function(data, from, to, variable = "keypoint") {
   write_structure(data, current)
 }
 
-# ------------------------------------------------------------------
-# Internal helpers
-# ------------------------------------------------------------------
+# ---- Internal helpers ----
 
 #' @keywords internal
 make_empty_connection_df <- function() {
@@ -273,10 +271,7 @@ coerce_to_connection_df <- function(x) {
         "When supplied as a list, each element must be a length-2 character vector (one `from`/`to` pair)."
       )
     }
-    # Each pair can be either implicit-by-position (c("head", "neck")) or
-    # explicit-by-name (c(from = "head", to = "neck")). Detect named pairs
-    # and route their values; otherwise fall back to position [1] = from,
-    # [2] = to.
+    # A pair may be positional or named c(from = , to = ).
     extract_pair <- function(p) {
       nm <- names(p)
       v <- as.character(p) # strips names
@@ -328,11 +323,7 @@ warn_unknown_connection_endpoints <- function(data, conn_df, variable) {
 }
 
 
-#' Write the structure category
-#'
-#' The storage behind the connection setters: connections live in the
-#' `structure` metadata category, keyed by variable (#118), where an
-#' `anistructure` will live (#154).
+#' Write the structure category (connections keyed by variable)
 #'
 #' @param data An anipoint object.
 #' @param structure Named list of connection tables.

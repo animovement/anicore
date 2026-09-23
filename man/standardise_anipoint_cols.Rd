@@ -21,16 +21,12 @@ standardise_anipoint_cols(
 
 \item{variables_where}{Spatial variable names.}
 
-\item{index}{The index column, which stays numeric. The temporal
-context variables are made categorical.}
+\item{index}{The index column, which stays numeric.}
 }
 \value{
 Data frame with standardised column types.
 }
 \description{
-Converts character identity and temporal variables to factors.
-Converts numeric identity and temporal variables (except the index) to
-integers.
-Spatial variables are converted to numeric.
+Identity/context columns become factor or integer; spatial become numeric.
 }
 \keyword{internal}

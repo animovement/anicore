@@ -13,21 +13,7 @@ ensure_no_declaration_fields(user_md)
 \code{TRUE}, invisibly.
 }
 \description{
-\code{\link[=set_metadata]{set_metadata()}} writes the metadata list and nothing else, which is
-what makes it safe to use everywhere. The variable declaration needs
-more than that: it names columns, so the names have to be checked
-against the frame, and for the three structural roles the frame has to
-be retyped, reordered, regrouped and its derived fields refreshed.
-Writing it — as an old flat field, or as the \code{variables} or
-\code{structure} category — is therefore refused, and the dedicated
-setters do the job instead.
-}
-\details{
-Restoring a \strong{complete} metadata object is a different operation, and
-is allowed — \code{\link[=set_metadata]{set_metadata()}} hands it to \code{\link[=write_metadata]{write_metadata()}} before
-this check runs. Rebuilding a frame and putting its metadata back is
-the round-trip the class-preserving methods perform internally, and
-downstream packages do it too — \code{animetric::summarise_keypoints()}
-recomputes a frame and restores the metadata it captured beforehand.
+Complete metadata objects bypass this check, so wholesale restores still
+work (used internally and downstream, e.g. \code{animetric}).
 }
 \keyword{internal}

@@ -15,8 +15,6 @@ to_anievent_from_columns(
 )
 }
 \description{
-Walks \code{state_cols} and \code{point_cols}, encodes each via the
-run-length / point-pick helpers, binds the bouts together, and
-casts the result via \code{\link[=as_anievent]{as_anievent()}}.
+String-keyed kernel shared by \code{to_anievent} methods
 }
 \keyword{internal}

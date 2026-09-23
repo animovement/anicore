@@ -1,9 +1,3 @@
-# Coordinate-system predicates
-#
-# These read `coordinate_system`, which is derived from the axis roles, so
-# they follow the frame's declaration rather than its column names (#109).
-# A helper keeps the frames terse.
-
 spatial_af <- function(...) {
   cols <- list(...)
   as_anipoint(
@@ -74,7 +68,6 @@ test_that("ensure_is_spherical() aborts when data is not spherical", {
   )
 })
 
-
 # 1D / 2D / 3D Cartesian ----
 
 test_that("is_cartesian_1d() correctly identifies 1D Cartesian data", {
@@ -119,12 +112,10 @@ test_that("ensure_is_cartesian_3d() aborts when data isn't 3D Cartesian", {
   )
 })
 
-
 # The predicates follow the declaration, not the column names (#109) ----
 
 test_that("a renamed frame satisfies the predicate for its coordinate system", {
-  # This is the point of axis roles: the frame is polar, so every spatial
-  # function that gates on `ensure_is_polar()` must accept it.
+  # The frame is polar, so anything gating on `ensure_is_polar()` must accept it.
   af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", rr = c(1, 2, 3), aa = c(0, 1, 2)),
     variables_where = c(rho = "rr", phi = "aa")
@@ -137,8 +128,7 @@ test_that("a renamed frame satisfies the predicate for its coordinate system", {
 })
 
 test_that("an undeclared column does not decide the coordinate system", {
-  # `rho` is dropped from the declaration but stays in the data. Matching
-  # column names would still call this spherical.
+  # `rho` stays in the data; matching column names would still say spherical.
   af <- as_anipoint(
     data.frame(
       time = 1:3,

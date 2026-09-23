@@ -67,9 +67,8 @@ test_that("set_index() moves the index and regroups the frame", {
   result <- set_index(af, "tick")
 
   expect_equal(get_index(result), "tick")
-  # The column the frame *was* indexed by must not become a grouping
-  # variable: holding one value per row, it would put every row in its own
-  # group. It becomes an ordinary undeclared column instead.
+  # Grouping by the old index would put every row in its own group, so it
+  # becomes an ordinary undeclared column.
   expect_false("time" %in% dplyr::group_vars(result))
   expect_false("tick" %in% dplyr::group_vars(result))
   expect_equal(dplyr::n_groups(result), 1L)
@@ -95,9 +94,8 @@ test_that("as_anipoint() aborts when the declared index is absent", {
 })
 
 test_that("variables_when never contains the index", {
-  # Frames built before the field existed list the index in
-  # `variables_when`. Carrying that through would group by it, putting
-  # every row in its own group, so it is normalised out on construction.
+  # Older frames list the index in `variables_when`; grouping by it would put
+  # every row in its own group, so construction normalises it out.
   af <- as_anipoint(data.frame(
     time = 1:4,
     session = c("a", "a", "b", "b"),
@@ -142,7 +140,6 @@ test_that("metadata serialised before the field existed reads back as time", {
   expect_equal(get_variables_when(af), character())
 })
 
-
 # The index is exactly one column ----
 
 test_that("as_anipoint() rejects an index that is not a single column name", {
@@ -176,7 +173,6 @@ test_that("anipoint() can declare an index too", {
   expect_equal(get_index(af), "frame")
   expect_false("time" %in% names(af))
 })
-
 
 # Everything temporal follows the index, not the name `time` ----
 
@@ -225,7 +221,6 @@ test_that("to_anievent() delimits bouts by the host frame's index", {
   expect_equal(ae$stop, c(20, 40))
 })
 
-
 # An anievent has no index ----
 
 test_that("an anievent declares no index", {
@@ -246,7 +241,6 @@ test_that("an anievent declares no index", {
   expect_equal(get_metadata(ae, "variables")$when$interval, c("start", "stop"))
   expect_error(get_index(ae), "no index column")
 })
-
 
 # The validator knows about the index ----
 
@@ -288,12 +282,11 @@ test_that("the default metadata skeleton keeps the index out of the when keys", 
   expect_false(when$index %in% when$keys)
 })
 
-
 # Keys plus index identify an observation (#49) ----
 
 test_that("validate_anipoint() warns when keys and index repeat", {
-  # Two rows for the same individual at the same time: whatever tells them
-  # apart is undeclared, and every grouped operation folds them together.
+  # Whatever tells these rows apart is undeclared, so grouped operations
+  # fold them together.
   af <- as_anipoint(
     data.frame(individual = "a", time = c(1, 2, 2), x = 1:3, y = 1:3)
   )
@@ -343,9 +336,8 @@ test_that("the temporal context counts towards the key", {
 })
 
 test_that("there is nothing to check when no key column is present", {
-  # Reachable only by calling the helper directly: through
-  # `validate_anipoint()` the index check aborts first. A frame that has
-  # drifted this far has bigger problems, and this should not be one of them.
+  # Only reachable directly: via `validate_anipoint()` the index check aborts
+  # first.
   af <- suppressWarnings(as_anipoint(
     data.frame(time = 1:3, x = 1:3, y = 1:3),
     variables_what = character(0)

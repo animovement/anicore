@@ -93,14 +93,7 @@ as_anievent.data.frame <- function(
     variables_when <- c(detected_when, "start", "stop")
   }
 
-  # Auto-derive `type` from bout duration if the caller didn't
-  # supply it. Classification is per `(channel, label)` group,
-  # not per row: a (channel, label) pair is "point" only when
-  # *all* of its bouts have `start == stop`. If even one bout is
-  # durative, the whole group is "state" — keeping the kind of event
-  # consistent across its occurrences. Users who know better (e.g. a
-  # state channel that happens to have only single-frame bouts) can
-  # pass `type` explicitly to override.
+  # `type` is per (channel, label): "point" only if every bout has start == stop.
   if (
     !"type" %in% names(data) &&
       all(c("start", "stop", "channel", "label") %in% names(data))
@@ -122,10 +115,7 @@ as_anievent.data.frame <- function(
     )
   }
 
-  # Attach class and metadata first, then let the shared restructure
-  # validate, standardise types, relocate and order — the same code the
-  # variable setters use, so construction and re-declaration can't drift
-  # apart (#82).
+  # Same restructure as the variable setters, so the two can't drift (#82).
   data <- new_anievent(data)
   data <- set_metadata(data, metadata = drop_spatial_metadata(metadata))
   data <- restructure_anievent(data, variables_what, variables_when)
@@ -156,15 +146,9 @@ ensure_has_anievent_cols <- function(data) {
 
 #' Standardise column types for an anievent
 #'
-#' Coerces identity and temporal-grouping columns to factor/integer
-#' (mirroring the aniframe convention), `channel` to character,
-#' `label` to factor, and `start`/`stop` to numeric.
-#'
 #' @param data Data frame to standardise.
 #' @param variables_what Identity variable names.
-#' @param variables_when Temporal variable names — grouping columns
-#'   (everything except `start`/`stop`) are coerced like identity
-#'   columns; `start` and `stop` are forced numeric.
+#' @param variables_when Temporal variable names, including `start`/`stop`.
 #'
 #' @return Data frame with standardised column types.
 #' @keywords internal
@@ -210,9 +194,7 @@ standardise_anievent_cols <- function(data, variables_what, variables_when) {
 
 #' Drop spatial metadata an anievent cannot carry
 #'
-#' Readers and older code pass spatial fields (often the old neutral
-#' spellings, #73); an anievent has no `space` category, so they are
-#' dropped rather than refused.
+#' Dropped rather than refused, since readers still pass them (#73).
 #'
 #' @param metadata Metadata supplied by the caller.
 #'

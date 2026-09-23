@@ -15,8 +15,6 @@ get_variables(data, role)
 Character vector of column names.
 }
 \description{
-Returns the flat column vector a role names. For \code{when} on an
-anievent, the interval columns come after the context keys, matching
-the order the flat field carried before the slots existed.
+For \code{when}, interval columns come after the context keys.
 }
 \keyword{internal}

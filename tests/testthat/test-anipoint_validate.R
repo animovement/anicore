@@ -1,9 +1,5 @@
-# Tests for validate_anipoint() and the spatial guards (#79)
-#
-# The metadata and the frame can drift apart under ordinary dplyr work:
-# select() drops a column without touching the metadata naming it, and
-# assignment can retype one. Neither is_aniframe() nor the
-# is_cartesian*() family notices, since those test for column names only.
+# validate_anipoint() and the spatial guards (#79): metadata and frame can
+# drift apart under ordinary dplyr work.
 
 make_flat_af <- function() {
   anipoint(
@@ -75,8 +71,7 @@ test_that("multiple missing columns are all named", {
 })
 
 test_that("a missing time column is caught", {
-  # `variables_when` has to be updated alongside the rename, or the
-  # declared-columns check fires first and this branch is never reached.
+  # Update `variables_when` too, or the declared-columns check fires first.
   no_time <- drift_metadata(
     dplyr::rename(make_flat_af(), moment = time),
     variables_when = "moment"
@@ -114,11 +109,8 @@ test_that("is_spatial tracks the metadata rather than the column names", {
   af <- make_flat_af()
   expect_true(is_spatial(af))
 
-  # Dropping a declared column leaves `variables_where` promising a column
-  # that isn't there. `is_spatial()` catches that; the coordinate-system
-  # predicates read the (now stale) declaration, so they report what the
-  # frame still claims to be rather than being fooled by the columns that
-  # happen to remain (#109).
+  # The dropped column is still declared: `is_spatial()` catches it, while the
+  # coordinate-system predicates report what the frame claims to be (#109).
   dropped <- dplyr::select(af, -x)
   expect_false(is_cartesian_1d(dropped))
   expect_true(is_cartesian_2d(dropped))

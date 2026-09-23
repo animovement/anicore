@@ -15,13 +15,6 @@ derive_angle_direction(directions, handedness = "unknown")
 One of \code{"clockwise"}, \code{"counter_clockwise"} or \code{"unknown"}.
 }
 \description{
-The turn from x to y reads counter-clockwise from the side the depth axis
-points to. Which side that is matters: the same scene filmed from above
-and from below gives images whose x and y are declared identically but
-whose rotations run opposite ways, and only \code{z} tells them apart.
-}
-\details{
-With no \code{z} declared the sense is the one the recording shows, measured
-from where it was taken.
+Seen from the side \code{z} points to; without \code{z}, from the viewer.
 }
 \keyword{internal}

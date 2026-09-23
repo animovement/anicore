@@ -16,6 +16,6 @@ infers it from a \code{start}/\code{stop} interval in \code{variables_when}.}
 The metadata in the nested layout.
 }
 \description{
-Already-nested metadata passes through untouched.
+Migrate a legacy flat metadata list to the category layout
 }
 \keyword{internal}

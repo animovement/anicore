@@ -2,7 +2,7 @@
 % Please edit documentation in R/unit_space.R
 \name{get_system_axes}
 \alias{get_system_axes}
-\title{The axes of a coordinate system that carry a length}
+\title{The axes of a coordinate system that carry a length (#98)}
 \usage{
 get_system_axes(coordinate_system)
 }
@@ -14,9 +14,6 @@ Character vector of axis names, empty when the coordinate system
 is \code{"unknown"} or \code{"none"}.
 }
 \description{
-The complement of the angular axes that \code{\link[=set_unit_angle]{set_unit_angle()}} converts. A
-spatial unit applies to these and to nothing else: on a cylindrical frame
-\code{rho} and \code{z} are both lengths while \code{phi} is an angle, so converting by
-column name rather than by role leaves one of them behind (#98).
+The axes of a coordinate system that carry a length (#98)
 }
 \keyword{internal}

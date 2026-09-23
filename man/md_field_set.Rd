@@ -17,8 +17,6 @@ md_field_set(md, field, value, call = rlang::caller_env())
 \code{md}, with the field written.
 }
 \description{
-The category is created if the object carries it; writing a \code{space}
-field into metadata that has no \code{space} category is refused, because
-that absence is a statement (#73), not an accident.
+Refuses a category the object lacks (e.g. \code{space} on an anievent, #73).
 }
 \keyword{internal}

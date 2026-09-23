@@ -15,10 +15,6 @@ md_field(md, field)
 The field's value, or \code{NULL}.
 }
 \description{
-Resolves the field through the category map; \code{spec_version} sits at
-the top level. A field whose category the object does not carry (an
-anievent has no \code{space}) gives \code{NULL}. Metadata still in the legacy
-flat layout is read directly, so old serialised objects keep working
-until a write migrates them.
+Legacy flat metadata is read directly; a missing category gives \code{NULL}.
 }
 \keyword{internal}

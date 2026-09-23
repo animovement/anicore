@@ -1,5 +1,4 @@
-# Aliases from the aniframe -> anipoint rename (#154). Remove after one
-# release cycle.
+# Aliases from the aniframe -> anipoint rename (#154); remove after one release.
 
 #' Deprecated aniframe constructors
 #'

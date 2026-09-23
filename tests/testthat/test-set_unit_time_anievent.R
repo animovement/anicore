@@ -1,16 +1,3 @@
-# Tests for set_unit_time() / set_sampling_rate() dispatched on anievent
-#
-# Coverage:
-#   - set_unit_time on an anievent in seconds converts start/stop to ms
-#   - set_unit_time on a frame/unknown anievent with no calibration emits
-#     info and leaves the values alone (metadata still flips)
-#   - set_unit_time rejects unknown target units
-#   - set_unit_time uses a custom calibration_factor on a frame-unit anievent
-#   - set_sampling_rate on a frame-unit anievent converts start/stop to
-#     seconds and updates sampling_rate metadata
-#   - set_sampling_rate on an SI-unit anievent only updates metadata, with
-#     an informational message
-
 make_frame_anievent <- function(sampling_unit = "frame") {
   ae <- anievent(
     individual = 1L,

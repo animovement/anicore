@@ -1,7 +1,5 @@
-# Getters for the fields that already had setters (#121)
-#
-# The point is that downstream stops naming metadata fields as literals, so
-# a later restructure (#118) does not reach them.
+# Getters for the fields that already had setters (#121), so downstream
+# stops naming metadata fields as literals.
 
 test_that("every field with a setter has a getter that reads it back", {
   af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1)
@@ -34,8 +32,7 @@ test_that("the getters see what their setters wrote", {
 })
 
 test_that("the factor-backed getters return a bare character", {
-  # Downstream almost always wraps these in as.character(); doing it here
-  # means they no longer have to.
+  # Returned as character so downstream needn't wrap them in as.character().
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
   for (value in list(

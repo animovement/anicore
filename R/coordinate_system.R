@@ -1,15 +1,4 @@
-# Coordinate-system predicates (#109)
-#
-# These used to match column *names* — `is_polar()` looked for columns
-# literally called `rho` and `phi`. That was wrong in both directions once
-# axis roles existed: a frame whose coordinates are called anything else
-# was refused by every spatial function despite being polar, and a frame
-# that still carried an undeclared `rho` column reported as spherical
-# after `rho` had been dropped from the declaration.
-#
-# They read `coordinate_system` instead, which is derived from the axis
-# roles on every construction and re-declaration, so the predicates and
-# the metadata cannot disagree.
+# Predicates read the `coordinate_system` field, not column names (#109).
 
 #' The coordinate system an anipoint is in
 #'
@@ -234,14 +223,6 @@ list_cartesian_systems <- function() {
 
 #' Ensure the frame is in one of the coordinate systems a caller needs
 #'
-#' The shared guard behind `ensure_is_polar()` and its siblings. It does
-#' the check itself rather than being handed the answer, so it keeps the
-#' rule the rest of the package follows: `is_*()` returns a logical,
-#' `ensure_*()` errors.
-#'
-#' Reports what the frame *is* in, and points at the two ways out: saying
-#' what the columns mean, or converting the coordinates.
-#'
 #' @param data An anipoint object.
 #' @param permitted Coordinate systems that satisfy the caller.
 #' @param wanted Human-readable name of the required coordinate system.
@@ -274,8 +255,6 @@ ensure_coordinate_system <- function(data, permitted, wanted) {
 #' @return Character string naming the coordinate system.
 #' @keywords internal
 infer_coordinate_system <- function(variables_where) {
-  # The roles decide the system. For a bare vector of column names the
-  # name is the role, which is the historical behaviour (#109).
   roles <- names(normalise_axes(variables_where))
   key <- paste(sort(roles), collapse = ",")
 
@@ -284,10 +263,7 @@ infer_coordinate_system <- function(variables_where) {
     return(coord_map[[key]])
   }
 
-  # Two different problems, and they want different advice: roles that are
-  # recognised but do not combine into a system (a spherical frame that has
-  # lost `rho`, say) need the coordinates converting, whereas names that are
-  # not roles at all just need declaring.
+  # Known roles not forming a system need converting; unknown names declaring.
   hint <- if (length(roles) > 0L && all(roles %in% list_axis_roles())) {
     "Convert the coordinates to a system these axes do form; {.pkg anispace} has the transformations."
   } else {

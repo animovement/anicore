@@ -1,12 +1,4 @@
-# Declaring the event variables (#82)
-#
-# `variables_event` is the fourth variable role, and the odd one out: it
-# declares which columns carry per-frame event labels, but unlike the
-# other three it does not change the shape of the frame — nothing is
-# retyped, relocated, reordered or regrouped by declaring it. What it
-# shares with them is that it names columns, and a name that doesn't
-# match a column is a promise the frame can't keep. So it gets the same
-# four verbs, and `set_metadata()` refuses it for the same reason.
+# Unlike other variable roles, declaring events doesn't restructure (#82).
 
 #' Declare the event columns and validate them against the frame
 #'
@@ -18,10 +10,7 @@
 declare_variables_event <- function(data, state, point) {
   ensure_can_declare_events(data)
 
-  # `NULL` means "leave this side alone". With named arguments it reads as
-  # not-supplied, and silently clearing the side the caller never mentioned
-  # is the same footgun `add_*()` exists to avoid elsewhere. A side is
-  # cleared by naming it explicitly as `character()`.
+  # `NULL` leaves a side alone; clearing it requires an explicit `character()`.
   current <- normalise_variables_event(md_event(get_metadata(data)))
   if (is.null(state)) {
     state <- current$state
@@ -45,12 +34,7 @@ declare_variables_event <- function(data, state, point) {
 }
 
 
-#' Ensure the object can carry an event declaration
-#'
-#' `variables_event` names per-frame columns, which only an anipoint
-#' has. An anievent already *is* the encoded form — its events live in
-#' `channel` and `label` — so `to_anievent()` drops the field rather than
-#' inheriting it.
+#' Ensure the object can carry an event declaration (only an anipoint can)
 #'
 #' @param data Object to test.
 #'

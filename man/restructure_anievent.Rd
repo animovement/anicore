@@ -15,8 +15,6 @@ restructure_anievent(data, variables_what, variables_when)
 \code{data}, restructured, with the declaration recorded.
 }
 \description{
-The anievent counterpart to \code{\link[=restructure_anipoint]{restructure_anipoint()}}: validate,
-standardise types, relocate, and order by identity then bout start.
-An anievent is not grouped.
+Like \code{\link[=restructure_anipoint]{restructure_anipoint()}}, but never grouped.
 }
 \keyword{internal}

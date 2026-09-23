@@ -2,7 +2,7 @@
 % Please edit documentation in R/metadata_tree.R
 \name{md_variables}
 \alias{md_variables}
-\title{The variables category, in canonical list shape}
+\title{The variables category, in canonical list shape (legacy metadata translated)}
 \usage{
 md_variables(md)
 }
@@ -14,7 +14,6 @@ A named list of roles (\code{what}, \code{when}, \code{where}, \code{event}), ea
 a named list of slots.
 }
 \description{
-Legacy flat metadata is translated on the way out, so readers written
-against the list shape work on old serialised objects too.
+The variables category, in canonical list shape (legacy metadata translated)
 }
 \keyword{internal}

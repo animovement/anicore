@@ -1,9 +1,5 @@
-# Tests for the identity (`what`) rule (#77)
-#
-# The rule an aniframe actually enforces is "at least one identity
-# variable", not "a keypoint column". Auto-detection guarantees it by
-# adding one when the data has none; an explicit `character(0)` is a
-# deliberate opt-out and is left alone.
+# The identity (`what`) rule (#77): at least one identity variable, unless
+# explicitly opted out with `character(0)`.
 
 flat_df <- function() {
   data.frame(time = 1:5, x = as.numeric(1:5), y = as.numeric(1:5))
@@ -128,8 +124,7 @@ test_that("the recognised identity names are a single source of truth", {
 })
 
 test_that("aniframe and anievent recognise the same identity names", {
-  # `subject` is the behavioural-coding name for what tracking tools
-  # call an `individual`; both classes accept both.
+  # `subject` is the behavioural-coding name for `individual`.
   af <- as_anipoint(dplyr::mutate(flat_df(), subject = "a"))
   expect_equal(get_variables_what(af), "subject")
   expect_false("keypoint" %in% names(af))
