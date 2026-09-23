@@ -4,7 +4,9 @@
 \alias{list_metadata_schema}
 \title{The metadata layout each frame class must follow}
 \usage{
-list_metadata_schema(class = c("anipoint", "anisegment", "anievent"))
+list_metadata_schema(
+  class = c("anipoint", "anisegment", "anijoint", "anievent")
+)
 }
 \arguments{
 \item{class}{Frame class name.}

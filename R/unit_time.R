@@ -53,6 +53,10 @@ convert_unit_time.anisegment <- convert_unit_time.anipoint
 
 #' @rdname convert_unit_time
 #' @export
+convert_unit_time.anijoint <- convert_unit_time.anipoint
+
+#' @rdname convert_unit_time
+#' @export
 convert_unit_time.anievent <- function(
   data,
   to_unit,

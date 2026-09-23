@@ -37,6 +37,8 @@ frame_class <- function(data) {
     "anievent"
   } else if (is_anisegment(data)) {
     "anisegment"
+  } else if (is_anijoint(data)) {
+    "anijoint"
   } else {
     "anipoint"
   }
@@ -358,10 +360,10 @@ apply_variables <- function(data, variables, strict = TRUE) {
     ))
   }
 
-  if (is_anisegment(data)) {
+  if (is_anisegment(data) || is_anijoint(data)) {
     md <- get_metadata(data)
     md$variables <- variables
-    return(restructure_anisegment(data, md))
+    return(restructure_value_frame(data, md))
   }
 
   index <- variables$when$index

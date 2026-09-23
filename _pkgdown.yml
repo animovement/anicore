@@ -105,6 +105,13 @@ reference:
       - as_anisegment
       - is_anisegment
 
+  - title: "Joints"
+    desc: >
+      One angle per joint, computed from its two segments.
+    contents:
+      - as_anijoint
+      - is_anijoint
+
   - title: "Spatial checks"
     desc: |
       These functions provide checks for your coordinate system.
@@ -143,6 +150,7 @@ reference:
     - deg_to_rad
     - wrap_angle
     - unwrap_angle
+    - angle_between
 
   - subtitle: "Circular statistics"
     contents:

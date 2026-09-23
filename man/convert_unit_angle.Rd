@@ -7,7 +7,7 @@
 convert_unit_angle(data, to_unit, cols = NULL)
 }
 \arguments{
-\item{data}{An anipoint.}
+\item{data}{An anipoint, or an anijoint, whose \code{angle} is converted.}
 
 \item{to_unit}{\code{"rad"} or \code{"deg"}.}
 
