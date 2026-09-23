@@ -7,7 +7,7 @@
 compute_sampling_interval(data)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 }
 \value{
 Numeric scalar, or \code{NA} when the frame has no gaps to measure.

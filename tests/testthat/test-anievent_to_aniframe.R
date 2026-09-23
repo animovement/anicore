@@ -1,4 +1,4 @@
-# Tests for to_anievent.aniframe (RLE encoding from aniframe -> anievent)
+# Tests for to_anievent.anipoint (RLE encoding from aniframe -> anievent)
 #
 # Construction:
 #   - state column run-length-encoded into bouts (start = first frame time,
@@ -137,12 +137,12 @@ test_that("metadata is inherited from the host aniframe", {
   expect_equal(get_metadata(ae, "sampling_rate"), 30)
 })
 
-test_that("to_anievent.aniframe errors when no event columns are declared", {
+test_that("to_anievent.anipoint errors when no event columns are declared", {
   af <- anipoint(individual = 1L, time = 1:3, x = 1:3, y = 1:3)
   expect_error(to_anievent(af), "no event columns declared")
 })
 
-test_that("to_anievent.aniframe errors when a declared column is missing", {
+test_that("to_anievent.anipoint errors when a declared column is missing", {
   # Declaring a column that isn't there is rejected by the setter, so
   # the drifted state has to be forced to reach to_anievent()'s own check.
   af <- anipoint(individual = 1L, time = 1:3, x = 1:3, y = 1:3)
@@ -154,7 +154,7 @@ test_that("to_anievent.aniframe errors when a declared column is missing", {
   expect_error(to_anievent(af), "not present in the data")
 })
 
-test_that("to_anievent.aniframe picks up <channel>_modifiers list-columns", {
+test_that("to_anievent.anipoint picks up <channel>_modifiers list-columns", {
   af <- anipoint(
     individual = rep(1L, 5),
     time = 1:5,
@@ -177,7 +177,7 @@ test_that("to_anievent.aniframe picks up <channel>_modifiers list-columns", {
   expect_equal(ae$modifiers[[2]], "tail")
 })
 
-test_that("to_anievent.aniframe handles an aniframe with no identity columns", {
+test_that("to_anievent.anipoint handles an aniframe with no identity columns", {
   af <- as_anipoint(
     dplyr::tibble(
       time = 1:5,
@@ -374,7 +374,7 @@ test_that("explicit variables_what overrides scope detection", {
   expect_equal(nrow(ae), 4) # duplicate per keypoint
 })
 
-test_that("to_anievent.aniframe returns an empty anievent when all event rows are NA", {
+test_that("to_anievent.anipoint returns an empty anievent when all event rows are NA", {
   af <- anipoint(
     individual = rep(1L, 3),
     time = 1:3,
@@ -434,7 +434,7 @@ test_that("explicit variables_when overrides metadata-driven grouping", {
   expect_false("observation" %in% get_metadata(ae, "variables_when"))
 })
 
-test_that("to_anievent.aniframe gathers <col>_modifiers on point channels", {
+test_that("to_anievent.anipoint gathers <col>_modifiers on point channels", {
   af <- anipoint(
     individual = rep(1L, 5),
     time = 1:5,

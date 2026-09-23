@@ -7,7 +7,6 @@
 format_plural_title(x)
 }
 \description{
-Used by \code{\link[=tbl_sum.aniframe]{tbl_sum.aniframe()}} to derive row labels from \code{variables_what} /
-\code{variables_when} (e.g. \code{"individual"} -> \code{"Individuals"}).
+\code{"individual"} -> \code{"Individuals"}.
 }
 \keyword{internal}

@@ -273,7 +273,7 @@ test_that("the refusal names every offending field at once", {
 
 # ---- Print header ------------------------------------------------------
 
-test_that("tbl_sum.aniframe surfaces state and point variables in the header", {
+test_that("tbl_sum.anipoint surfaces state and point variables in the header", {
   af <- anipoint(
     individual = rep(1L, 4),
     time = 1:4,
@@ -291,7 +291,7 @@ test_that("tbl_sum.aniframe surfaces state and point variables in the header", {
   expect_equal(unname(header["Point event variables"]), "call")
 })
 
-test_that("tbl_sum.aniframe omits state/point rows when variables_event is empty", {
+test_that("tbl_sum.anipoint omits state/point rows when variables_event is empty", {
   af <- example_anipoint()
   header <- pillar::tbl_sum(af)
 

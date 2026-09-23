@@ -2,18 +2,18 @@
 % Please edit documentation in R/coordinate_system.R
 \name{is_cylindrical}
 \alias{is_cylindrical}
-\title{Test whether an aniframe uses a cylindrical coordinate system}
+\title{Test whether an anipoint uses a cylindrical coordinate system}
 \usage{
 is_cylindrical(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \value{
 A logical value.
 }
 \description{
-Test whether an aniframe uses a cylindrical coordinate system
+Test whether an anipoint uses a cylindrical coordinate system
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)

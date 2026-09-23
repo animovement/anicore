@@ -47,9 +47,7 @@ as_anievent.anievent <- function(
   variables_what = NULL,
   variables_when = NULL
 ) {
-  # Objects serialised before the aniframe superclass existed lack it in
-  # their class vector; slot it in behind `anievent` so subclasses keep
-  # dispatch priority.
+  # Repair objects serialised before the aniframe superclass existed.
   if (!inherits(data, "aniframe")) {
     class(data) <- append(
       class(data),
@@ -69,7 +67,7 @@ as_anievent.aniframe <- function(
   variables_when = NULL
 ) {
   cli::cli_abort(c(
-    "Cannot cast an {.cls aniframe} directly to an {.cls anievent}.",
+    "Cannot cast an {.cls {class(data)[[1]]}} directly to an {.cls anievent}.",
     "i" = "Use {.fn to_anievent} to encode per-frame event columns into bouts."
   ))
 }

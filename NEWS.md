@@ -6,7 +6,7 @@
 
   Concretely:
 
-  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace `aniframe()`, `as_aniframe()`, `example_aniframe()` and `validate_aniframe()`. The old names remain as aliases that warn once per session, and will be removed after one release cycle.
+  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace `aniframe()`, `as_aniframe()`, `example_aniframe()` and `validate_aniframe()`. The old names remain as soft-deprecated aliases, and will be removed after one release cycle.
   * `is_aniframe()` now answers "is this any animovement frame?" — an anievent passes it too. Code that means the position grain should test with the new `is_anipoint()` / `ensure_is_anipoint()` instead.
   * Functions that need coordinates (axes, units of space and angle, connections, orientation columns, the index, event declarations) now guard with `ensure_is_anipoint()`, so a wrong-grain input fails at the door rather than deep inside.
   * Objects serialised before this release lack the new classes in their class vector; re-cast them with `as_anipoint()` (or `as_anievent()`), which repairs the class vector from the stored metadata.

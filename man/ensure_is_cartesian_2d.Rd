@@ -7,7 +7,7 @@
 ensure_is_cartesian_2d(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \description{
 Internal guard for 2-D Cartesian checks

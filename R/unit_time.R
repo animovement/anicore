@@ -1,7 +1,7 @@
-#' Set the temporal unit of an aniframe or anievent
+#' Set the temporal unit of an anipoint or anievent
 #'
 #' @description
-#' Converts the temporal columns of an `aniframe` (its index column) or
+#' Converts the temporal columns of an `anipoint` (its index column) or
 #' `anievent` (the `start` and `stop` columns) to a different unit of
 #' measurement. Handles automatic conversion between standard SI time
 #' units and custom calibration from frame or arbitrary units.
@@ -21,7 +21,7 @@
 #'   and `unit_time` metadata updated accordingly.
 #'
 #' @details
-#' For an `aniframe` the column [get_index()] names is multiplied by the
+#' For an `anipoint` the column [get_index()] names is multiplied by the
 #' calibration factor; for an `anievent` both `start` and `stop` are. In
 #' either case:
 #' * the function validates `to_unit` against the permitted levels;
@@ -34,10 +34,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' # aniframe: convert milliseconds to seconds (automatic)
+#' # anipoint: convert milliseconds to seconds (automatic)
 #' data_s <- set_unit_time(data, to_unit = "s")
 #'
-#' # aniframe: convert frames to seconds at 30 fps
+#' # anipoint: convert frames to seconds at 30 fps
 #' data_s <- set_unit_time(data, to_unit = "s", calibration_factor = 1 / 30)
 #'
 #' # anievent: same call shape; mutates start/stop instead of the index
@@ -51,7 +51,7 @@ set_unit_time <- function(data, to_unit, calibration_factor = 1) {
 
 #' @rdname set_unit_time
 #' @export
-set_unit_time.aniframe <- function(data, to_unit, calibration_factor = 1) {
+set_unit_time.anipoint <- function(data, to_unit, calibration_factor = 1) {
   factor <- resolve_unit_time_calibration(data, to_unit, calibration_factor)
 
   index <- get_index(data)
@@ -81,12 +81,8 @@ set_unit_time.anievent <- function(data, to_unit, calibration_factor = 1) {
 
 #' Resolve the multiplicative factor for a unit_time conversion
 #'
-#' Shared between `set_unit_time.aniframe()` and
-#' `set_unit_time.anievent()`. Validates `to_unit`, reads the current
-#' `unit_time` from metadata, and returns the calibration factor to
-#' apply to the temporal columns. Emits an informational message and
-#' returns 1 (no-op on data values) when the source unit is `"frame"` /
-#' `"unknown"` and no calibration factor was supplied.
+#' Returns 1 (values unchanged) when converting from `"frame"` or
+#' `"unknown"` without a calibration factor.
 #'
 #' @keywords internal
 resolve_unit_time_calibration <- function(data, to_unit, calibration_factor) {
@@ -112,7 +108,7 @@ resolve_unit_time_calibration <- function(data, to_unit, calibration_factor) {
   calibration_factor
 }
 
-#' Set the sampling rate of an aniframe or anievent
+#' Set the sampling rate of an anipoint or anievent
 #'
 #' @description
 #' Sets the sampling rate (in Hz) on an [anipoint()] or [anievent()] and,
@@ -121,7 +117,7 @@ resolve_unit_time_calibration <- function(data, to_unit, calibration_factor) {
 #' `1 / sampling_rate`. If `unit_time` is already an SI unit, only the
 #' metadata is updated.
 #'
-#' @param data An aniframe or anievent.
+#' @param data An anipoint or anievent.
 #' @param sampling_rate Numeric value in Hz (samples per second).
 #'
 #' @return The input object with `sampling_rate` metadata updated and,
@@ -129,7 +125,7 @@ resolve_unit_time_calibration <- function(data, to_unit, calibration_factor) {
 #'
 #' @examples
 #' \dontrun{
-#' # aniframe in frames -> seconds at 30 fps
+#' # anipoint in frames -> seconds at 30 fps
 #' data_s <- set_sampling_rate(data, sampling_rate = 30)
 #'
 #' # anievent: same call shape
@@ -144,17 +140,6 @@ set_sampling_rate <- function(data, sampling_rate) {
 #' @rdname set_sampling_rate
 #' @export
 set_sampling_rate.aniframe <- function(data, sampling_rate) {
-  set_sampling_rate_impl(data, sampling_rate)
-}
-
-#' @rdname set_sampling_rate
-#' @export
-set_sampling_rate.anievent <- function(data, sampling_rate) {
-  set_sampling_rate_impl(data, sampling_rate)
-}
-
-#' @keywords internal
-set_sampling_rate_impl <- function(data, sampling_rate) {
   if (!get_metadata(data, "unit_time") %in% c("frame", "unknown")) {
     cli::cli_alert_info(
       "unit_time is already set to a SI unit (not {c(\"frame\", \"unknown\")}). Data remains unchanged, but sampling_rate has been changed in the metadata"
@@ -196,7 +181,6 @@ list_conversion_factors_time <- function() {
     byrow = FALSE
   )
 
-  # Attach row- and column-names
   permitted_units <- c("ms", "s", "m", "h")
   rownames(m) <- permitted_units
   colnames(m) <- permitted_units

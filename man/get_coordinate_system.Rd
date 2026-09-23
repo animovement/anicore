@@ -2,12 +2,12 @@
 % Please edit documentation in R/coordinate_system.R
 \name{get_coordinate_system}
 \alias{get_coordinate_system}
-\title{The coordinate system an aniframe is in}
+\title{The coordinate system an anipoint is in}
 \usage{
 get_coordinate_system(data)
 }
 \arguments{
-\item{data}{An aniframe or anievent object.}
+\item{data}{An anipoint or anievent object.}
 }
 \value{
 Length-one character vector: one of \code{"cartesian_1d"},

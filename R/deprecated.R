@@ -1,12 +1,11 @@
-# Deprecated aliases from the aniframe -> anipoint rename (#154).
-# `aniframe` survives as the abstract parent class; the position-grain
-# constructors now carry the grain's name. Remove after one release cycle.
+# Aliases from the aniframe -> anipoint rename (#154). Remove after one
+# release cycle.
 
 #' Deprecated aniframe constructors
 #'
 #' The position-grain frame is now called `anipoint`; `aniframe` names the
 #' abstract parent class shared with [anievent][is_anievent()]. These
-#' aliases forward to their replacements and warn once per session.
+#' aliases forward to their replacements.
 #'
 #' @param ... Passed to the replacement function.
 #' @param data Passed to the replacement function.
@@ -45,11 +44,15 @@ validate_aniframe <- function(data) {
   validate_anipoint(data)
 }
 
+# deprecate_soft() warns direct callers only, so users are not warned about
+# calls inside packages they cannot change.
 #' @keywords internal
 warn_deprecated_alias <- function(old, new) {
-  cli::cli_warn(
-    "{.fn {old}} is deprecated as of anicore 0.9.0; use {.fn {new}} instead.",
-    .frequency = "once",
-    .frequency_id = paste0(old, "-deprecated")
+  lifecycle::deprecate_soft(
+    "0.9.0",
+    paste0(old, "()"),
+    paste0(new, "()"),
+    env = rlang::caller_env(),
+    user_env = rlang::caller_env(2)
   )
 }

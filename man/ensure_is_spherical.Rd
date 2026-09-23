@@ -7,7 +7,7 @@
 ensure_is_spherical(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \description{
 Internal guard for spherical checks

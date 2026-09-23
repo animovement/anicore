@@ -7,7 +7,7 @@
 is_cartesian_1d(data, stop = FALSE)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 
 \item{stop}{Unused, and kept only so the signature does not change.
 It has no effect.}

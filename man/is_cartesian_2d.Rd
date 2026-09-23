@@ -7,7 +7,7 @@
 is_cartesian_2d(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \value{
 A logical value.

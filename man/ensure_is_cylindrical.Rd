@@ -7,7 +7,7 @@
 ensure_is_cylindrical(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \description{
 Internal guard for cylindrical checks

@@ -7,7 +7,7 @@
 ensure_is_cartesian(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \description{
 Stops with a clear error message if \code{data} is not Cartesian.

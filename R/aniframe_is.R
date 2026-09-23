@@ -35,6 +35,12 @@ is_aniframe <- function(x) {
 #' @export
 ensure_is_aniframe <- function(x) {
   if (!is_aniframe(x)) {
+    if (inherits(x, "anievent")) {
+      cli::cli_abort(c(
+        "This anievent predates the aniframe superclass.",
+        "i" = "Re-cast it with {.fn as_anievent}."
+      ))
+    }
     cli::cli_abort("Data is not an aniframe.")
   }
 }

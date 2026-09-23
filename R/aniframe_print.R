@@ -1,20 +1,16 @@
-#' Custom tibble summary for aniframe
+#' Custom tibble summary for anipoint
 #'
 #' @description
-#' Builds the print header rows shown above an aniframe. The set of rows is
-#' driven by the metadata: one row per column listed in `variables_what` and
-#' one row per column in `variables_when`. The index gets its own interval
-#' row rather than a per-value one, so it is excluded here. This means custom
-#' identity/temporal variables (e.g. `track`, `model`, `session`) appear
-#' automatically, and rows are omitted entirely when their column is absent.
+#' One row per `variables_what` and non-index `variables_when` column, plus
+#' event variables, sampling rate and the time interval.
 #'
-#' @param x An aniframe object
+#' @param x An anipoint object
 #' @param ... Additional arguments (unused)
 #' @return Named character vector with summary information
 #' @importFrom pillar tbl_sum
 #' @keywords internal
 #' @export
-tbl_sum.aniframe <- function(x, ...) {
+tbl_sum.anipoint <- function(x, ...) {
   default_header <- NextMethod()
 
   md <- get_metadata(x)
@@ -79,15 +75,14 @@ tbl_sum.aniframe <- function(x, ...) {
 
 #' Title-case and pluralise a metadata column name for the print header
 #'
-#' Used by [tbl_sum.aniframe()] to derive row labels from `variables_what` /
-#' `variables_when` (e.g. `"individual"` -> `"Individuals"`).
+#' `"individual"` -> `"Individuals"`.
 #'
 #' @keywords internal
 format_plural_title <- function(x) {
   paste0(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), "s")
 }
 
-#' Build the "Time" interval row for the aniframe print summary
+#' Build the "Time" interval row for the anipoint print summary
 #'
 #' Returns `NULL` when the interval cannot be expressed in seconds (e.g.
 #' `unit_time = "frame"` with no `sampling_rate`, or `unit_time = "unknown"`).
@@ -119,10 +114,7 @@ format_time_interval <- function(x, md) {
   secs_min <- time_min * spu
   secs_max <- time_max * spu
 
-  # Use sub-second (millisecond) precision when the recording is shorter
-  # than one second (otherwise rounding both endpoints to integer seconds
-  # collapses them to the same value, e.g. an 88 ms run -> "00:00:00 to
-  # 00:00:00").
+  # Under a second, whole seconds would collapse both endpoints to 00:00:00.
   fractional <- (secs_max - secs_min) < 1
 
   start_dt <- md$start_datetime
