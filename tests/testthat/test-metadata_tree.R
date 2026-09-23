@@ -381,3 +381,22 @@ test_that("the validator rejects entries outside the schema", {
   ev$variables$where <- list(position = "x")
   expect_error(ensure_valid_metadata(ev, "anievent"), "Unknown variable role")
 })
+
+test_that("md_field() reads legacy flat metadata directly", {
+  expect_equal(
+    md_field(legacy_metadata(sampling_rate = 25), "sampling_rate"),
+    25
+  )
+})
+
+test_that("[[<- with a position writes through to the list", {
+  md <- get_metadata(af())
+  md[[1]] <- list(aniframe = "9.9.9")
+  expect_s3_class(md, "aniframe_metadata")
+  expect_equal(unclass(md)[[1]], list(aniframe = "9.9.9"))
+})
+
+test_that("a flat metadata object prints its fields", {
+  flat <- structure(list(sampling_rate = 30), class = "aniframe_metadata")
+  expect_output(print(flat), "sampling_rate")
+})

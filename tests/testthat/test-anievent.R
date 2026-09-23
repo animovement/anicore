@@ -561,3 +561,16 @@ test_that("the neutral values are permitted on an aniframe too", {
 
   expect_equal(as.character(get_metadata(af, "reference_frame")), "none")
 })
+
+test_that("a pre-superclass anievent is pointed at as_anievent()", {
+  old <- anievent(
+    individual = 1L,
+    channel = "behaviour",
+    label = "REM",
+    start = 3,
+    stop = 9
+  )
+  class(old) <- setdiff(class(old), "aniframe")
+
+  expect_error(ensure_is_aniframe(old), "as_anievent")
+})
