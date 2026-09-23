@@ -373,23 +373,6 @@ apply_variables <- function(data, variables, strict = TRUE) {
   )
 }
 
-
-#' Ensure a declaration is a character vector
-#'
-#' @param variables Value supplied by the caller.
-#'
-#' @return `TRUE`, invisibly.
-#' @keywords internal
-ensure_variables_character <- function(variables) {
-  if (!is.character(variables)) {
-    cli::cli_abort(
-      "{.arg variables} must be a character vector, not {.cls {class(variables)}}."
-    )
-  }
-  invisible(TRUE)
-}
-
-
 #' Ensure declared columns are present
 #'
 #' @param data A data frame.
@@ -416,22 +399,4 @@ ensure_has_declared_cols <- function(data, cols, role) {
     paste0(lead, ": {.val {missing_cols}}."),
     "i" = "Create the column first, then declare it."
   ))
-}
-
-
-#' The spatial declaration, as a role mapping where there is one
-#'
-#' Re-declaring from the bare columns would lose the axis roles and reduce
-#' the frame to `unknown` (#109).
-#'
-#' @param data An aniframe.
-#'
-#' @return Named character vector, or a bare one when no roles are known.
-#' @keywords internal
-get_declared_where <- function(data) {
-  axes <- if (is_anipoint(data)) resolve_axes(get_metadata(data))
-  if (length(axes) > 0L) {
-    return(axes)
-  }
-  unname(md_where_position(get_metadata(data)))
 }

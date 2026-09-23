@@ -44,8 +44,7 @@ ensure_no_declaration_fields <- function(user_md) {
           variables_event = ,
           axes = "set_variables",
           structure = "set_connections",
-          connections = "set_connections",
-          paste0("set_", field)
+          connections = "set_connections"
         )
       },
       character(1)

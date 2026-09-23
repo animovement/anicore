@@ -324,3 +324,57 @@ test_that("declaring reaches the same state as constructing with it", {
   expect_equal(class(declared$id), class(constructed$id))
   expect_equal(get_metadata(declared), get_metadata(constructed))
 })
+
+# ---- Variables family edge cases ----
+
+test_that("get_keys() is the what and when keys, without the index", {
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1) |>
+    dplyr::mutate(trial = 1L) |>
+    add_variables(when = "trial")
+  expect_equal(
+    get_keys(af),
+    c(get_variables(af, "what"), get_variables(af, "when", "keys"))
+  )
+  expect_true("trial" %in% get_keys(af))
+  expect_false(get_index(af) %in% get_keys(af))
+})
+
+test_that("the index can be neither added to nor removed", {
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  expect_error(add_variables(af, when = list(index = "x")), "set_index")
+  expect_error(remove_variables(af, when = "time"), "set_index")
+})
+
+test_that("event has no main slot, so a bare vector is refused", {
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  expect_error(set_variables(af, event = "b"), "named list of slots")
+})
+
+test_that("a slot the class does not carry is refused", {
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  expect_error(set_variables(af, when = list(interval = "x")), "no slot")
+})
+
+test_that("where$orientation is declared, kept through restructuring, and checked", {
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1) |>
+    dplyr::mutate(heading = 0)
+  af <- set_variables(af, where = list(orientation = c(yaw = "heading")))
+  expect_equal(get_variables(af, "where", "orientation"), c(yaw = "heading"))
+
+  af <- dplyr::mutate(af, id = "a") |> add_variables(what = "id")
+  expect_equal(get_variables(af, "where", "orientation"), c(yaw = "heading"))
+
+  expect_error(
+    set_variables(af, where = list(orientation = c(yaw = "nope"))),
+    "Missing spatial variable"
+  )
+})
+
+test_that("re-casting a stripped frame keeps position columns that have no roles", {
+  df <- data.frame(time = 1:3, u = c(1, 2, 3), v = c(0, 1, 0))
+  af <- suppressWarnings(as_anipoint(df, variables_where = c("u", "v")))
+  stripped <- dplyr::ungroup(strip_animovement_class(af))
+  attr(stripped, "metadata") <- attr(af, "metadata")
+  recast <- suppressWarnings(as_anipoint(stripped))
+  expect_equal(get_variables(recast, "where"), c("u", "v"))
+})

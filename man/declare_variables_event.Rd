@@ -9,7 +9,7 @@ declare_variables_event(data, state, point)
 \arguments{
 \item{data}{An anipoint object.}
 
-\item{state, point}{Character vectors of column names, or \code{NULL}.}
+\item{state, point}{Character vectors of column names.}
 }
 \value{
 \code{data}, with the declaration recorded.

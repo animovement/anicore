@@ -1,38 +1,3 @@
-#' Restructure a frame to match a declaration
-#'
-#' @param data An aniframe or anievent object.
-#' @param variables_what,variables_when,variables_where The full
-#'   declaration to apply.
-#'
-#' @return `data`, restructured, with the declaration recorded.
-#' @keywords internal
-restructure_frame <- function(
-  data,
-  variables_what,
-  variables_when,
-  variables_where,
-  strict = TRUE
-) {
-  if (is_anievent(data)) {
-    if (length(variables_where) > 0) {
-      cli::cli_abort(c(
-        "An {.cls anievent} has no spatial variables.",
-        "i" = "{.field variables_where} is always empty on an anievent; spatial position lives on the {.cls anipoint} it was encoded from."
-      ))
-    }
-    return(restructure_anievent(data, variables_what, variables_when))
-  }
-
-  restructure_anipoint(
-    data,
-    variables_what,
-    variables_when,
-    variables_where,
-    strict = strict
-  )
-}
-
-
 #' Strip a frame back to its dplyr classes
 #'
 #' Avoids dispatching into class-preserving methods and the `ungroup()`
