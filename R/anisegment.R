@@ -12,7 +12,10 @@
 #' lower of the two endpoints' values; other undeclared columns are
 #' dropped.
 #'
-#' [as_anipoint()] inverts the conversion given the root point's trajectory.
+#' [as_anipoint()] rebuilds positions from the segments, anchored at the
+#' root point's trajectory. That is useful after editing the segments — for
+#' example holding each segment's length constant — since every point but
+#' the root then moves to agree with them.
 #'
 #' @param data A Cartesian 2D or 3D anipoint.
 #' @param structure Name of the structure to use. May be omitted when only
@@ -26,8 +29,10 @@
 #' seg <- as_anisegment(af)
 #' seg
 #'
-#' # Round trip, given the root's trajectory
-#' back <- as_anipoint(seg, root = af)
+#' # Hold each segment's length constant, then rebuild the positions
+#' rigid <- seg |>
+#'   dplyr::mutate(length = stats::median(length))
+#' rebuilt <- as_anipoint(rigid, root = af)
 #'
 #' @seealso [anistructure()], [set_structure()]
 #' @export
