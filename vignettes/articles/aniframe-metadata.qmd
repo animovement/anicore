@@ -63,7 +63,7 @@ question:
 |---------------|---------------------------------------------------------------------|
 | `recording`   | provenance: `source`, `source_version`, `source_format`, `filename` |
 | `time`        | `unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime` |
-| `space`       | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle` |
+| `space`       | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`, `euler_sequence`, `euler_intrinsic` |
 | `variables`   | which columns play which role: `what`, `when`, `where`, `event`, each a list of named slots |
 | `structure`   | relationships between levels of a variable — today's connections    |
 
