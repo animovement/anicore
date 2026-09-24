@@ -14,6 +14,6 @@ Named list with the \code{declared} spatial variables and the
 \code{missing} and \code{non_numeric} subsets of them.
 }
 \description{
-The shared kernel behind \code{\link[=is_spatial]{is_spatial()}} and \code{\link[=ensure_is_spatial]{ensure_is_spatial()}}.
+Spatial columns that are missing or not numeric
 }
 \keyword{internal}

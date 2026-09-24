@@ -55,25 +55,18 @@ get_handedness <- function(data) {
   ensure_is_aniframe(data)
   md <- get_metadata(data)
 
-  # Three directions say more than the field does, so they win. Nothing can
-  # drift out of step with them because nothing else is consulted.
+  # Three declared directions take precedence over the stored field.
   derived <- derive_handedness(resolve_axis_directions(md))
   if (!identical(derived, "unknown")) {
     return(derived)
   }
-  as.character(md[["handedness"]] %||% "unknown")
+  as.character(md_field(md, "handedness") %||% "unknown")
 }
 
 
 #' Work out the sense of rotation from the axis directions
 #'
-#' The turn from x to y reads counter-clockwise from the side the depth axis
-#' points to. Which side that is matters: the same scene filmed from above
-#' and from below gives images whose x and y are declared identically but
-#' whose rotations run opposite ways, and only `z` tells them apart.
-#'
-#' With no `z` declared the sense is the one the recording shows, measured
-#' from where it was taken.
+#' Seen from the side `z` points to; without `z`, from the viewer.
 #'
 #' @param directions Named character vector of axis directions.
 #' @param handedness A stated handedness, used when no `z` is declared.
@@ -91,9 +84,7 @@ derive_angle_direction <- function(directions, handedness = "unknown") {
     vectors[[directions[["y"]]]]
   )
 
-  # The side the frame was observed from. A declared `z` says it outright;
-  # a stated handedness says it too, since the right-handed completion of x
-  # and y is their cross product and the left-handed one is its opposite.
+  # Right-handed z is x cross y; left-handed is its opposite.
   normal <- if ("z" %in% names(directions)) {
     vectors[[directions[["z"]]]]
   } else if (identical(handedness, "right")) {
@@ -116,10 +107,7 @@ derive_angle_direction <- function(directions, handedness = "unknown") {
 }
 
 
-#' Work out handedness from three axis directions
-#'
-#' The sign of the determinant of the three direction vectors: positive is
-#' the right-handed orientation, the one `right`, `up` and `back` are in.
+#' Work out handedness from three axis directions (sign of the determinant)
 #'
 #' @param directions Named character vector of axis directions.
 #'
@@ -206,9 +194,7 @@ set_handedness <- function(data, handedness = "right") {
   ensure_is_anipoint(data)
   ensure_is_one_of(handedness, c("right", "left"), "handedness")
 
-  # Recorded whether or not the axes are spelled out, because a frame may
-  # state the convention and nothing else. Where they are spelled out they
-  # are brought into line, and are what `get_handedness()` then reads.
+  # Recorded even without declared axes: a frame may state only the convention.
   data <- set_derived_orientation(
     data,
     wanted = handedness,
@@ -267,10 +253,7 @@ set_angle_direction <- function(data, angle_direction) {
 
 #' Declare axis directions by the answer they should give
 #'
-#' The shared half of [set_handedness()] and [set_angle_direction()]. Both
-#' invert the same one-way derivation, which is under-determined on its own:
-#' the axes already declared supply the rest of the answer, and when they
-#' supply all of it one axis has to turn over.
+#' Shared by [set_handedness()] and [set_angle_direction()].
 #'
 #' @param data An anipoint object.
 #' @param wanted The value the derivation should give.
@@ -310,8 +293,7 @@ set_derived_orientation <- function(
     return(data)
   }
 
-  # One role short: its direction is whatever gives the wanted answer, and
-  # nothing is reflected because the axis had no direction to turn from.
+  # One role short: solve for it; nothing to reflect.
   undeclared <- setdiff(roles, declared)
   if (length(undeclared) == 1L) {
     return(set_axis_directions(
@@ -320,8 +302,7 @@ set_derived_orientation <- function(
     ))
   }
 
-  # All declared, and the answer is wrong: reverse the axis on the pair
-  # this quantity is conventionally turned on.
+  # All declared and wrong: reverse the conventional axis for this quantity.
   role <- names(current)[list_direction_pairs()[current] == turning]
   set_axis_directions(
     data,

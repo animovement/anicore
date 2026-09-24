@@ -77,7 +77,7 @@ set_connections <- function(data, connections, variable = "keypoint") {
     current[[variable]] <- conn_df
   }
 
-  set_metadata(data, connections = current)
+  write_structure(data, current)
 }
 
 #' Get connections from an anipoint
@@ -106,10 +106,7 @@ set_connections <- function(data, connections, variable = "keypoint") {
 #' @export
 get_connections <- function(data, variable = NULL) {
   ensure_is_anipoint(data)
-  current <- get_metadata(data, "connections")
-  if (is.null(current)) {
-    current <- list()
-  }
+  current <- get_metadata(data, "structure") %||% list()
 
   if (is.null(variable)) {
     return(current)
@@ -174,7 +171,7 @@ add_connections <- function(data, from, to, variable = "keypoint") {
   }
   current[[variable]] <- dplyr::bind_rows(existing, pairs)
 
-  set_metadata(data, connections = current)
+  write_structure(data, current)
 }
 
 #' Remove connections from an anipoint
@@ -222,12 +219,10 @@ remove_connections <- function(data, from, to, variable = "keypoint") {
   remaining <- dplyr::anti_join(existing, to_remove, by = c("from", "to"))
   current[[variable]] <- remaining
 
-  set_metadata(data, connections = current)
+  write_structure(data, current)
 }
 
-# ------------------------------------------------------------------
-# Internal helpers
-# ------------------------------------------------------------------
+# ---- Internal helpers ----
 
 #' @keywords internal
 make_empty_connection_df <- function() {
@@ -240,7 +235,7 @@ ensure_known_connection_variable <- function(data, variable) {
     cli::cli_abort("{.arg variable} must be a single character string.")
   }
   md <- get_metadata(data)
-  permitted <- unique(c(md$variables_what, md$variables_when))
+  permitted <- unique(c(md_what_keys(md), md_when_keys(md)))
   if (!variable %in% permitted) {
     cli::cli_abort(c(
       "{.arg variable} must be one of {.val {permitted}}, not {.val {variable}}.",
@@ -273,10 +268,7 @@ coerce_to_connection_df <- function(x) {
         "When supplied as a list, each element must be a length-2 character vector (one `from`/`to` pair)."
       )
     }
-    # Each pair can be either implicit-by-position (c("head", "neck")) or
-    # explicit-by-name (c(from = "head", to = "neck")). Detect named pairs
-    # and route their values; otherwise fall back to position [1] = from,
-    # [2] = to.
+    # A pair may be positional or named c(from = , to = ).
     extract_pair <- function(p) {
       nm <- names(p)
       v <- as.character(p) # strips names
@@ -325,4 +317,18 @@ warn_unknown_connection_endpoints <- function(data, conn_df, variable) {
     ))
   }
   invisible()
+}
+
+
+#' Write the structure category (connections keyed by variable)
+#'
+#' @param data An anipoint object.
+#' @param structure Named list of connection tables.
+#'
+#' @return `data`, with the category written.
+#' @keywords internal
+write_structure <- function(data, structure) {
+  md <- get_metadata(data)
+  md$structure <- structure
+  write_metadata(data, md)
 }

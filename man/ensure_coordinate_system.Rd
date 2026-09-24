@@ -17,13 +17,6 @@ ensure_coordinate_system(data, permitted, wanted)
 \code{TRUE}, invisibly.
 }
 \description{
-The shared guard behind \code{ensure_is_polar()} and its siblings. It does
-the check itself rather than being handed the answer, so it keeps the
-rule the rest of the package follows: \verb{is_*()} returns a logical,
-\verb{ensure_*()} errors.
-}
-\details{
-Reports what the frame \emph{is} in, and points at the two ways out: saying
-what the columns mean, or converting the coordinates.
+Ensure the frame is in one of the coordinate systems a caller needs
 }
 \keyword{internal}

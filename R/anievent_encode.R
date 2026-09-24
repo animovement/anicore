@@ -1,15 +1,8 @@
 # Encoding per-frame labels into bouts (#66)
-#
-# Split out of `anievent_to.R`, which held both the `to_anievent()` API
-# and this: the engine that turns a column of per-frame labels into the
-# bouts an anievent is made of. The dispatch is one subject, the encoding
-# another, and this is the intricate half.
 
 #' Normalise an event-column vector to character labels
 #'
-#' Logical → column name on TRUE, `NA` on FALSE. Factor / character →
-#' character. Lets a single kernel handle both binary (logical) and
-#' multi-level (factor / character) inputs.
+#' Logical becomes the column name on TRUE, `NA` on FALSE.
 #'
 #' @keywords internal
 normalise_event_values <- function(x, col_name) {
@@ -22,12 +15,7 @@ normalise_event_values <- function(x, col_name) {
 
 #' Detect the identity / grouping scope of one event column
 #'
-#' Returns the minimal subset of `candidate_cols` that the value of
-#' `event_col` varies across (given `time_col`). Used by
-#' `to_anievent.anipoint()` to drop redundant identity columns —
-#' e.g. a `behaviour` column that is constant across `keypoint`
-#' for each `(individual, time)` drops `keypoint` from the resulting
-#' anievent's grouping.
+#' The minimal subset of `candidate_cols` that `event_col` varies across.
 #'
 #' @keywords internal
 detect_event_scope <- function(
@@ -70,11 +58,7 @@ detect_event_scope <- function(
 
 #' Encode one state event column into bouts
 #'
-#' Within each `group_cols` partition, emit one row per maximal run
-#' of identical non-`NA` (normalised) values in `col`. `NA` rows
-#' break runs (so a value sequence like `c("REM", NA, "REM")` becomes
-#' two bouts, not one). `start` is the `time_col` value at the first
-#' frame in the run; `stop` is the value at the last frame.
+#' One row per maximal run of identical non-`NA` values; `NA` breaks runs.
 #'
 #' @keywords internal
 encode_state_bouts <- function(data, col, time_col, group_cols) {
@@ -95,10 +79,7 @@ encode_state_bouts <- function(data, col, time_col, group_cols) {
     key <- rep("", nrow(data))
   }
 
-  # Run-start detection on the full sequence (NAs included). A run
-  # starts when the group key changes, OR the NA-ness flips, OR the
-  # value changes (both sides non-NA). NA rows form their own runs
-  # and get dropped from the emit list below.
+  # NA rows form their own runs and are dropped below.
   prev_key <- c(NA_character_, key[-length(key)])
   prev_val <- c(NA_character_, vals[-length(vals)])
   key_changed <- is.na(prev_key) | key != prev_key

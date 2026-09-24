@@ -1,5 +1,4 @@
-# Tests for to_anievent.data.frame (RLE encoding from a plain data frame
-# with bare-name tidyselect of state / point / identity columns)
+# to_anievent.data.frame()
 
 test_that("factor state column is run-length-encoded into bouts", {
   df <- dplyr::tibble(
@@ -186,7 +185,7 @@ test_that("variables_when isolates bouts across temporal groups", {
   )
 
   expect_true("observation" %in% names(ae))
-  expect_true("observation" %in% get_metadata(ae, "variables_when"))
+  expect_true("observation" %in% get_variables_when(ae))
   expect_equal(nrow(ae), 4) # REM/wake per clip
 })
 

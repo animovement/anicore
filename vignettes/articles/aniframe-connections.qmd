@@ -25,9 +25,8 @@ values of an identity or temporal variable. The most common case is a
 **skeleton** — edges between keypoints — but the same shape works for
 a social network (edges between individuals) or a session graph.
 
-`anipoint` stores this as a single metadata field, `connections`, plus
-a small family of functions for managing it. This article covers that
-field and those functions.
+`anipoint` stores this in the `structure` category of its metadata,
+managed by a small family of functions. This article covers those.
 
 For the rest of the metadata see
 [Metadata on an aniframe](aniframe-metadata.html); for the data-column

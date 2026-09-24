@@ -13,9 +13,6 @@ has_axis_roles(variables_where)
 \code{TRUE} when every element carries a role name.
 }
 \description{
-Explicit roles are validated strictly and an unrecognised one aborts.
-A bare vector of column names keeps the older, lenient behaviour of
-warning and falling back to \code{"unknown"}, because that is what readers
-and existing frames rely on.
+Was this declaration written as an explicit role mapping?
 }
 \keyword{internal}

@@ -1,26 +1,3 @@
-# Test outline for example_anipoint():
-#
-# Validation:
-#   - errors when n_keypoints > 11
-#   - errors when n_dims is invalid
-#
-# Default behaviour:
-#   - creates aniframe with default parameters
-#   - has correct dimensions with defaults
-#
-# Keypoint handling:
-#   - uses centroid when n_keypoints is 1
-#   - uses anatomical keypoints when n_keypoints > 1
-#
-# Spatial dimensions:
-#   - creates 1D data with only x
-#   - creates 2D data with x and y
-#   - creates 3D data with x, y, and z
-#
-# Design structure:
-#   - creates correct number of rows
-#   - respects n_trials and n_sessions
-
 test_that("example_anipoint errors when n_keypoints > 11", {
   expect_error(
     example_anipoint(n_keypoints = 12),
@@ -85,7 +62,7 @@ test_that("example_anipoint creates 1D data with only x", {
   expect_true("x" %in% names(result))
   expect_false("y" %in% names(result))
   expect_false("z" %in% names(result))
-  expect_equal(get_metadata(result)$variables_where, "x")
+  expect_equal(get_variables_where(result), "x")
 })
 
 test_that("example_anipoint creates 2D data with x and y", {
@@ -93,7 +70,7 @@ test_that("example_anipoint creates 2D data with x and y", {
 
   expect_true(all(c("x", "y") %in% names(result)))
   expect_false("z" %in% names(result))
-  expect_equal(get_metadata(result)$variables_where, c("x", "y"))
+  expect_equal(get_variables_where(result), c("x", "y"))
 })
 
 test_that("example_anipoint creates 3D data with x, y, and z", {
@@ -101,7 +78,7 @@ test_that("example_anipoint creates 3D data with x, y, and z", {
 
   expect_true(all(c("x", "y", "z") %in% names(result)))
   expect_equal(
-    get_metadata(result)$variables_where,
+    get_variables_where(result),
     c("x", "y", "z")
   )
 })
@@ -135,9 +112,9 @@ test_that("example_anipoint respects n_trials and n_sessions", {
 test_that("example_anipoint sets correct metadata variables", {
   result <- example_anipoint()
 
-  expect_equal(get_metadata(result)$variables_what, c("individual", "keypoint"))
+  expect_equal(get_variables_what(result), c("individual", "keypoint"))
   expect_equal(
-    get_metadata(result)$variables_when,
+    get_variables_when(result),
     # The index is declared separately and is not temporal *context*.
     c("session", "trial")
   )

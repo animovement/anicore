@@ -1,18 +1,13 @@
-# Angle primitives (#128)
-#
-# Moved from anispace, which had them one layer above the packages that
-# need them: animetric re-exported both, and anicore could not reach them
-# at all.
+# Angle primitives, moved from anispace (#128).
 
 test_that("unwrap_angle correctly unwraps continuous angles", {
-  # Simple increasing sequence that doesn't need unwrapping
+  # Nothing to unwrap
   x <- c(0, 0.1, 0.2, 0.3)
   expect_equal(unwrap_angle(x), x)
 
-  # Sequence that wraps around 2*pi -> 0
+  # Wraps around 2*pi -> 0
   x <- c(3 * pi / 2, 7 * pi / 4, 2 * pi - 0.1, 0.1)
   result <- unwrap_angle(x)
-  # Should be monotonically increasing after unwrapping
   expect_true(all(diff(result) > 0))
 })
 
@@ -21,7 +16,6 @@ test_that("unwrap_angle handles NA at start", {
   result <- unwrap_angle(x)
 
   expect_true(is.na(result[1]))
-  # Remaining values should still be correctly unwrapped
   expect_equal(result[2:4], c(0.1, 0.2, 0.3))
 })
 
@@ -31,7 +25,6 @@ test_that("unwrap_angle handles NA in middle", {
 
   expect_equal(result[1:2], c(0.1, 0.2))
   expect_true(is.na(result[3]))
-  # Values after NA should continue unwrapping from non-NA values
   expect_false(is.na(result[4]))
   expect_false(is.na(result[5]))
 })
@@ -74,13 +67,10 @@ test_that("unwrap_angle handles single element", {
 })
 
 test_that("unwrap_angle preserves monotonicity across 2*pi boundary", {
-  # Angles that cross from just below 2*pi to just above 0
   x <- c(5.5, 6.0, 6.2, 0.1, 0.3)
   result <- unwrap_angle(x)
 
-  # After unwrapping, should be monotonically increasing
   expect_true(all(diff(result) > 0))
-  # Last values should be > 2*pi after unwrapping
 
   expect_true(result[5] > 2 * pi)
 })

@@ -1,70 +1,14 @@
-# Test outline for connections API:
-#
-# Storage shape:
-#   - default `connections` metadata is an empty list
-#   - set_connections stores a 2-col tibble keyed by variable name
-#
-# set_connections inputs:
-#   - accepts data.frame with from/to columns
-#   - accepts list of length-2 character vectors
-#   - NULL clears the entry for that variable
-#   - errors on data.frame missing from/to columns
-#   - errors on malformed list elements
-#   - errors on unsupported input type
-#
-# Variable validation:
-#   - errors when variable is not in variables_what or variables_when
-#   - allows variable in variables_when (e.g. "session")
-#
-# Endpoint warning (typo-catcher, #6):
-#   - warns when from/to value isn't in the variable's column
-#   - keeps the connection despite the warning
-#   - skips the warning when the variable column is absent from data
-#
-# get_connections:
-#   - returns the full named list when variable is NULL
-#   - returns an empty tibble when no connections are set for variable
-#
-# add_connections:
-#   - appends a single pair (length-1 vectors)
-#   - appends multiple pairs (length-N vectors)
-#   - preserves existing connections from previous calls
-#   - errors when from/to lengths differ
-#
-# remove_connections:
-#   - removes exact (directional) matches
-#   - leaves non-matching pairs alone
-#   - is a no-op when the variable has no connections
-#
-# Multiple variables:
-#   - connections on different variables coexist
-#
-# Defensive paths and edge cases:
-#   - get_connections returns an empty list when the metadata field is NULL
-#   - set_connections errors when variable isn't a single character string
-#   - add_connections errors when from/to vectors are empty
-#   - set_connections doesn't warn when variable is in metadata but the
-#     column is absent from data (e.g. staged for a future merge)
-#
-# Round-trip with set_metadata (regression for tibble-merge bug):
-#   - subsequent set_connections call doesn't error (set_metadata replaces
-#     list-valued fields rather than deep-merging)
-
-# ------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------
+# ---- Helpers ----
 
 mini_aniframe <- function() {
   example_anipoint(n_obs = 3, n_individuals = 2, n_keypoints = 5)
 }
 
-# ------------------------------------------------------------------
-# Storage shape
-# ------------------------------------------------------------------
+# ---- Storage shape ----
 
 test_that("default connections metadata is an empty list", {
   data <- mini_aniframe()
-  expect_equal(get_metadata(data, "connections"), list())
+  expect_equal(get_connections(data), list())
 })
 
 test_that("set_connections stores a from/to tibble keyed by variable", {
@@ -79,9 +23,7 @@ test_that("set_connections stores a from/to tibble keyed by variable", {
   expect_equal(names(conns$keypoint), c("from", "to"))
 })
 
-# ------------------------------------------------------------------
-# Inputs
-# ------------------------------------------------------------------
+# ---- Inputs ----
 
 test_that("set_connections accepts a data.frame with from/to columns", {
   data <- mini_aniframe()
@@ -116,7 +58,7 @@ test_that("set_connections accepts named pairs (c(from = ..., to = ...))", {
 
 test_that("set_connections handles named pairs in any order", {
   data <- mini_aniframe()
-  # Names supplied "to" first, "from" second — should still route correctly
+  # Columns supplied as to/from rather than from/to.
   data <- set_connections(
     data,
     list(c(to = "neck", from = "head"))
@@ -150,9 +92,7 @@ test_that("set_connections errors on unsupported input types", {
   expect_error(set_connections(data, "head -> neck"), "data.frame")
 })
 
-# ------------------------------------------------------------------
-# Variable validation
-# ------------------------------------------------------------------
+# ---- Variable validation ----
 
 test_that("set_connections errors on unknown variable", {
   data <- mini_aniframe()
@@ -169,9 +109,7 @@ test_that("set_connections accepts variables_when entries (e.g. session)", {
   )
 })
 
-# ------------------------------------------------------------------
-# Endpoint warning (typo-catcher)
-# ------------------------------------------------------------------
+# ---- Endpoint warning (typo-catcher) ----
 
 test_that("set_connections warns when an endpoint isn't in the column", {
   data <- mini_aniframe()
@@ -187,9 +125,7 @@ test_that("set_connections keeps the typo'd connection despite the warning", {
   expect_equal(get_connections(data, "keypoint")$to, "necc")
 })
 
-# ------------------------------------------------------------------
-# get_connections
-# ------------------------------------------------------------------
+# ---- get_connections ----
 
 test_that("get_connections returns the full list when variable is NULL", {
   data <- mini_aniframe()
@@ -206,9 +142,7 @@ test_that("get_connections returns an empty tibble for unset variable", {
   expect_equal(names(result), c("from", "to"))
 })
 
-# ------------------------------------------------------------------
-# add_connections
-# ------------------------------------------------------------------
+# ---- add_connections ----
 
 test_that("add_connections appends a single pair", {
   data <- mini_aniframe()
@@ -241,9 +175,7 @@ test_that("add_connections errors on length mismatch", {
   )
 })
 
-# ------------------------------------------------------------------
-# remove_connections
-# ------------------------------------------------------------------
+# ---- remove_connections ----
 
 test_that("remove_connections removes exact matches", {
   data <- mini_aniframe() |>
@@ -271,9 +203,7 @@ test_that("remove_connections is a no-op when no connections exist for variable"
   )
 })
 
-# ------------------------------------------------------------------
-# Multiple variables
-# ------------------------------------------------------------------
+# ---- Multiple variables ----
 
 test_that("connections on different variables coexist", {
   data <- mini_aniframe()
@@ -286,17 +216,12 @@ test_that("connections on different variables coexist", {
   expect_equal(nrow(conns$individual), 1)
 })
 
-# ------------------------------------------------------------------
-# Defensive paths and input-validation edge cases
-# ------------------------------------------------------------------
+# ---- Defensive paths and input-validation edge cases ----
 
-test_that("get_connections defensively returns an empty list when the field is NULL", {
-  # Older / externally-constructed metadata may have a NULL connections
-  # field rather than an empty list. Force that state and confirm the
-  # defensive `is.null(current)` branch returns list().
-  data <- mini_aniframe()
+test_that("get_connections returns an empty list on legacy metadata without connections", {
+  data <- legacy_anipoint()
   md <- attr(data, "metadata")
-  md["connections"] <- list(NULL)
+  md$connections <- NULL
   attr(data, "metadata") <- md
 
   expect_equal(get_connections(data), list())
@@ -327,18 +252,15 @@ test_that("add_connections errors when from or to is empty", {
 })
 
 test_that("set_connections doesn't warn when variable is in metadata but absent from data", {
-  # Declaring a column that isn't in the data is rejected at
-  # construction (#77), but metadata can still drift out of sync with
-  # the frame afterwards — the divergence `validate_anipoint()` reports.
-  # Given such an object, the endpoint check has nothing to check
-  # against, so it should early-return rather than warn about every
-  # value.
+  # Metadata that has drifted from the data (#77): nothing to check the
+  # endpoints against, so no warning.
   data <- as_anipoint(
     data.frame(individual = 1L, time = 1:3, x = 1:3, y = 1:3)
   )
-  drifted <- get_metadata(data)
-  drifted$variables_what <- c("individual", "future_keypoint")
-  data <- attach_metadata(data, drifted)
+  data <- drift_metadata(
+    data,
+    variables_what = c("individual", "future_keypoint")
+  )
 
   expect_no_warning(
     data <- set_connections(
@@ -350,9 +272,7 @@ test_that("set_connections doesn't warn when variable is in metadata but absent 
   expect_equal(nrow(get_connections(data, "future_keypoint")), 1)
 })
 
-# ------------------------------------------------------------------
-# Round-trip with set_metadata (regression: list-of-tibbles merge bug)
-# ------------------------------------------------------------------
+# ---- Round-trip with set_metadata (regression: list-of-tibbles merge bug) ----
 
 test_that("repeated set_connections doesn't error (regression for list merge)", {
   data <- mini_aniframe()

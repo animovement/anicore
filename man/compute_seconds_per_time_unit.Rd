@@ -7,7 +7,6 @@
 compute_seconds_per_time_unit(unit, sampling_rate)
 }
 \description{
-Returns \code{NA_real_} when conversion is not possible (e.g. \code{"frame"} without
-a \code{sampling_rate}, or \code{"unknown"}).
+\code{NA_real_} when conversion is not possible.
 }
 \keyword{internal}

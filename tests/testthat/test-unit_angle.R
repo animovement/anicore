@@ -1,28 +1,18 @@
-# ------------------------------------------------------------
-# Helper: create a minimal aniframe object for the tests
-# ------------------------------------------------------------
 make_test_aniframe <- function(df, unit = "rad") {
-  # Turn a plain data.frame into an aniframe and attach unit_angle metadata
   df %>%
-    as_anipoint() %>% # from your package
-    set_metadata(unit_angle = unit) # store the current angular unit
+    as_anipoint() %>%
+    set_metadata(unit_angle = unit)
 }
 
-# ------------------------------------------------------------
-# Sample data – three numeric angle columns
-# ------------------------------------------------------------
 raw_df <- data.frame(
   time = c(0, 1, 2),
   x = c(1, 1, 1),
   y = c(2, 2, 2),
   head_left = c(0, pi / 2, pi),
   head_right = c(pi / 4, pi / 3, pi / 6),
-  speed = c(1, 2, 3) # non‑angle column, should stay untouched
+  speed = c(1, 2, 3) # not an angle
 )
 
-# ------------------------------------------------------------
-# Begin the test suite
-# ------------------------------------------------------------
 test_that("set_unit_angle converts rad → deg correctly", {
   anif <- make_test_aniframe(raw_df, unit = "rad")
 
@@ -32,17 +22,14 @@ test_that("set_unit_angle converts rad → deg correctly", {
     to_unit = "deg"
   )
 
-  # Metadata should now report degrees
   expect_equal(get_metadata(out, "unit_angle") |> as.character(), "deg")
 
-  # Angle columns are converted, other columns unchanged
   expect_equal(out$head_left, rad_to_deg(raw_df$head_left))
   expect_equal(out$head_right, rad_to_deg(raw_df$head_right))
   expect_equal(out$speed, raw_df$speed)
 })
 
 test_that("set_unit_angle converts deg → rad correctly", {
-  # Start from a degree‑based aniframe
   deg_df <- data.frame(
     time = c(0, 1, 2),
     x = c(1, 1, 1),
@@ -68,7 +55,6 @@ test_that("set_unit_angle converts deg → rad correctly", {
 test_that("no conversion occurs when target unit already set", {
   anif <- make_test_aniframe(raw_df, unit = "rad")
 
-  # Capture the informational message
   expect_message(
     out <- set_unit_angle(
       anif,
@@ -78,7 +64,6 @@ test_that("no conversion occurs when target unit already set", {
     "Angular unit is already rad"
   )
 
-  # Object should be identical (aside from possible class attributes)
   expect_identical(
     out,
     as_anipoint(raw_df) |> set_metadata(unit_angle = "rad")
@@ -104,7 +89,6 @@ test_that("missing columns raise an informative error", {
 })
 
 test_that("non‑numeric columns raise an informative error", {
-  # Introduce a character column deliberately
   bad_df <- raw_df
   bad_df$head_left <- as.character(bad_df$head_left)
 
@@ -116,9 +100,7 @@ test_that("non‑numeric columns raise an informative error", {
   )
 })
 
-# ------------------------------------------------------------
-# Spatial angular columns (phi, theta) are auto-converted (#21)
-# ------------------------------------------------------------
+# ---- Spatial angular columns (phi, theta) are auto-converted (#21) ----
 
 test_that("set_unit_angle auto-converts phi for polar data (rad -> deg)", {
   df <- data.frame(

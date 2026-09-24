@@ -1,7 +1,6 @@
 # Test set_unit_space ----
 
 test_that("set_unit_space converts between standard units correctly", {
-  # Create test data in millimeters
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     y = c(15, 25, 35),
@@ -11,7 +10,6 @@ test_that("set_unit_space converts between standard units correctly", {
     as_anipoint() |>
     set_metadata(unit_space = "mm")
 
-  # Convert mm to cm
   result <- set_unit_space(data, to_unit = "cm")
 
   expect_equal(result$x, c(1, 2, 3))
@@ -99,7 +97,6 @@ test_that("set_unit_space errors on invalid to_unit", {
 })
 
 test_that("set_unit_space handles missing spatial columns gracefully", {
-  # Data with only x column
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1, 2, 3)
@@ -135,7 +132,6 @@ test_that("set_unit_space preserves non-spatial columns", {
 # Test set_unit_time ----
 
 test_that("set_unit_time converts between standard units correctly", {
-  # Create test data in seconds
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     y = c(15, 25, 35),
@@ -144,7 +140,6 @@ test_that("set_unit_time converts between standard units correctly", {
     as_anipoint() |>
     set_metadata(unit_time = "s")
 
-  # Convert s to ms
   result <- set_unit_time(data, to_unit = "ms")
 
   expect_equal(result$time, c(1000, 2000, 3000))
@@ -215,7 +210,7 @@ test_that("set_unit_time handles custom calibration factor", {
     as_anipoint() |>
     set_metadata(unit_time = "frame")
 
-  # 30 frames per second (1 frame = 1/30 seconds)
+  # 30 fps
   result <- set_unit_time(data, to_unit = "s", calibration_factor = 1 / 30)
 
   expect_equal(result$time, c(0, 1 / 30, 2 / 30))
@@ -291,17 +286,12 @@ test_that("list_conversion_factors_space has correct diagonal values", {
 test_that("list_conversion_factors_space has correct conversion values", {
   result <- list_conversion_factors_space()
 
-  # mm to cm
+  # Indexed [to, from].
   expect_equal(result["cm", "mm"], 1 / 10)
-  # mm to m
   expect_equal(result["m", "mm"], 1 / 1000)
-  # cm to mm
   expect_equal(result["mm", "cm"], 10)
-  # cm to m
   expect_equal(result["m", "cm"], 1 / 100)
-  # m to mm
   expect_equal(result["mm", "m"], 1000)
-  # m to cm
   expect_equal(result["cm", "m"], 100)
 })
 
@@ -325,25 +315,16 @@ test_that("list_conversion_factors_time has correct diagonal values", {
 test_that("list_conversion_factors_time has correct conversion values", {
   result <- list_conversion_factors_time()
 
-  # ms to s
+  # Indexed [to, from].
   expect_equal(result["s", "ms"], 1 / 1000)
-  # ms to m
   expect_equal(result["m", "ms"], 1 / (1000 * 60))
-  # ms to h
   expect_equal(result["h", "ms"], 1 / (1000 * 60 * 60))
-  # s to ms
   expect_equal(result["ms", "s"], 1000)
-  # s to m
   expect_equal(result["m", "s"], 1 / 60)
-  # s to h
   expect_equal(result["h", "s"], 1 / (60 * 60))
-  # m to s
   expect_equal(result["s", "m"], 60)
-  # m to h
   expect_equal(result["h", "m"], 1 / 60)
-  # h to m
   expect_equal(result["m", "h"], 60)
-  # h to s
   expect_equal(result["s", "h"], 60 * 60)
 })
 
@@ -396,17 +377,15 @@ test_that("set_unit_space converts rho on a polar frame", {
 
   result <- set_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10)
 
-  # rho is a length, so it converts; phi is an angle and belongs to
-  # set_unit_angle(), so it must not.
+  # phi is an angle, owned by set_unit_angle().
   expect_equal(result$rho, c(10, 20, 30))
   expect_equal(result$phi, c(0, 1, 2))
   expect_equal(as.character(get_metadata(result, "unit_space")), "cm")
 })
 
 test_that("set_unit_space converts both length axes of a cylindrical frame", {
-  # The sharp case: one length axis named rho and one named z. Selecting
-  # columns by name converted z and left rho, leaving two axes of the same
-  # coordinate system in different units under a single unit_space (#98).
+  # Selecting by name used to convert z but not rho, leaving one system in
+  # two units (#98).
   data <- anipoint(
     individual = "a",
     time = 1:3,
@@ -439,9 +418,8 @@ test_that("set_unit_space converts rho on a spherical frame and leaves both angl
 })
 
 test_that("set_unit_space warns rather than silently claiming a unit it did not apply", {
-  # An unrecognised set of spatial names leaves coordinate_system "unknown",
-  # so there is no way to tell a length from an angle. Converting nothing
-  # while updating the metadata is the same lie as #98, so it warns.
+  # With coordinate_system "unknown" a length can't be told from an angle, so
+  # converting nothing while updating the metadata would repeat #98.
   data <- suppressWarnings(as_anipoint(
     dplyr::tibble(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c("u", "v")

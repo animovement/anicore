@@ -1,24 +1,3 @@
-# Tests for the anievent class
-#
-# Construction:
-#   - anievent() builds an object with the expected class chain
-#   - as_anievent() coerces a data.frame
-#   - as_anievent() on an existing anievent is a no-op
-#   - column type standardisation (channel -> character, label -> factor,
-#     start/stop -> numeric, individual character -> factor)
-#   - metadata defaults: variables_what = "individual",
-#     variables_when = c("start", "stop"), variables_where = character()
-#   - optional modifiers list-column is preserved
-#
-# Validation (validate_anievent):
-#   - rejects missing required columns
-#   - rejects wrong column types
-#   - rejects negative intervals (stop < start)
-#   - rejects malformed modifiers (non-list cell, unnamed entries)
-#
-# Predicates:
-#   - is_anievent / ensure_is_anievent
-
 # ---- Construction --------------------------------------------------------
 
 test_that("anievent() builds an object with the expected class chain", {
@@ -126,10 +105,11 @@ test_that("anievent metadata gets anievent-flavoured defaults", {
     stop = 9
   )
 
-  md <- get_metadata(ae)
-  expect_equal(md$variables_what, "individual")
-  expect_equal(md$variables_when, c("start", "stop"))
-  expect_length(md$variables_where, 0)
+  expect_equal(get_variables_what(ae), "individual")
+  expect_equal(get_variables_when(ae), c("start", "stop"))
+  expect_length(get_variables_where(ae), 0)
+  # and no space category at all (#73, #118)
+  expect_null(get_metadata(ae, "space"))
 })
 
 test_that("anievent auto-detects recognised identity columns", {
@@ -141,7 +121,7 @@ test_that("anievent auto-detects recognised identity columns", {
     stop = c(9, 19)
   )
 
-  expect_equal(get_metadata(ae, "variables_what"), "subject")
+  expect_equal(get_variables_what(ae), "subject")
 })
 
 test_that("anievent accepts an explicit non-default identity column", {
@@ -154,7 +134,7 @@ test_that("anievent accepts an explicit non-default identity column", {
     variables_what = "rat"
   )
 
-  expect_equal(get_metadata(ae, "variables_what"), "rat")
+  expect_equal(get_variables_what(ae), "rat")
   expect_s3_class(ae$rat, "factor")
 })
 
@@ -167,7 +147,7 @@ test_that("anievent works with no identity column", {
   )
 
   expect_s3_class(ae, "anievent")
-  expect_length(get_metadata(ae, "variables_what"), 0)
+  expect_length(get_variables_what(ae), 0)
 })
 
 test_that("anievent auto-detects observation / session / trial into variables_when", {
@@ -182,7 +162,7 @@ test_that("anievent auto-detects observation / session / trial into variables_wh
   )
 
   expect_equal(
-    get_metadata(ae, "variables_when"),
+    get_variables_when(ae),
     c("observation", "trial", "start", "stop")
   )
 })
@@ -392,7 +372,7 @@ test_that("type auto-derives from start/stop when not supplied", {
   )
   expect_s3_class(ae$type, "factor")
   expect_equal(levels(ae$type), c("state", "point"))
-  # arrange-by-start reorders to (3, 4.5, 14); the start==stop bout sits second
+  # Sorted by start, so the point bout sits second.
   expect_equal(
     as.character(ae$type),
     c("state", "point", "state")
@@ -400,9 +380,8 @@ test_that("type auto-derives from start/stop when not supplied", {
 })
 
 test_that("type auto-derive is per (channel, label) — mixed-duration group is uniformly state", {
-  # (behaviour, REM) has two bouts: one durative (3-9), one single-frame
-  # (14-14). With the "any durative -> state" rule, both stay state.
-  # (call, alarm) is the only point group (start == stop).
+  # REM has a durative and a single-frame bout; any durative bout makes the
+  # whole group state.
   ae <- anievent(
     individual = c(1L, 1L, 1L),
     channel = c("behaviour", "behaviour", "call"),
@@ -410,7 +389,6 @@ test_that("type auto-derive is per (channel, label) — mixed-duration group is 
     start = c(3, 14, 4.5),
     stop = c(9, 14, 4.5)
   )
-  # arrange-by-start reorders rows
   by_key <- split(
     as.character(ae$type),
     paste(ae$channel, as.character(ae$label), sep = "/")
@@ -420,8 +398,7 @@ test_that("type auto-derive is per (channel, label) — mixed-duration group is 
 })
 
 test_that("type override wins over auto-derive", {
-  # All bouts have start == stop, auto-derive would say "point".
-  # Explicit override forces "state".
+  # Every bout has start == stop, so auto-derive alone would say "point".
   ae <- anievent(
     individual = 1L,
     channel = "motif",
@@ -455,7 +432,6 @@ test_that("validate_anievent rejects wrong type levels", {
     start = 1,
     stop = 3
   )
-  # Mutate type to a factor with wrong levels
   ae$type <- factor("state", levels = c("state", "point", "extra"))
   expect_error(
     validate_anievent(ae),
@@ -510,8 +486,8 @@ test_that("is_anievent / ensure_is_anievent work as expected", {
 # ---- Spatial metadata is not applicable to an anievent (#73) ------------
 
 test_that("an anievent does not claim a spatial layout it cannot have", {
-  # Reading a BORIS export used to produce an anievent announcing a
-  # coordinate system, inherited from the movement defaults.
+  # BORIS imports used to announce a coordinate system inherited from the
+  # movement defaults.
   ae <- anievent(
     individual = 1L,
     channel = "behaviour",
@@ -519,41 +495,41 @@ test_that("an anievent does not claim a spatial layout it cannot have", {
     start = c(1, 4),
     stop = c(3, 5)
   )
-  md <- get_metadata(ae)
-
-  expect_equal(as.character(md$reference_frame), "none")
-  expect_equal(as.character(md$unit_angle), "none")
-  expect_equal(as.character(md$unit_space), "none")
-  expect_equal(as.character(md$coordinate_system), "unknown")
-  expect_length(md$axis_directions, 0)
-  expect_length(md$axis_extents, 0)
+  # An absent `space` category (#118), so every spatial field reads as NULL.
+  expect_null(get_metadata(ae, "space"))
+  expect_null(get_metadata(ae, "reference_frame"))
+  expect_null(get_metadata(ae, "unit_space"))
+  expect_null(get_metadata(ae, "coordinate_system"))
   expect_equal(get_angle_direction(ae), "unknown")
   expect_equal(get_handedness(ae), "unknown")
 })
 
-test_that("metadata the caller supplies is left alone", {
-  ae <- anievent(
-    individual = 1L,
-    channel = "behaviour",
-    label = c("REM", "wake"),
-    start = c(1, 4),
-    stop = c(3, 5),
-    metadata = list(unit_space = "mm", reference_frame = "egocentric")
-  )
-  md <- get_metadata(ae)
+test_that("spatial metadata passed to an anievent is dropped", {
+  build <- function(metadata) {
+    anievent(
+      individual = 1L,
+      channel = "behaviour",
+      label = c("REM", "wake"),
+      start = c(1, 4),
+      stop = c(3, 5),
+      metadata = metadata
+    )
+  }
 
-  expect_equal(as.character(md$unit_space), "mm")
-  expect_equal(as.character(md$reference_frame), "egocentric")
-  # Fields the caller said nothing about are still neutral.
-  expect_equal(as.character(md$coordinate_system), "unknown")
+  ae <- build(list(unit_space = "none", coordinate_system = "unknown"))
+  expect_null(get_metadata(ae, "space"))
+
+  ae <- build(list(unit_space = "mm", handedness = "unknown", source = "x"))
+  expect_null(get_metadata(ae, "space"))
+  expect_equal(get_metadata(ae, "source"), "x")
 })
 
 test_that("an aniframe keeps its movement defaults", {
-  md <- get_metadata(anipoint(time = 1:3, x = 1:3, y = 1:3))
+  af <- anipoint(time = 1:3, x = 1:3, y = 1:3)
 
-  expect_equal(as.character(md$reference_frame), "allocentric")
-  expect_equal(as.character(md$unit_space), "px")
-  expect_equal(as.character(md$unit_angle), "rad")
+  expect_equal(as.character(get_metadata(af, "reference_frame")), "allocentric")
+  expect_equal(as.character(get_metadata(af, "unit_space")), "px")
+  expect_equal(as.character(get_metadata(af, "unit_angle")), "rad")
 })
 
 test_that("to_anievent does not carry the host frame's spatial metadata over", {
@@ -567,14 +543,14 @@ test_that("to_anievent does not carry the host frame's spatial metadata over", {
   af <- set_variables_event(af, state = "behaviour")
   af <- set_metadata(af, sampling_rate = 30, unit_time = "s")
 
-  md <- get_metadata(to_anievent(af))
+  ae <- to_anievent(af)
 
-  expect_length(md$axis_directions, 0)
-  expect_equal(as.character(md$unit_space), "none")
-  expect_equal(as.character(md$reference_frame), "none")
+  expect_null(get_metadata(ae, "space"))
+  expect_null(get_metadata(ae, "unit_space"))
+  expect_null(get_metadata(ae, "reference_frame"))
   # Fields that do mean something for bouts are still inherited.
-  expect_equal(md$sampling_rate, 30)
-  expect_equal(as.character(md$unit_time), "s")
+  expect_equal(get_metadata(ae, "sampling_rate"), 30)
+  expect_equal(as.character(get_metadata(ae, "unit_time")), "s")
 })
 
 test_that("the neutral values are permitted on an aniframe too", {

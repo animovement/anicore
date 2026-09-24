@@ -1,11 +1,5 @@
-# Tests that downstream subclasses survive the class-preserving methods (#81)
-#
-# Packages such as animetric build subclasses on top of `aniframe`
-# (`aniframe_kin`, `aniframe_kin2d`) without registering methods of their
-# own. The methods here must therefore restore whatever class stack came
-# in, rather than asserting a fixed one — and must keep the subclass ahead
-# of its parent, so a future `filter.aniframe_kin` wins dispatch over
-# `filter.aniframe`.
+# Downstream subclasses (e.g. animetric's) survive the class-preserving
+# methods, ahead of their parent so their own methods win dispatch (#81).
 
 # ---- Helpers -----------------------------------------------------------
 
@@ -86,9 +80,8 @@ test_that("ungroup preserves the subclass without re-grouping the result", {
   expect_warning(out <- dplyr::ungroup(af))
 
   expect_subclass_preserved(out)
-  # The dplyr-owned tail of the class vector comes from `NextMethod()`,
-  # never from the captured input — otherwise ungrouping would restore
-  # the `grouped_df` it had just removed.
+  # The dplyr-owned class tail comes from `NextMethod()`, not the input, or
+  # ungrouping would restore `grouped_df`.
   expect_false(inherits(out, "grouped_df"))
   expect_false(dplyr::is_grouped_df(out))
 })
@@ -166,11 +159,9 @@ test_that("preserve_animovement_class restores order and drops dplyr classes", {
 
   out <- preserve_animovement_class(bare, cls, list_default_metadata())
 
-  # Animovement classes restored ahead of the tibble tail, in order...
   expect_identical(
     class(out),
     c("test_kin", "aniframe", "tbl_df", "tbl", "data.frame")
   )
-  # ...and `grouped_df` left to dplyr.
   expect_false(inherits(out, "grouped_df"))
 })

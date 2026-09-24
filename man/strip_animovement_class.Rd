@@ -13,9 +13,7 @@ strip_animovement_class(data)
 \code{data} with the animovement classes removed.
 }
 \description{
-The structural steps operate on a plain frame, so they neither
-dispatch back into the class-preserving methods nor trigger the
-\code{ungroup()} "use with care" warning when a declaration leaves nothing
-to group by.
+Avoids dispatching into class-preserving methods and the \code{ungroup()}
+"use with care" warning.
 }
 \keyword{internal}

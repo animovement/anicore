@@ -13,12 +13,6 @@ warn_coordinate_system_drift(data)
 \code{TRUE}, invisibly.
 }
 \description{
-\code{coordinate_system} is derived from \code{variables_where} by
-\code{\link[=infer_coordinate_system]{infer_coordinate_system()}}, but only at construction. Writing the
-source field on its own leaves the derived one stale.
-}
-\details{
-Called only from \code{\link[=validate_anipoint]{validate_anipoint()}}, after \code{\link[=ensure_is_spatial]{ensure_is_spatial()}} has
-established that \code{variables_where} declares at least one column.
+Assumes \code{\link[=ensure_is_spatial]{ensure_is_spatial()}} has already passed.
 }
 \keyword{internal}

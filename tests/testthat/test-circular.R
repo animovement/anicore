@@ -1,15 +1,7 @@
-# Tests for the circular descriptives
-# -----------------------------------
-# 1. They agree with the {circular} package, which they replace (#147)
-# 2. They are unaffected by where the circle is cut
-# 3. Degenerate and empty input behave
-
-# Reference values from {circular} 0.5-2, computed once so that checking against
-# it needs no dependency on it -- this suite exists to stop depending on it.
+# Reference values from {circular} 0.5-2, which these replace (#147),
+# computed once so the suite doesn't depend on it:
 #   median: as.numeric(median.circular(circular(x %% (2 * pi)))) %% (2 * pi)
 #   sd:     as.numeric(sd.circular(circular(x)))
-# Each median was also checked against a 100,001-point grid search for the
-# direction minimising the summed angular distance, which is the definition.
 reference <- list(
   concentrated_odd = list(
     x = c(1.02, 0.87, 1.31, 0.95, 1.44),
@@ -51,9 +43,7 @@ test_that("circ_sd() agrees with the reference implementation", {
 })
 
 test_that("circ_median() averages tied directions on the circle", {
-  # Two directions tie for the median, one either side of zero. Averaging them
-  # arithmetically gives their antipode -- the direction that *maximises* the
-  # summed angular distance, 180 degrees from the answer.
+  # A tie either side of zero: averaging arithmetically gives the antipode.
   x <- reference$tied_across_zero$x
   objective <- function(theta) sum(pi - abs(pi - abs(x - theta)))
 
@@ -69,8 +59,7 @@ test_that("circ_mean() is the mean direction, not the arithmetic mean", {
     tolerance = 1e-9
   )
 
-  # Directions are compared as directions: the mean of 350 and 10 degrees is
-  # 0, which in [0, 2*pi) is reached from below.
+  # The mean of 350 and 10 degrees is 0, reached from below in [0, 2*pi).
   expect_equal(
     circ_difference(0, circ_mean(deg_to_rad(c(350, 10)))),
     0,
@@ -93,8 +82,8 @@ test_that("the summaries do not depend on where the circle is cut", {
 })
 
 test_that("identical angles have no spread", {
-  # circular::sd.circular() returns NaN here, because the resultant length of a
-  # constant sample can land above 1 in floating point.
+  # sd.circular() returns NaN here: a constant sample's resultant length can
+  # exceed 1 in floating point.
   x <- rep(2.1, 8) + stats::rnorm(8, 0, 1e-9)
 
   expect_equal(circ_sd(x), 0, tolerance = 1e-6)

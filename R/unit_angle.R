@@ -49,7 +49,6 @@ set_unit_angle <- function(data, to_unit, cols = NULL) {
     )
   }
 
-  # Validate user-supplied cols
   if (!is.null(cols)) {
     if (!all(cols %in% names(data))) {
       cli::cli_abort("All provided columns must be in the data.")

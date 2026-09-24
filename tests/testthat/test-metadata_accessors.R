@@ -1,7 +1,5 @@
-# Getters for the fields that already had setters (#121)
-#
-# The point is that downstream stops naming metadata fields as literals, so
-# a later restructure (#118) does not reach them.
+# Getters for the fields that already had setters (#121), so downstream
+# stops naming metadata fields as literals.
 
 test_that("every field with a setter has a getter that reads it back", {
   af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1)
@@ -34,8 +32,7 @@ test_that("the getters see what their setters wrote", {
 })
 
 test_that("the factor-backed getters return a bare character", {
-  # Downstream almost always wraps these in as.character(); doing it here
-  # means they no longer have to.
+  # Returned as character so downstream needn't wrap them in as.character().
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
   for (value in list(
@@ -67,7 +64,7 @@ test_that("they work on an anievent too, where the field applies", {
 
   expect_equal(get_unit_time(ae), as.character(get_metadata(ae, "unit_time")))
   # An anievent has no spatial component, so these read as "not applicable".
-  expect_equal(get_unit_space(ae), "none")
+  expect_true(is.na(get_unit_space(ae)))
   expect_length(get_axis_directions(ae), 0)
   expect_equal(get_handedness(ae), "unknown")
 })

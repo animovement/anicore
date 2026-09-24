@@ -1,17 +1,3 @@
-# Test outline for print.aniframe_metadata():
-#
-# Output structure:
-#   - first captured line is non-empty (no leading newline)
-#   - no two consecutive empty lines (no blank lines between entries)
-#   - last line is the trailing newline emitted by cat()
-#
-# Content:
-#   - includes the "animovement metadata" header
-#   - lists every metadata field name
-#   - shows "(character)" / "(factor)" type annotation per field
-#   - empty metadata renders the "No metadata available" message
-#   - multi-element character vectors render comma-separated
-
 capture_md_print <- function(x) {
   old <- Sys.getenv("NO_COLOR", unset = NA)
   Sys.setenv("NO_COLOR" = "1")
@@ -31,10 +17,8 @@ test_that("print has no leading newline and no blank lines between entries", {
 
   out <- capture_md_print(md)
 
-  # First line should be the header (non-empty)
   expect_gt(nchar(out[1]), 0)
 
-  # No two adjacent blank lines
   if (length(out) >= 2) {
     blanks <- nchar(out) == 0
     expect_false(any(blanks[-length(blanks)] & blanks[-1]))
@@ -109,4 +93,58 @@ test_that("print returns input invisibly", {
   capture.output(returned <- print(md))
 
   expect_identical(returned, md)
+})
+
+test_that("print renders the category tree with sections", {
+  data <- example_anipoint()
+  data <- suppressWarnings(set_connections(
+    data,
+    list(c("head", "thorax"), c("thorax", "abdomen")),
+    variable = "keypoint"
+  ))
+  out <- capture_md_print(get_metadata(data))
+  text <- paste(out, collapse = "\n")
+
+  expect_match(text, "spec_version")
+  for (category in list_metadata_categories()) {
+    expect_match(text, category, fixed = TRUE)
+  }
+  # variables print one line per role, slots inline
+  expect_match(text, "keys:")
+  expect_match(text, "index: time")
+  # structure prints one line per keyed variable
+  expect_match(text, "keypoint: 2 connections")
+})
+
+test_that("print renders an empty structure category as (empty)", {
+  out <- capture_md_print(get_metadata(example_anipoint()))
+  expect_match(paste(out, collapse = "\n"), "(empty)", fixed = TRUE)
+})
+
+test_that("print renders a flat field selection", {
+  data <- set_metadata(example_anipoint(), sampling_rate = 30)
+  out <- capture_md_print(get_metadata(data, c("sampling_rate", "source")))
+  text <- paste(out, collapse = "\n")
+
+  expect_match(text, "sampling_rate")
+  expect_match(text, "30")
+})
+
+test_that("empty categories render as (empty)", {
+  expect_match(
+    paste(
+      cli::cli_format_method(print_metadata_leaves(list())),
+      collapse = "\n"
+    ),
+    "(empty)",
+    fixed = TRUE
+  )
+  expect_match(
+    paste(
+      cli::cli_format_method(print_metadata_variables(list())),
+      collapse = "\n"
+    ),
+    "(empty)",
+    fixed = TRUE
+  )
 })

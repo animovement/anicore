@@ -1,11 +1,4 @@
-# Testing convert_nan_to_na:
-# - Converts NaN to NA in numeric columns
-# - Leaves NA values unchanged
-# - Leaves non-numeric columns unchanged
-# - Handles data frames with no numeric columns
-# - Handles empty data frames
-#
-# Also tests rad_to_deg() and deg_to_rad()
+# convert_nan_to_na(), rad_to_deg() and deg_to_rad()
 
 test_that("convert_nan_to_na converts NaN to NA in numeric columns", {
   df <- data.frame(

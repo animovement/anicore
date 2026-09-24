@@ -11,16 +11,12 @@ standardise_anievent_cols(data, variables_what, variables_when)
 
 \item{variables_what}{Identity variable names.}
 
-\item{variables_when}{Temporal variable names — grouping columns
-(everything except \code{start}/\code{stop}) are coerced like identity
-columns; \code{start} and \code{stop} are forced numeric.}
+\item{variables_when}{Temporal variable names, including \code{start}/\code{stop}.}
 }
 \value{
 Data frame with standardised column types.
 }
 \description{
-Coerces identity and temporal-grouping columns to factor/integer
-(mirroring the aniframe convention), \code{channel} to character,
-\code{label} to factor, and \code{start}/\code{stop} to numeric.
+Standardise column types for an anievent
 }
 \keyword{internal}

@@ -1,13 +1,4 @@
-# Tests for class-preserving dplyr and base-R methods on anievent
-#
-# Each verb / extractor must:
-#   - preserve the `anievent` class on its result
-#   - preserve metadata (sampling_rate is the smoke-test field)
-#
-# Covered methods:
-#   - dplyr: arrange, filter, group_by, ungroup, mutate, relocate, rename,
-#     select, slice
-#   - base: [, [[, $, [<-, [[<-, $<-, names<-, as.data.frame
+# Each method must keep the anievent class and its metadata.
 
 make_anievent <- function() {
   ae <- anievent(

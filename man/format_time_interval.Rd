@@ -7,10 +7,6 @@
 format_time_interval(x, md)
 }
 \description{
-Returns \code{NULL} when the interval cannot be expressed in seconds (e.g.
-\code{unit_time = "frame"} with no \code{sampling_rate}, or \code{unit_time = "unknown"}).
-When \code{start_datetime} is set in metadata, formats absolute datetimes;
-otherwise formats elapsed time as \code{HH:MM:SS}. Switches to millisecond
-precision (\code{HH:MM:SS.fff}) when the recording is shorter than one second.
+\code{NULL} when the interval cannot be expressed in seconds.
 }
 \keyword{internal}

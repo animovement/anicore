@@ -17,8 +17,6 @@ ensure_has_declared_cols(data, cols, role)
 \code{TRUE}, invisibly.
 }
 \description{
-Shared by construction (\code{\link[=ensure_has_anipoint_cols]{ensure_has_anipoint_cols()}}) and re-declaration,
-so a column that isn't there is reported the same way whichever route
-the caller took.
+Ensure declared columns are present
 }
 \keyword{internal}

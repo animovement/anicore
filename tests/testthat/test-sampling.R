@@ -21,8 +21,7 @@ test_that("the interval is in the unit the index is in", {
 })
 
 test_that("the interval is measured per key, not pooled", {
-  # Two individuals, each sampled at 1, both restarting at time 1. Pooling
-  # would see a gap of -4 between them and call the interval something else.
+  # Both individuals restart at time 1; pooling would see a gap of -4.
   af <- as_anipoint(data.frame(
     individual = rep(c("a", "b"), each = 5),
     time = rep(1:5, 2),
@@ -50,12 +49,10 @@ test_that("an anievent has no interval, having no index", {
   expect_true(is.na(get_sampling_interval(ae)))
 })
 
-
 # Regularity is computed, not stored ----
 
 test_that("regularity follows the data rather than the metadata", {
-  # The point of computing on demand: dropping a row changes the answer,
-  # and a stored logical would go on claiming the old one.
+  # A stored logical would go stale when a row is dropped.
   af <- example_anipoint(n_obs = 5, n_individuals = 1, n_keypoints = 1)
   expect_true(is_sampling_regular(af))
 
@@ -89,7 +86,6 @@ test_that("is_sampling_regular() rejects a nonsense tolerance", {
   expect_error(is_sampling_regular(af, tolerance = c(1, 2)), "single number")
 })
 
-
 # A declared rate that disagrees with the index ----
 
 test_that("validate_anipoint() warns when sampling_rate contradicts the index", {
@@ -111,8 +107,7 @@ test_that("validate_anipoint() warns when sampling_rate contradicts the index", 
 })
 
 test_that("a frame-indexed recording is not second-guessed", {
-  # There the rate is the frames-to-seconds conversion, not a claim the
-  # gaps can contradict.
+  # Here the rate converts frames to seconds; the gaps can't contradict it.
   af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     set_metadata(sampling_rate = 30)
 
@@ -139,16 +134,15 @@ test_that("aniframe.quiet silences the mismatch warning", {
 test_that("metadata written before the field existed still validates", {
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
   md <- get_metadata(af)
-  md[["sampling_interval"]] <- NULL
+  md$time$sampling_interval <- NULL
 
   expect_no_error(ensure_valid_metadata(md))
   expect_true(has_all_metadata_fields(md))
 })
 
 test_that("a non-numeric index does not abort construction", {
-  # `sampling_interval` is derived inside the constructor, before the index
-  # has been checked for type. A reader handing over an empty or untyped
-  # column must not blow up there (found via aniread's empty-file test).
+  # `sampling_interval` is derived before the index is type-checked, so an
+  # empty or untyped column must not blow up there (via aniread).
   df <- data.frame(
     individual = character(0),
     time = character(0),
@@ -160,7 +154,6 @@ test_that("a non-numeric index does not abort construction", {
   expect_true(is.na(get_sampling_interval(af)))
   expect_true(is.na(is_sampling_regular(af)))
 })
-
 
 # Frames with nothing to measure ----
 
@@ -174,7 +167,7 @@ test_that("no gaps are taken when the index column is gone", {
 test_that("the interval is NA when metadata predates the field", {
   af <- example_anipoint(n_obs = 5, n_individuals = 1, n_keypoints = 1)
   md <- attr(af, "metadata")
-  md[["sampling_interval"]] <- NULL
+  md$time$sampling_interval <- NULL
   attr(af, "metadata") <- md
 
   expect_true(is.na(get_sampling_interval(af)))

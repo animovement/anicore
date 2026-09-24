@@ -1,10 +1,4 @@
-# Circular descriptive statistics.
-#
-# Angles have no smallest or largest value, so the ordinary median and standard
-# deviation do not apply: the mean of 350 and 10 degrees is 0, not 180. These
-# are the circular equivalents, kept here beside the other angle utilities so
-# that the rest of the suite does not need a dependency for four short
-# functions.
+# Circular descriptive statistics, kept here to avoid a dependency.
 
 #' Circular median
 #'
@@ -33,8 +27,7 @@ circ_median <- function(x, na_rm = TRUE) {
 
   x <- wrap_angle(x)
 
-  # Every candidate is either an observation or its antipode; the minimiser is
-  # always one of them, so the search is exact rather than numerical.
+  # The minimiser is an observation or its antipode, so the search is exact.
   candidates <- wrap_angle(c(x, x + pi))
   distance <- vapply(
     candidates,
@@ -92,9 +85,7 @@ circ_sd <- function(x, na_rm = TRUE) {
     return(NA_real_)
   }
 
-  # Clamped because the resultant length of identical angles can land a hair
-  # above 1 in floating point, which would make the logarithm positive and the
-  # root NaN.
+  # Clamp: floating point can put R a hair above 1, making the root NaN.
   resultant <- min(sqrt(mean(cos(x))^2 + mean(sin(x))^2), 1)
   sqrt(max(-2 * log(resultant), 0))
 }
@@ -122,7 +113,6 @@ circ_mad <- function(x, na_rm = TRUE) {
 }
 
 
-# Shared NA handling: drop them, or keep one so the caller gets NA back.
 #' @noRd
 circ_drop_na <- function(x, na_rm) {
   if (isTRUE(na_rm)) x[!is.na(x)] else x

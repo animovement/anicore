@@ -1,14 +1,10 @@
-# Which way the axes point, and what follows from it (#124)
-#
-# The cases that matter are the ones two axes cannot tell apart: the same
-# scene recorded from opposite sides.
+# Axis orientation, handedness and angle direction (#124).
 
 frame_2d <- function(y = c(0, 5, 10)) {
   as_anipoint(
     data.frame(individual = "a", time = 1:3, x = c(1, 2, 3), y = y)
   )
 }
-
 
 # Reading the orientation off the axes ----
 
@@ -21,8 +17,8 @@ test_that("a frame with no axis directions claims no orientation", {
 })
 
 test_that("two axes give the sense the recording shows", {
-  # `atan2(y, x)` counts counter-clockwise, so an image-plane frame counts
-  # the other way round from the maths convention.
+  # `atan2(y, x)` counts counter-clockwise, so an image-plane frame runs the
+  # other way.
   expect_equal(
     get_angle_direction(set_axis_directions(
       frame_2d(),
@@ -46,8 +42,7 @@ test_that("two axes cannot fix a handedness", {
 })
 
 test_that("three axes fix both, and agree with each other", {
-  # `det[x y z]` is `(x cross y) . z`, so a right-handed frame counts
-  # counter-clockwise about its own depth axis, always.
+  # A right-handed frame always counts counter-clockwise about its depth axis.
   for (z in c("back", "forward")) {
     af <- set_axis_directions(frame_2d(), c(x = "right", y = "up", z = z))
 
@@ -89,12 +84,10 @@ test_that("handedness matches the table in #124", {
   )
 })
 
-
 # The side the recording was made from ----
 
 test_that("the viewing side is what tells two mirrored recordings apart", {
-  # A rodent filmed from above and through a glass floor gives images whose
-  # x and y are declared identically, but whose rotations run opposite ways.
+  # Filmed from above vs through a glass floor: same x/y, opposite rotations.
   above <- set_axis_directions(
     frame_2d(),
     c(x = "right", y = "down", z = "back")
@@ -111,8 +104,7 @@ test_that("the viewing side is what tells two mirrored recordings apart", {
 })
 
 test_that("turning the depth axis over leaves an x-y frame's data alone", {
-  # Nothing carries `z`, so there is nothing to express differently -- the
-  # direction is a fact about the space, not about the columns.
+  # Nothing carries `z`; the direction describes the space, not the columns.
   above <- set_axis_directions(
     frame_2d(),
     c(x = "right", y = "down", z = "back")
@@ -123,7 +115,6 @@ test_that("turning the depth axis over leaves an x-y frame's data alone", {
   expect_equal(below$y, above$y)
   expect_equal(get_angle_direction(below), "counter_clockwise")
 })
-
 
 # Stating the convention without spelling out the axes ----
 
@@ -160,8 +151,7 @@ test_that("stating a handedness completes the third axis", {
 })
 
 test_that("declared axes are read in preference to a stated handedness", {
-  # The three directions say more, so nothing can drift out of step: the
-  # recorded value is brought into line rather than left contradicting them.
+  # The directions say more, so the stored handedness is brought into line.
   af <- set_handedness(frame_2d(), "left")
   af <- set_axis_directions(af, c(x = "right", y = "up", z = "back"))
 
@@ -176,7 +166,6 @@ test_that("turning the handedness over reverses the depth axis", {
     get_axis_directions(set_handedness(af, "left"))[["z"]],
     "forward"
   )
-  # The axes that were not the depth one are left alone.
   expect_equal(get_axis_directions(set_handedness(af, "left"))[["x"]], "right")
 })
 
@@ -190,7 +179,6 @@ test_that("handedness must be one of the two", {
   expect_error(set_handedness(frame_2d(), "widdershins"), "must be one of")
   expect_error(set_handedness(frame_2d(), c("right", "left")), "must be one of")
 })
-
 
 # Asking for a sense of rotation ----
 
@@ -228,7 +216,6 @@ test_that("angle direction must be one of the two", {
   expect_error(set_angle_direction(frame_2d(), "sideways"), "must be one of")
 })
 
-
 # An anievent has no orientation at all ----
 
 test_that("an anievent claims neither", {
@@ -241,13 +228,10 @@ test_that("an anievent claims neither", {
   expect_equal(get_angle_direction(ae), "unknown")
 })
 
-
 # The derivations on their own ----
 
 test_that("a stated handedness settles the sense when no z is declared", {
-  # Not reachable through `set_handedness()`, which completes the third
-  # axis when two are declared -- but metadata can carry the coarser
-  # statement without them.
+  # Unreachable via `set_handedness()`, but stored metadata can carry it.
   expect_equal(
     derive_angle_direction(c(x = "right", y = "down"), "right"),
     "counter_clockwise"
@@ -259,14 +243,12 @@ test_that("a stated handedness settles the sense when no z is declared", {
 })
 
 test_that("axes that do not span the view give no sense of rotation", {
-  # x across and y into the frame turn about the vertical, which the
-  # default viewpoint sees edge-on.
+  # x across and y into the frame are seen edge-on from the default viewpoint.
   expect_equal(derive_angle_direction(c(x = "right", y = "back")), "unknown")
 })
 
 test_that("parallel axes give no handedness", {
-  # Rejected at declaration, but stored metadata is not required to have
-  # come from the setter.
+  # Rejected at declaration, but stored metadata may not come from the setter.
   expect_equal(
     derive_handedness(c(x = "right", y = "left", z = "up")),
     "unknown"

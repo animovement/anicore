@@ -34,8 +34,7 @@
 #' @export
 validate_anipoint <- function(data) {
   ensure_is_anipoint(data)
-  # Before the generic check, which also names the index but reports it
-  # less helpfully.
+  # Before the generic check, which reports a missing index less helpfully.
   ensure_has_index(data)
   ensure_has_declared_variables(data)
   ensure_is_spatial(data)
@@ -48,15 +47,7 @@ validate_anipoint <- function(data) {
 
 #' Warn when the declaration does not identify one observation per row
 #'
-#' Identity plus temporal context plus the index is meant to be a
-#' composite key: one entity, in one context, at one position. When it
-#' repeats, some variable that distinguishes the rows is undeclared, and
-#' every grouped operation silently folds those rows together — a
-#' trajectory with two `x` values at the same instant is not a trajectory.
-#'
-#' A warning rather than an error. The state is reachable part-way through
-#' honest work — a frame read before its identity column is declared, say
-#' — and nothing in the class is broken by it (#49).
+#' A warning, not an error: the state is reachable mid-workflow (#49).
 #'
 #' @param data An anipoint object.
 #'
@@ -65,7 +56,7 @@ validate_anipoint <- function(data) {
 warn_duplicate_observations <- function(data) {
   md <- get_metadata(data)
   key <- intersect(
-    c(md$variables_what, md$variables_when, resolve_index(md)),
+    c(md_what_keys(md), md_when_keys(md), resolve_index(md)),
     names(data)
   )
   if (length(key) == 0L) {
@@ -87,14 +78,6 @@ warn_duplicate_observations <- function(data) {
 
 #' Columns declared by the metadata, keyed by role
 #'
-#' `variables_event` is a named list of `state` / `point` columns rather
-#' than a flat vector, so it is flattened here to give every role the same
-#' shape. `NA` entries mean "unset" and are dropped.
-#'
-#' `variables_index` is read through [resolve_index()] rather than
-#' directly, so a frame serialised before the field existed reports the
-#' `time` column it was built with rather than nothing at all.
-#'
 #' @param md An anipoint metadata list.
 #'
 #' @return Named list of character vectors, one per declaration field.
@@ -107,12 +90,12 @@ get_declared_variables <- function(md) {
 
   list(
     variables_index = drop_na(resolve_index(md)),
-    variables_what = drop_na(md$variables_what),
-    variables_when = drop_na(md$variables_when),
-    variables_where = drop_na(md$variables_where),
+    variables_what = drop_na(md_what_keys(md)),
+    variables_when = drop_na(md_when_keys(md)),
+    variables_where = drop_na(unname(md_where_position(md))),
     variables_event = drop_na(c(
-      md$variables_event$state,
-      md$variables_event$point
+      md_event(md)$state,
+      md_event(md)$point
     ))
   )
 }
@@ -146,9 +129,6 @@ ensure_has_declared_variables <- function(data) {
 
 #' Ensure the index column is present and numeric
 #'
-#' Which column that is comes from the frame's own declaration; `time` is
-#' its default, not a requirement (#109).
-#'
 #' @param data An anipoint object.
 #'
 #' @return `TRUE`, invisibly.
@@ -172,15 +152,13 @@ ensure_has_index <- function(data) {
 
 #' Spatial columns that are missing or not numeric
 #'
-#' The shared kernel behind [is_spatial()] and [ensure_is_spatial()].
-#'
 #' @param data An anipoint object.
 #'
 #' @return Named list with the `declared` spatial variables and the
 #'   `missing` and `non_numeric` subsets of them.
 #' @keywords internal
 find_spatial_problems <- function(data) {
-  declared <- get_metadata(data, "variables_where")
+  declared <- get_variables(data, "where")
   declared <- as.character(declared[!is.na(declared)])
 
   present <- intersect(declared, names(data))
@@ -282,12 +260,7 @@ ensure_is_spatial <- function(data) {
 
 #' Warn when coordinate_system no longer matches variables_where
 #'
-#' `coordinate_system` is derived from `variables_where` by
-#' [infer_coordinate_system()], but only at construction. Writing the
-#' source field on its own leaves the derived one stale.
-#'
-#' Called only from [validate_anipoint()], after [ensure_is_spatial()] has
-#' established that `variables_where` declares at least one column.
+#' Assumes [ensure_is_spatial()] has already passed.
 #'
 #' @param data An anipoint object.
 #'
@@ -295,10 +268,11 @@ ensure_is_spatial <- function(data) {
 #' @keywords internal
 warn_coordinate_system_drift <- function(data) {
   md <- get_metadata(data)
-  declared <- as.character(md$variables_where[!is.na(md$variables_where)])
-  recorded <- as.character(md$coordinate_system)
-  # `infer_coordinate_system()` warns on combinations it doesn't
-  # recognise; we report the mismatch ourselves below.
+  declared <- as.character(unname(md_where_position(md))[
+    !is.na(unname(md_where_position(md)))
+  ])
+  recorded <- as.character(md_field(md, "coordinate_system"))
+  # The mismatch is reported below instead.
   implied <- suppressWarnings(infer_coordinate_system(declared))
 
   if (!identical(recorded, implied)) {

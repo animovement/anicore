@@ -1,12 +1,3 @@
-# Tests for the variables_event field and its setters (#66, #76, #82)
-#
-# The fourth variable role. Unlike the other three it doesn't change the
-# shape of the frame — nothing is retyped, relocated or regrouped — but
-# it names columns, so a name matching nothing is a promise the frame
-# can't keep. Since #82 the field is written through its own setters and
-# refused by set_metadata(), so the validation that used to be exercised
-# through set_metadata() now runs behind declare_variables_event().
-
 event_af <- function() {
   anipoint(
     time = 1:5,
@@ -30,23 +21,28 @@ mini_ae <- function() {
 
 # ---- The field itself --------------------------------------------------
 
-test_that("list_default_metadata() includes variables_event with empty state and point", {
-  md <- list_default_metadata()
+test_that("list_default_metadata() includes an event role with empty state and point", {
+  event <- list_default_metadata()$variables$event
 
-  expect_true("variables_event" %in% names(md))
-  expect_type(md$variables_event, "list")
-  expect_named(md$variables_event, c("state", "point"))
-  expect_type(md$variables_event$state, "character")
-  expect_type(md$variables_event$point, "character")
-  expect_length(md$variables_event$state, 0)
-  expect_length(md$variables_event$point, 0)
+  expect_type(event, "list")
+  expect_named(event, c("state", "point"))
+  expect_type(event$state, "character")
+  expect_type(event$point, "character")
+  expect_length(event$state, 0)
+  expect_length(event$point, 0)
 })
 
-test_that("ensure_valid_metadata() tolerates metadata missing variables_event", {
-  md <- list_default_metadata()
+test_that("legacy metadata missing variables_event still reads and writes", {
+  af <- legacy_anipoint()
+  md <- attr(af, "metadata")
   md$variables_event <- NULL
+  attr(af, "metadata") <- md
 
-  expect_no_error(ensure_valid_metadata(md))
+  expect_equal(
+    get_variables_event(af),
+    list(state = character(), point = character())
+  )
+  expect_no_error(set_metadata(af, source = "x"))
 })
 
 test_that("ensure_valid_variables_event() returns invisibly on NULL", {
@@ -54,15 +50,12 @@ test_that("ensure_valid_variables_event() returns invisibly on NULL", {
 })
 
 test_that("a malformed variables_event is caught on any metadata write", {
-  # The setters can only produce a well-formed list, so these guards now
-  # only fire on metadata forced onto an object by hand or read back from
-  # an object serialised elsewhere. `write_metadata()` runs them on every
-  # write, so a drifted frame trips them on the next dplyr verb.
+  # The setters only produce well-formed lists, so force a drift; the next
+  # dplyr verb's metadata write should catch it.
   half <- drift_metadata(event_af(), variables_event = list(state = "x"))
   expect_error(dplyr::filter(half, time > 0), "must be a list with entries")
 
-  # A non-list never gets that far through a write — the metadata class
-  # check rejects it first — so the guard is exercised directly.
+  # A non-list is rejected earlier by the metadata class check.
   expect_error(
     ensure_valid_variables_event("nonsense"),
     "must be a list with entries"
@@ -87,9 +80,7 @@ test_that("set_variables_event declares both sides and reads back", {
 })
 
 test_that("set_variables_event replaces the named side, leaving the other", {
-  # Naming one side must not silently undeclare the other: the columns
-  # would stay in the frame while to_anievent() quietly stopped encoding
-  # them.
+  # Otherwise the other side's columns would silently stop being encoded.
   af <- event_af() |>
     dplyr::mutate(did_stuff = factor("yes")) |>
     set_variables_event(state = "behaviour", point = "call")
@@ -207,8 +198,7 @@ test_that("a non-character declaration errors", {
 })
 
 test_that("either side can be declared on its own (#76)", {
-  # On a frame with nothing declared, naming one side leaves the other
-  # empty -- not because it is cleared, but because it already was.
+  # The other side is empty because it already was, not because it's cleared.
   state_only <- set_variables_event(event_af(), state = "behaviour")
   expect_equal(get_variables_event(state_only)$state, "behaviour")
   expect_equal(get_variables_event(state_only)$point, character())

@@ -10,8 +10,6 @@ list_direction_vectors()
 Named list of length-3 numeric vectors.
 }
 \description{
-In a right-handed basis with \code{right}, \code{up} and \code{back} as the positive
-axes — \code{back} being toward the viewer. \code{\link[=get_angle_direction]{get_angle_direction()}} and
-\code{\link[=get_handedness]{get_handedness()}} are read off these.
+Right-handed basis; \code{right}, \code{up} and \code{back} (toward viewer) are positive.
 }
 \keyword{internal}

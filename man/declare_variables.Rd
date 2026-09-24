@@ -17,8 +17,6 @@ declare_variables(data, role, variables, strict = TRUE)
 \code{data}, restructured and re-declared.
 }
 \description{
-The shared kernel behind the \code{set_} / \code{add_} / \code{remove_} functions.
-Reads the other two roles from the metadata so the frame is always
-restructured against a complete, consistent declaration.
+Declare one variable role and restructure the frame to match
 }
 \keyword{internal}

@@ -1,27 +1,14 @@
-# Declaring the structural variables (#82)
-#
-# `variables_what`, `variables_when` and `variables_where` are not
-# ordinary metadata — they are the frame's structure. They decide how
-# columns are typed, which order columns and rows come in, what the frame
-# is grouped by, and (from `variables_where`) the `coordinate_system`.
-#
-# Writing them without redoing that work leaves the frame and its own
-# description disagreeing: the print header updates, so it looks like it
-# worked, while the grouping still reflects the old declaration. They
-# therefore get dedicated setters that do the whole job, and
-# `set_metadata()` refuses them.
-
 #' The metadata fields that declare which columns carry which role
 #'
-#' Writing any of these has consequences beyond the metadata list — at
-#' the least the named columns must exist, and for the three structural
-#' roles the frame is retyped, reordered and regrouped to match — so they
-#' are reachable only through their own setters.
+#' Reachable only through their own setters, which restructure the frame.
 #'
 #' @return Character vector of metadata field names.
 #' @keywords internal
 list_declaration_metadata_fields <- function() {
   c(
+    "variables",
+    "structure",
+    "connections",
     "variables_index",
     "variables_what",
     "variables_when",
@@ -34,22 +21,28 @@ list_declaration_metadata_fields <- function() {
 
 #' Read a variable role from the metadata
 #'
+#' For `when`, interval columns come after the context keys.
+#'
 #' @param data An aniframe or anievent object.
 #' @param role One of `"what"`, `"when"`, `"where"`.
 #'
 #' @return Character vector of column names.
 #' @keywords internal
 get_variables <- function(data, role) {
-  as.character(get_metadata(data, paste0("variables_", role)))
+  md <- get_metadata(data)
+  switch(
+    role,
+    what = md_what_keys(md),
+    when = c(md_when_keys(md), md_when_interval(md)),
+    where = unname(md_where_position(md))
+  )
 }
 
 
 #' The spatial declaration, as a role mapping where there is one
 #'
-#' `get_variables()` strips names, which for `where` throws the axis roles
-#' away. Every path that re-declares the spatial columns has to start from
-#' the mapping instead, or `union()` and `setdiff()` silently reduce a
-#' renamed frame to `unknown` (#109).
+#' Re-declaring from `get_variables()` would lose the axis roles and reduce
+#' the frame to `unknown` (#109).
 #'
 #' @param data An aniframe or anievent object.
 #'
@@ -66,10 +59,6 @@ get_declared_where <- function(data) {
 
 #' Declare one variable role and restructure the frame to match
 #'
-#' The shared kernel behind the `set_` / `add_` / `remove_` functions.
-#' Reads the other two roles from the metadata so the frame is always
-#' restructured against a complete, consistent declaration.
-#'
 #' @param data An aniframe or anievent object.
 #' @param role One of `"what"`, `"when"`, `"where"`.
 #' @param variables Character vector of column names to declare.
@@ -85,8 +74,7 @@ declare_variables <- function(data, role, variables, strict = TRUE) {
     when = get_variables(data, "when"),
     where = get_declared_where(data)
   )
-  # Only `where` carries names worth keeping; stripping them elsewhere
-  # guards `union()`/`setdiff()` against surprises.
+  # Only `where` carries meaningful names.
   declared[[role]] <- if (identical(role, "where")) {
     variables
   } else {
@@ -105,9 +93,6 @@ declare_variables <- function(data, role, variables, strict = TRUE) {
 
 #' Ensure a declaration is a character vector
 #'
-#' Guards the `add_` / `remove_` paths in particular, where `union()` and
-#' `setdiff()` would otherwise silently coerce.
-#'
 #' @param variables Value supplied by the caller.
 #'
 #' @return `TRUE`, invisibly.
@@ -123,10 +108,6 @@ ensure_variables_character <- function(variables) {
 
 
 #' Ensure declared columns are present
-#'
-#' Shared by construction ([ensure_has_anipoint_cols()]) and re-declaration,
-#' so a column that isn't there is reported the same way whichever route
-#' the caller took.
 #'
 #' @param data A data frame.
 #' @param cols Character vector of declared column names.
@@ -154,10 +135,6 @@ ensure_has_declared_cols <- function(data, cols, role) {
   ))
 }
 
-
-# ------------------------------------------------------------------
-# Public API
-# ------------------------------------------------------------------
 
 #' Declare which columns carry identity, time and position
 #'
@@ -269,9 +246,6 @@ add_variables_when <- function(data, variables) {
   ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
-  # `variables_when` holds only the temporal context, so a new column
-  # simply joins it — the index sorts after all of them regardless, and is
-  # declared separately.
   declare_variables(data, "when", union(get_variables(data, "when"), variables))
 }
 
@@ -281,9 +255,7 @@ add_variables_where <- function(data, variables) {
   ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
-  # `union()` drops names, so combining has to happen on the mapping: the
-  # roles already declared, plus the new ones, with anything the addition
-  # supersedes -- by role or by column -- taken out first.
+  # `union()` drops names, so combine the role mappings by hand.
   current <- normalise_axes(get_declared_where(data))
   added <- normalise_axes(variables)
   superseded <- names(current) %in% names(added) | current %in% added
@@ -321,14 +293,10 @@ remove_variables_where <- function(data, variables) {
   ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
-  # By column, like the other `remove_` verbs; the roles of whatever is
-  # left travel with it, which `setdiff()` on bare columns would lose.
   current <- normalise_axes(get_declared_where(data))
 
-  # Leniently: the caller removed a column, they did not assert that what
-  # is left is a coordinate system. Declaring an incoherent set outright
-  # still aborts; arriving at one by removal degrades to `unknown` with a
-  # warning, so a remove-then-add is not blocked halfway through.
+  # Non-strict so a remove-then-add is not blocked halfway; the leftover set
+  # degrades to `unknown` with a warning.
   declare_variables(
     data,
     "where",

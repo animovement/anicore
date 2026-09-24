@@ -34,9 +34,6 @@ quantity that can be stated on its own.}
 \code{data}, with directions declared through \code{\link[=set_axis_directions]{set_axis_directions()}}.
 }
 \description{
-The shared half of \code{\link[=set_handedness]{set_handedness()}} and \code{\link[=set_angle_direction]{set_angle_direction()}}. Both
-invert the same one-way derivation, which is under-determined on its own:
-the axes already declared supply the rest of the answer, and when they
-supply all of it one axis has to turn over.
+Shared by \code{\link[=set_handedness]{set_handedness()}} and \code{\link[=set_angle_direction]{set_angle_direction()}}.
 }
 \keyword{internal}

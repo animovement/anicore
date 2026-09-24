@@ -13,8 +13,6 @@ compute_sampling_gaps(data)
 Numeric vector of gaps, empty when there are none to take.
 }
 \description{
-Diffed per key -- identity plus temporal context -- because the index
-restarts in each group. A frame that is perfectly regular within every
-track looks wildly irregular pooled.
+Per key, because the index restarts in each group.
 }
 \keyword{internal}

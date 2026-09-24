@@ -1,11 +1,3 @@
-# Tests for tbl_sum.anievent (the print header for anievent)
-#
-# Coverage:
-#   - default header shows class name and identity row
-#   - "Event channels" row lists unique values from the `channel` column
-#   - "Sampling rate" row appears when set in metadata
-#   - zero-row anievent omits the "Event channels" row
-
 test_that("tbl_sum.anievent shows class name and identity row", {
   ae <- anievent(
     individual = c(1L, 1L, 2L),

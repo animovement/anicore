@@ -22,9 +22,6 @@ to apply.}
 \code{data}, restructured, with the declaration recorded.
 }
 \description{
-The tail of \code{\link[=as_anipoint]{as_anipoint()}}, factored out so that construction and
-re-declaration cannot drift apart: validate the declared columns
-exist, standardise their types, relocate, arrange, regroup, and
-refresh the derived \code{coordinate_system}.
+Shared by construction and re-declaration so they cannot drift apart.
 }
 \keyword{internal}

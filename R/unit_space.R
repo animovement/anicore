@@ -49,7 +49,6 @@
 set_unit_space <- function(data, to_unit, calibration_factor = 1) {
   ensure_is_anipoint(data)
 
-  # Check that to_unit is permitted
   if (!to_unit %in% levels(list_default_metadata()[["unit_space"]])) {
     cli::cli_abort(
       "Space unit can only be {levels(list_default_metadata()[[\"unit_space\"]])}, not {to_unit}."
@@ -68,10 +67,7 @@ set_unit_space <- function(data, to_unit, calibration_factor = 1) {
     )
   }
 
-  # Calibrate the axes that carry a length. Picking them by name would
-  # convert x/y/z and silently leave rho — a length — in the old unit while
-  # the metadata claimed the new one (#98). `get_system_axes()` names roles, so
-  # they are resolved to columns through the frame's own mapping (#109).
+  # Select length axes by role, not name, so `rho` is converted too (#98).
   axes <- get_axes(data)
   space_cols <- unname(
     axes[intersect(
@@ -93,7 +89,7 @@ set_unit_space <- function(data, to_unit, calibration_factor = 1) {
       dplyr::across(
         .cols = dplyr::any_of(space_cols),
         .fns = ~ .x * calibration_factor,
-        .names = "{.col}" # keep the original column names
+        .names = "{.col}"
       )
     )
 
@@ -107,12 +103,7 @@ set_unit_space <- function(data, to_unit, calibration_factor = 1) {
 }
 
 
-#' The axes of a coordinate system that carry a length
-#'
-#' The complement of the angular axes that [set_unit_angle()] converts. A
-#' spatial unit applies to these and to nothing else: on a cylindrical frame
-#' `rho` and `z` are both lengths while `phi` is an angle, so converting by
-#' column name rather than by role leaves one of them behind (#98).
+#' The axes of a coordinate system that carry a length (#98)
 #'
 #' @param coordinate_system A `coordinate_system` metadata value.
 #'
@@ -146,7 +137,6 @@ list_conversion_factors_space <- function() {
     byrow = FALSE
   )
 
-  # Attach row‑ and column‑names
   permitted_units <- c("mm", "cm", "m")
   rownames(m) <- permitted_units
   colnames(m) <- permitted_units

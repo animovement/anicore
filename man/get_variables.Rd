@@ -15,6 +15,6 @@ get_variables(data, role)
 Character vector of column names.
 }
 \description{
-Read a variable role from the metadata
+For \code{when}, interval columns come after the context keys.
 }
 \keyword{internal}

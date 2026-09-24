@@ -13,7 +13,6 @@ ensure_variables_character(variables)
 \code{TRUE}, invisibly.
 }
 \description{
-Guards the \code{add_} / \code{remove_} paths in particular, where \code{union()} and
-\code{setdiff()} would otherwise silently coerce.
+Ensure a declaration is a character vector
 }
 \keyword{internal}

@@ -1,17 +1,12 @@
-# tests/testthat/test-aniframe_methods.R
-
-# ------------------------------------------------------------------
-# Helper ----------------------------------------------------------------
-# Create a fresh aniframe object and capture its metadata once.
+# ---- Helpers ----
 make_af <- function() {
-  af <- example_anipoint() # ← your convenience constructor
+  af <- example_anipoint()
   meta <- get_metadata(af)
   list(obj = af, meta = meta)
 }
 
-# Helper to compare metadata while ignoring timezone differences
+# Compares metadata, ignoring timezone differences.
 expect_metadata_equal <- function(actual, expected) {
-  # Convert any POSIXct fields to numeric for comparison
   normalize_datetime <- function(x) {
     if (is.list(x)) {
       x <- lapply(x, function(item) {
@@ -31,8 +26,7 @@ expect_metadata_equal <- function(actual, expected) {
   expect_identical(actual_norm, expected_norm)
 }
 
-# ------------------------------------------------------------------
-# 1. dplyr verbs ----------------------------------------------------
+# ---- dplyr verbs ----
 test_that("group_by preserves class & metadata", {
   src <- make_af()
   out <- dplyr::group_by(src$obj, individual)
@@ -99,8 +93,7 @@ test_that("slice preserves class & metadata", {
   expect_metadata_equal(get_metadata(out), src$meta)
 })
 
-# ------------------------------------------------------------------
-# 2. Base‑R extraction ------------------------------------------------
+# ---- Base-R extraction ----
 test_that("[ ] subsetting preserves class & metadata", {
   src <- make_af()
   out <- src$obj[1:2, c("individual", "x")]
@@ -122,8 +115,7 @@ test_that("$ extraction returns a plain vector (no class) but does not alter met
   expect_metadata_equal(get_metadata(src$obj), src$meta)
 })
 
-# ------------------------------------------------------------------
-# 3. Assignment operators ---------------------------------------------
+# ---- Assignment operators ----
 test_that("[<-] assignment preserves class & metadata", {
   src <- make_af()
   out <- src$obj
@@ -156,8 +148,7 @@ test_that("names<- assignment preserves class & metadata", {
   expect_metadata_equal(get_metadata(out), src$meta)
 })
 
-# ------------------------------------------------------------------
-# 4. Conversion -------------------------------------------------------
+# ---- Conversion ----
 test_that("as.data.frame drops the class but leaves metadata untouched", {
   src <- make_af()
   df <- as.data.frame(src$obj)
@@ -165,8 +156,7 @@ test_that("as.data.frame drops the class but leaves metadata untouched", {
   expect_metadata_equal(get_metadata(src$obj), src$meta)
 })
 
-# ------------------------------------------------------------------
-# 5. Round‑trip sanity check -----------------------------------------
+# ---- Round-trip ----
 test_that("a full pipeline keeps class & metadata", {
   src <- make_af()
   out <- src$obj |>

@@ -57,7 +57,6 @@ example_anipoint <- function(
     cli::cli_abort("{.arg n_dims} must be 1, 2, or 3.")
   }
 
-  # Make vector of keypoints
   if (n_keypoints == 1) {
     keypoints <- "centroid"
   } else {
@@ -76,7 +75,6 @@ example_anipoint <- function(
     )[seq_len(n_keypoints)]
   }
 
-  # Create the design matrix with all combinations
   design <- expand.grid(
     time = seq_len(n_obs),
     individual = seq_len(n_individuals),
@@ -87,7 +85,6 @@ example_anipoint <- function(
 
   n_total <- nrow(design)
 
-  # Build spatial variables based on dimensions
   variables_where <- switch(
     as.character(n_dims),
     "1" = "x",
@@ -95,7 +92,6 @@ example_anipoint <- function(
     "3" = c("x", "y", "z")
   )
 
-  # Create base anipoint arguments
   anipoint_args <- list(
     individual = design$individual,
     keypoint = design$keypoint,

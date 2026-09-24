@@ -1,12 +1,4 @@
-# Getters for the fields that already have setters (#121)
-#
-# Every field with a dedicated setter should have a dedicated getter. Six
-# did not, and they are the ones downstream reaches for by name -- which
-# means downstream has to know the field names, and would have to be
-# updated again when the metadata is restructured (#118).
-#
-# These all read through `get_metadata()`, which is the single place that
-# knows the storage layout, so a restructure is invisible to them.
+# Getters for fields that have dedicated setters (#121).
 
 #' The sampling rate, in Hz
 #'
@@ -40,7 +32,12 @@ get_sampling_rate <- function(data) {
 #' @export
 get_unit_space <- function(data) {
   ensure_is_aniframe(data)
-  as.character(get_metadata(data, "unit_space"))
+  value <- get_metadata(data, "unit_space")
+  if (is.null(value)) {
+    # An anievent has no `space` category (#73).
+    return(NA_character_)
+  }
+  as.character(value)
 }
 
 
@@ -76,5 +73,9 @@ get_unit_time <- function(data) {
 #' @export
 get_unit_angle <- function(data) {
   ensure_is_aniframe(data)
-  as.character(get_metadata(data, "unit_angle"))
+  value <- get_metadata(data, "unit_angle")
+  if (is.null(value)) {
+    return(NA_character_)
+  }
+  as.character(value)
 }

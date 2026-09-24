@@ -1,9 +1,4 @@
-# Tests for the variable-role setters (#82)
-#
-# The structural fields are the frame's structure, not a description of
-# it. Declaring one has to retype, relocate, rearrange, regroup and
-# refresh the derived fields — otherwise the frame and its own metadata
-# disagree while the print header suggests all is well.
+# The variable-role setters (#82): declaring a role reshapes the frame.
 
 flat_af <- function() {
   anipoint(
@@ -57,10 +52,7 @@ test_that("set_metadata refuses them through a partial metadata list too", {
 })
 
 test_that("a complete metadata object can still be restored wholesale", {
-  # Rebuilding a frame and putting its metadata back is a round-trip, not
-  # a field write. The class-preserving methods do it internally, and
-  # downstream packages do it after recomputing a frame — refusing it
-  # left them no way to carry metadata across a rebuild.
+  # A wholesale restore is a round-trip, which downstream rebuilds rely on.
   af <- set_metadata(id_af(), sampling_rate = 30)
   md <- get_metadata(af)
 
@@ -87,8 +79,7 @@ test_that("set_metadata still writes ordinary fields", {
 })
 
 test_that("the dplyr methods still round-trip structural metadata", {
-  # They restore metadata wholesale, structural fields included, which
-  # would trip the refusal if they went through set_metadata().
+  # They restore metadata wholesale, so the refusal must not catch them.
   af <- id_af()
   out <- dplyr::filter(af, x > 0)
 
@@ -143,15 +134,24 @@ test_that("adding an identity column keeps the other roles intact", {
     dplyr::mutate(id_af(), id = "hi") |> add_variables_what("id")
   )
 
+  before <- unclass(before)
+  after <- unclass(after)
   changed <- names(before)[!mapply(identical, before, after[names(before)])]
-  expect_equal(changed, "variables_what")
+  expect_equal(changed, "variables")
+  expect_equal(
+    setdiff(after$variables$what$keys, before$variables$what$keys),
+    "id"
+  )
+  expect_identical(after$variables$when, before$variables$when)
+  expect_identical(after$variables$where, before$variables$where)
+  expect_identical(after$variables$event, before$variables$event)
 })
 
 # ---- Declaring position ------------------------------------------------
 
 test_that("declaring a third spatial column refreshes coordinate_system", {
-  # The second half of #82: coordinate_system is derived, so writing
-  # variables_where alone used to leave it stale.
+  # coordinate_system is derived, so writing variables_where alone left it
+  # stale (#82).
   af <- flat_af() |>
     dplyr::mutate(z = 0) |>
     add_variables_where("z")
@@ -193,7 +193,6 @@ test_that("declaring a temporal grouping column groups and orders by it", {
   expect_equal(get_variables_when(af), "session")
   expect_equal(dplyr::group_vars(af), "session")
   expect_s3_class(af$session, "factor")
-  # Ordered by the temporal context, so sessions are contiguous.
   expect_equal(as.character(af$session), c("a", "a", "a", "b", "b", "b"))
 })
 
@@ -287,8 +286,7 @@ test_that("an anievent is never grouped by a declaration", {
 # ---- Construction and re-declaration agree -----------------------------
 
 test_that("declaring reaches the same state as constructing with it", {
-  # The table from #82: the two routes used to differ in column order,
-  # column type and grouping.
+  # The two routes used to differ in column order, type and grouping (#82).
   declared <- flat_af() |>
     dplyr::mutate(id = "hi") |>
     add_variables_what("id")

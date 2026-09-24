@@ -1,22 +1,3 @@
-# Tests for to_anievent.anipoint (RLE encoding from aniframe -> anievent)
-#
-# Construction:
-#   - state column run-length-encoded into bouts (start = first frame time,
-#     stop = last frame time)
-#   - point column emits one row per non-NA frame with start == stop
-#   - both state and point columns coexist in one call
-#   - NA values break runs (gap is not part of any bout)
-#   - per-(individual, observation) grouping isolates bouts
-#
-# Metadata propagation:
-#   - unit_time inherited from the host aniframe
-#   - sampling_rate inherited
-#   - variables_when picks up grouping cols + start/stop
-#
-# Errors:
-#   - host with no variables_event declared
-#   - declared column missing from host data
-
 make_state_aniframe <- function() {
   af <- anipoint(
     individual = rep(1L, 8),
@@ -125,7 +106,7 @@ test_that("observation grouping isolates bouts across clips", {
   ae <- to_anievent(af)
   expect_equal(nrow(ae), 4)
   expect_true("observation" %in% names(ae))
-  expect_true("observation" %in% get_metadata(ae, "variables_when"))
+  expect_true("observation" %in% get_variables_when(ae))
 })
 
 test_that("metadata is inherited from the host aniframe", {
@@ -143,8 +124,7 @@ test_that("to_anievent.anipoint errors when no event columns are declared", {
 })
 
 test_that("to_anievent.anipoint errors when a declared column is missing", {
-  # Declaring a column that isn't there is rejected by the setter, so
-  # the drifted state has to be forced to reach to_anievent()'s own check.
+  # The setter rejects undeclared columns, so the drift has to be forced.
   af <- anipoint(individual = 1L, time = 1:3, x = 1:3, y = 1:3)
   af <- drift_metadata(
     af,
@@ -196,7 +176,6 @@ test_that("to_anievent.anipoint handles an aniframe with no identity columns", {
 })
 
 test_that("redundant identity columns (e.g. keypoint when behaviour is constant across keypoints) are dropped from bouts", {
-  # behaviour is constant across keypoint within (individual, time)
   af <- anipoint(
     individual = rep(1L, 6),
     keypoint = rep(c("head", "tail"), each = 3),
@@ -212,10 +191,10 @@ test_that("redundant identity columns (e.g. keypoint when behaviour is constant 
 
   ae <- to_anievent(af)
 
-  # Should be 2 bouts (REM 1-2, wake 3-3), not 4 (duplicated per keypoint)
+  # REM 1-2 and wake 3, not duplicated per keypoint.
   expect_equal(nrow(ae), 2)
   expect_false("keypoint" %in% names(ae))
-  expect_false("keypoint" %in% get_metadata(ae, "variables_what"))
+  expect_false("keypoint" %in% get_variables_what(ae))
   expect_equal(ae$start, c(1, 3))
   expect_equal(ae$stop, c(2, 3))
 })
@@ -227,7 +206,6 @@ test_that("non-redundant identity columns (e.g. behaviour varying by keypoint) a
     time = rep(1:3, 2),
     x = rnorm(6),
     y = rnorm(6),
-    # head: always REM; tail: always wake -> varies by keypoint
     behaviour = factor(
       c("REM", "REM", "REM", "wake", "wake", "wake"),
       levels = c("REM", "wake")
@@ -237,7 +215,7 @@ test_that("non-redundant identity columns (e.g. behaviour varying by keypoint) a
 
   ae <- to_anievent(af)
   expect_true("keypoint" %in% names(ae))
-  expect_true("keypoint" %in% get_metadata(ae, "variables_what"))
+  expect_true("keypoint" %in% get_variables_what(ae))
   expect_equal(nrow(ae), 2) # one bout per keypoint
 })
 
@@ -253,16 +231,13 @@ test_that("singleton identity columns are preserved (single individual aniframe 
 
   ae <- to_anievent(af)
   expect_true("individual" %in% names(ae))
-  # No auto-added keypoint: `individual` already satisfies the
-  # at-least-one-identity rule (#77).
+  # No keypoint added: `individual` already satisfies the identity rule (#77).
   expect_false("keypoint" %in% names(ae))
-  expect_setequal(get_metadata(ae, "variables_what"), "individual")
+  expect_setequal(get_variables_what(ae), "individual")
 })
 
 test_that("temporal-grouping columns (observation / session / trial) are always carried over regardless of variation", {
-  # Two observations with the SAME behaviour pattern. The old aggressive
-  # rule would drop observation; the new rule keeps temporal grouping
-  # unconditionally because clips are distinct contexts.
+  # Identical patterns in both clips: temporal grouping is kept regardless.
   af <- anipoint(
     individual = rep(1L, 8),
     observation = c(rep("clip_a", 4), rep("clip_b", 4)),
@@ -275,14 +250,14 @@ test_that("temporal-grouping columns (observation / session / trial) are always 
 
   ae <- to_anievent(af)
   expect_true("observation" %in% names(ae))
-  expect_true("observation" %in% get_metadata(ae, "variables_when"))
+  expect_true("observation" %in% get_variables_when(ae))
   # 4 bouts: REM clip_a, wake clip_a, REM clip_b, wake clip_b
   expect_equal(nrow(ae), 4)
 })
 
 test_that("multi-value identity columns are dropped when the event is constant across them", {
-  # individual: 2 values, epoch constant per time -> dropped, leaving the
-  # anievent with no identity columns at all, which is permitted there.
+  # epoch doesn't vary by individual, so no identity column survives, which
+  # an anievent permits.
   af <- anipoint(
     individual = c(1L, 1L, 2L, 2L),
     time = c(1:2, 1:2),
@@ -295,7 +270,7 @@ test_that("multi-value identity columns are dropped when the event is constant a
   ae <- to_anievent(af)
   expect_false("individual" %in% names(ae))
   expect_false("keypoint" %in% names(ae))
-  expect_length(get_metadata(ae, "variables_what"), 0)
+  expect_length(get_variables_what(ae), 0)
   expect_equal(nrow(ae), 2) # one A bout, one B bout
 })
 
@@ -306,9 +281,9 @@ test_that("channels with disagreeing scopes error with a helpful message", {
     time = rep(1:3, 2),
     x = rnorm(6),
     y = rnorm(6),
-    # behaviour: individual-scope (constant across keypoint)
+    # constant across keypoint
     behaviour = factor(rep(c("REM", "REM", "wake"), 2)),
-    # limb_extended: keypoint-scope (varies by keypoint)
+    # varies by keypoint
     limb_extended = factor(rep(c("yes", "no"), each = 3))
   )
   af <- set_variables_event(
@@ -341,8 +316,6 @@ test_that("point channel keeps identity columns when the scope detection require
 })
 
 test_that("empty-rows path keeps identity columns when forced via variables_what", {
-  # All-NA event with an explicit variables_what override -> empty bout df
-  # is produced with the (forced) identity column present.
   af <- anipoint(
     individual = c(1L, 2L),
     time = c(1, 2),
@@ -368,7 +341,6 @@ test_that("explicit variables_what overrides scope detection", {
   )
   af <- set_variables_event(af, state = "behaviour", point = character())
 
-  # Force keypoint to be kept even though it's redundant
   ae <- to_anievent(af, variables_what = c("individual", "keypoint"))
   expect_true("keypoint" %in% names(ae))
   expect_equal(nrow(ae), 4) # duplicate per keypoint
@@ -396,10 +368,7 @@ test_that("as_anievent on an aniframe errors with a redirect to to_anievent", {
 })
 
 test_that("scope-disagreement error formats empty scopes as '<none>'", {
-  # 2 individuals x 2 keypoints x 2 times = 8 rows.
-  # behaviour: constant across both identities -> scope = character()
-  # limb_extended: varies by keypoint only -> scope = c("keypoint")
-  # Different scopes -> disagreement error, empty scope rendered as <none>.
+  # behaviour's scope is empty, limb_extended's is keypoint.
   af <- anipoint(
     individual = rep(c(1L, 2L), each = 4),
     keypoint = rep(c("head", "tail"), 4),
@@ -431,7 +400,7 @@ test_that("explicit variables_when overrides metadata-driven grouping", {
 
   # Override drops `observation` from the grouping; bouts cross clips.
   ae <- to_anievent(af, variables_when = character())
-  expect_false("observation" %in% get_metadata(ae, "variables_when"))
+  expect_false("observation" %in% get_variables_when(ae))
 })
 
 test_that("to_anievent.anipoint gathers <col>_modifiers on point channels", {

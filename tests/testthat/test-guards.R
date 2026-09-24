@@ -1,8 +1,6 @@
 library(testthat)
 
-# ------------------------------------------------------------------
-# Tests for is_class()
-# ------------------------------------------------------------------
+# ---- Tests for is_class() ----
 
 test_that("is_class returns TRUE when class matches", {
   x <- data.frame(a = 1:3)
@@ -44,9 +42,7 @@ test_that("is_class works with custom S3 classes", {
   expect_false(is_class(x, "another_class"))
 })
 
-# ------------------------------------------------------------------
-# Tests for ensure_class()
-# ------------------------------------------------------------------
+# ---- Tests for ensure_class() ----
 
 test_that("ensure_class does not error when class matches", {
   x <- data.frame(a = 1:3)

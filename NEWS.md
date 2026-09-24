@@ -2,6 +2,18 @@
 
 ## Breaking changes
 
+* The metadata list becomes a category tree (#118): `recording` (`source`, `source_version`, `source_format`, `filename`), `time` (`unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime`), `space` (`coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`), `variables`, and `structure` (which now holds what `connections` held), with `spec_version` at the top level. This is a `spec_version` major bump: `aniframe` moves to 3.0.0 and `anievent` to 1.0.0.
+
+  Access stays flat, so most code needs no change: `get_metadata(data, "sampling_rate")` finds the field wherever it lives, `set_metadata(data, sampling_rate = 30)` writes it there, and a category name returns the whole category (`get_metadata(data, "space")`). The object `get_metadata()` returns also resolves `$` and `[[` flat, so `get_metadata(data)$sampling_rate` keeps working over the nested storage. What breaks is anything reaching into the raw attribute — `attr(x, "metadata")$sampling_rate` — and the old flat names for the variable declaration: `get_metadata(x, "variables_what")` and friends are refused with a pointer to `get_variables_what()`, `get_index()`, `get_axes()` and `get_connections()`.
+
+  The variable roles become lists of named slots — `what$keys`, `when$index` + `when$keys`, `where$position` (the axis-role mapping, absorbing the separate `axes` field), `event$state` + `event$point` — and the frame groups by `c(what$keys, when$keys)`. An anievent's `start`/`stop` get the slot the flat vector could never express, `when$interval`, which is why `get_index()` had to refuse anievents by string comparison before.
+
+  An anievent's spatial "not applicable" is now spelled as an absent `space` category instead of five neutral values (#73): its spatial fields read as `NULL` (`NA` through `get_unit_space()`, `get_unit_angle()` and `get_coordinate_system()`), and writing one errors. Spatial fields passed to `as_anievent()` are dropped silently, so readers written against the flat layout keep working.
+
+  Objects serialised with the flat layout are migrated to the tree, with `spec_version` bumped, whenever their metadata is read or written.
+
+  Assigning through the metadata object writes into the tree too, so `md$sampling_rate <- 30; set_metadata(x, metadata = md)` works; an unknown name errors. `names(get_metadata(x))` lists the categories, not the fields. `get_metadata()` with several names returns a plain named list. Setting a field to `NULL` errors; use `NA` for unknown.
+
 * The position-grain frame class is renamed from `aniframe` to `anipoint`, and `aniframe` becomes the abstract parent class shared by every animovement frame (#154). The class vectors are now `c("anipoint", "aniframe", ...)` and `c("anievent", "aniframe", ...)`, so the shared substrate — metadata accessors, dplyr methods, printing — is written once on the parent. The renamed structural-frame family (`anisegment`, `anijoint`) will join it as siblings of `anipoint`.
 
   Concretely:

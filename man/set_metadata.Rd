@@ -18,29 +18,17 @@ simultaneously with \code{...}}
 The object with updated metadata.
 }
 \description{
-Sets or updates metadata for an aniframe or anievent object. Metadata can
-be provided either as named arguments or as a list. If the object already
-has metadata, the new values will be merged with existing values, with new
-values taking precedence.
+Sets or updates metadata for an aniframe or anievent object. Metadata
+can be provided either as named arguments or as a list. If the object
+already has metadata, the new values will be merged with existing
+values, with new values taking precedence.
 
-Character values for factor fields will be automatically converted to factors
-if they match allowed levels.
+Fields are written by their own name wherever they live in the
+category tree (see \code{\link[=list_default_metadata]{list_default_metadata()}}): \code{set_metadata(data, sampling_rate = 30)} lands in \code{time}, \code{set_metadata(data, handedness = "left")} in \code{space}. Categories themselves are not writable, and the
+variable declaration goes through its dedicated setters.
 
-Default metadata fields include:
-\itemize{
-\item \code{source}: Data source identifier
-\item \code{source_version}: Version of the software that wrote the file, where
-the file states one
-\item \code{source_format}: The export layout the file was read as
-\item \code{filename}: Original filename(s) — accepts a character vector
-(length 1 or more) for readers that load from multiple files
-\item \code{sampling_rate}: Sampling rate in Hz
-\item \code{start_datetime}: Start date and time of recording
-\item \code{reference_frame}: Reference frame (default: "allocentric")
-\item \code{coordinate_system}: Coordinate system (default: "cartesian")
-\item \code{axis_directions}: Which way each axis points, keyed by axis role
-\item \code{axis_extents}: How far each axis runs, keyed by axis role
-}
+Character values for factor fields will be automatically converted to
+factors if they match allowed levels.
 }
 \examples{
 \dontrun{

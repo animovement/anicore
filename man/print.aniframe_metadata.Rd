@@ -15,14 +15,6 @@
 \code{x}, invisibly.
 }
 \description{
-Renders the metadata as a single block, captured via
-\code{\link[cli:cli_format_method]{cli::cli_format_method()}} and emitted with \code{\link[=cat]{cat()}}. Field names
-and types are padded to fixed widths so the values line up in
-aligned columns, similar to \code{\link[=str]{str()}}.
-}
-\details{
-The S3 class is named \code{aniframe_metadata} for historical reasons,
-but the metadata substrate is shared by both \code{\link[=anipoint]{anipoint()}} and
-\code{\link[=anievent]{anievent()}} objects.
+Shared by \code{\link[=anipoint]{anipoint()}} and \code{\link[=anievent]{anievent()}} despite the class name.
 }
 \keyword{internal}

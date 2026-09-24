@@ -10,8 +10,6 @@ list_angular_axis_dependencies()
 Named character vector, axis role to angular role.
 }
 \description{
-Turning a Cartesian axis over moves the angles measured from it. \code{phi}
-runs from \code{x} toward \code{y}, so either of those moves it; \code{theta} is measured
-from the pole, so only \code{z} moves it.
+The angular column an axis role is measured against
 }
 \keyword{internal}

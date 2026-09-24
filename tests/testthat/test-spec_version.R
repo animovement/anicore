@@ -1,25 +1,13 @@
-# Tests for the spec_version metadata field
-#
-# Default:
-#   - present in list_default_metadata() with expected aniframe + anievent entries
-#
-# Round-trip:
-#   - set_metadata() accepts a new spec_version list and stores it whole
-#
-# Backwards compatibility:
-#   - metadata missing spec_version still passes ensure_valid_metadata()
-
 test_that("list_default_metadata() includes spec_version with aniframe and anievent", {
   md <- list_default_metadata()
 
   expect_true("spec_version" %in% names(md))
   expect_type(md$spec_version, "list")
   expect_named(md$spec_version, c("aniframe", "anievent"))
-  # aniframe is major: `variables_when` no longer names the index, which
-  # breaks a consumer reading the index out of it. anievent is minor: it
-  # gains `variables_index`, always `NA` (#109).
-  expect_equal(md$spec_version$aniframe, "2.1.0")
-  expect_equal(md$spec_version$anievent, "0.4.0")
+  # Major for both: metadata became the category tree, variable roles slotted
+  # lists, and an anievent's spatial component an absent `space` (#118).
+  expect_equal(md$spec_version$aniframe, "3.0.0")
+  expect_equal(md$spec_version$anievent, "1.0.0")
 })
 
 test_that("set_metadata round-trips a custom spec_version list", {
@@ -35,9 +23,11 @@ test_that("set_metadata round-trips a custom spec_version list", {
   expect_equal(sv$anievent, "0.2.0")
 })
 
-test_that("ensure_valid_metadata() tolerates metadata missing spec_version", {
+test_that("ensure_valid_metadata() requires a well-formed spec_version", {
   md <- list_default_metadata()
   md$spec_version <- NULL
+  expect_error(ensure_valid_metadata(md), "spec_version")
 
-  expect_no_error(ensure_valid_metadata(md))
+  md$spec_version <- list(aniframe = "junk")
+  expect_error(ensure_valid_metadata(md), "spec_version")
 })

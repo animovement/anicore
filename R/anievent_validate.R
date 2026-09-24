@@ -75,11 +75,9 @@ ensure_anievent_intervals_nonnegative <- function(data) {
 }
 
 
-#' Find the first overlapping bout pair within any (identity +
-#' temporal-grouping + channel) group of an anievent.
+#' Find the first overlapping bout pair within a channel
 #'
-#' Returns `NULL` when no overlap exists; otherwise a small named list
-#' identifying the channel and offending row.
+#' @return `NULL`, or a list with the `channel` and offending `row`.
 #'
 #' @keywords internal
 find_anievent_channel_overlap <- function(data) {
@@ -89,12 +87,11 @@ find_anievent_channel_overlap <- function(data) {
 
   md <- get_metadata(data)
   group_cols <- intersect(
-    c(md$variables_what, setdiff(md$variables_when, c("start", "stop"))),
+    c(md_what_keys(md), md_when_keys(md)),
     names(data)
   )
 
-  # Work on a bare tibble so dplyr verbs don't trigger the
-  # `ungroup.anievent` "use with care" warning during validation.
+  # Bare tibble avoids the `ungroup()` "use with care" warning.
   bare <- dplyr::as_tibble(data)
   groups <- dplyr::group_by(
     bare,

@@ -17,6 +17,6 @@ reflect_axis(data, axis, reference)
 The data with \code{axis} replaced by \code{reference - data[[axis]]}.
 }
 \description{
-\code{reference - data[[axis]]}, which is what turning an axis over amounts to.
+Reflect a spatial axis around a reference value
 }
 \keyword{internal}

@@ -109,7 +109,7 @@ Behavioural coding often spans several clips or trials, each with its
 own time origin (`start = 0` means "the start of *this* clip", not "the
 start of the experiment"). To carry that context, add an `observation`,
 `session`, or `trial` column — those three names are auto-detected
-into `variables_when` alongside `start` and `stop`, and the column is
+as `when` keys, next to the `start`/`stop` interval, and the column is
 coerced to factor / integer the same way anipoint does it:
 
 ```{r}
@@ -121,7 +121,7 @@ ae_multi <- anievent(
   start = c(3, 14, 1, 7),
   stop = c(9, 19, 5, 12)
 )
-get_metadata(ae_multi, "variables_when")
+get_variables_when(ae_multi)
 ae_multi
 ```
 

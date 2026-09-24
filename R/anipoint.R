@@ -51,7 +51,6 @@ anipoint <- function(
 ) {
   dots <- rlang::list2(...)
 
-  # Check if a single data frame was passed
   if (length(dots) == 1 && is.data.frame(dots[[1]])) {
     x <- dots[[1]]
   } else {

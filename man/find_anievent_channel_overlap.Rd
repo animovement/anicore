@@ -2,13 +2,14 @@
 % Please edit documentation in R/anievent_validate.R
 \name{find_anievent_channel_overlap}
 \alias{find_anievent_channel_overlap}
-\title{Find the first overlapping bout pair within any (identity +
-temporal-grouping + channel) group of an anievent.}
+\title{Find the first overlapping bout pair within a channel}
 \usage{
 find_anievent_channel_overlap(data)
 }
+\value{
+\code{NULL}, or a list with the \code{channel} and offending \code{row}.
+}
 \description{
-Returns \code{NULL} when no overlap exists; otherwise a small named list
-identifying the channel and offending row.
+Find the first overlapping bout pair within a channel
 }
 \keyword{internal}

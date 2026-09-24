@@ -16,7 +16,7 @@ tbl_sum.anipoint <- function(x, ...) {
   md <- get_metadata(x)
   new_header <- character()
 
-  identity_vars <- intersect(md$variables_what, names(x))
+  identity_vars <- intersect(md_what_keys(md), names(x))
   for (col in identity_vars) {
     new_header <- c(
       new_header,
@@ -28,7 +28,7 @@ tbl_sum.anipoint <- function(x, ...) {
   }
 
   temporal_vars <- intersect(
-    setdiff(md$variables_when, resolve_index(md)),
+    md_when_keys(md),
     names(x)
   )
   for (col in temporal_vars) {
@@ -41,7 +41,7 @@ tbl_sum.anipoint <- function(x, ...) {
     )
   }
 
-  event_vars <- md$variables_event
+  event_vars <- md_event(md)
   if (!is.null(event_vars)) {
     state_vars <- intersect(event_vars$state, names(x))
     if (length(state_vars) > 0) {
@@ -59,7 +59,7 @@ tbl_sum.anipoint <- function(x, ...) {
     }
   }
 
-  sampling_rate <- md$sampling_rate
+  sampling_rate <- md_field(md, "sampling_rate")
   if (!is.null(sampling_rate) && !is.na(sampling_rate)) {
     new_header <- c(new_header, "Sampling rate" = paste(sampling_rate, "Hz"))
   }
@@ -84,11 +84,7 @@ format_plural_title <- function(x) {
 
 #' Build the "Time" interval row for the anipoint print summary
 #'
-#' Returns `NULL` when the interval cannot be expressed in seconds (e.g.
-#' `unit_time = "frame"` with no `sampling_rate`, or `unit_time = "unknown"`).
-#' When `start_datetime` is set in metadata, formats absolute datetimes;
-#' otherwise formats elapsed time as `HH:MM:SS`. Switches to millisecond
-#' precision (`HH:MM:SS.fff`) when the recording is shorter than one second.
+#' `NULL` when the interval cannot be expressed in seconds.
 #'
 #' @keywords internal
 format_time_interval <- function(x, md) {
@@ -104,8 +100,8 @@ format_time_interval <- function(x, md) {
   }
 
   spu <- compute_seconds_per_time_unit(
-    as.character(md$unit_time),
-    md$sampling_rate
+    as.character(md_field(md, "unit_time")),
+    md_field(md, "sampling_rate")
   )
   if (is.null(spu) || !is.finite(spu)) {
     return(NULL)
@@ -117,7 +113,7 @@ format_time_interval <- function(x, md) {
   # Under a second, whole seconds would collapse both endpoints to 00:00:00.
   fractional <- (secs_max - secs_min) < 1
 
-  start_dt <- md$start_datetime
+  start_dt <- md_field(md, "start_datetime")
   if (
     !is.null(start_dt) &&
       length(start_dt) == 1 &&
@@ -146,8 +142,7 @@ format_time_interval <- function(x, md) {
 
 #' Multiplier from a metadata `unit_time` value to seconds
 #'
-#' Returns `NA_real_` when conversion is not possible (e.g. `"frame"` without
-#' a `sampling_rate`, or `"unknown"`).
+#' `NA_real_` when conversion is not possible.
 #'
 #' @keywords internal
 compute_seconds_per_time_unit <- function(unit, sampling_rate) {

@@ -13,14 +13,6 @@ resolve_index(md)
 Length-one character vector.
 }
 \description{
-Objects serialised before the field existed have no \code{index}. They were
-built when a literal \code{time} column was mandatory, so that is what they
-are indexed by, and defaulting here keeps them working untouched.
-}
-\details{
-\code{NA} — how an \code{\link[=anievent]{anievent()}} spells "not applicable" — falls back the
-same way. The only path that reaches here with anievent metadata is a
-cast to \code{\link[=anipoint]{anipoint()}}, which needs \emph{some} index; \code{\link[=get_index]{get_index()}} refuses
-the anievent before it gets this far.
+Missing (pre-#109 objects) or \code{NA} (anievent) falls back to \code{"time"}.
 }
 \keyword{internal}

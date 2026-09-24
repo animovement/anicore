@@ -46,28 +46,9 @@ convert_inf_to_na <- function(data) {
 
 #' Identity variable names recognised across the animovement classes
 #'
-#' The identity (`what`) columns auto-detection looks for, shared by
-#' [as_anipoint()] and [as_anievent()]. Only the names present in the data
-#' are used, and any other column can be declared explicitly via
-#' `variables_what`.
-#'
-#' The names are listed coarsest first, which reads naturally for the ones
-#' that do nest — a `subject` has `track`s, a track has `keypoint`s. **That
-#' is the order detection emits, not a hierarchy a frame asserts.** Identity
-#' variables need not nest at all: `sex`, `treatment` and `genotype`
-#' partition a population without containing one another, and there is no
-#' sense in which one of them is finer than the next.
-#'
-#' So nothing should read a position in `variables_what` as meaning a level.
-#' Where a function needs to know which variable to operate on, it asks —
-#' `animetric::add_centroid()` takes `across`, `anispace::translate_coords()`
-#' takes `level` — rather than inferring one. The order does still carry
-#' through to column order and grouping, which is presentation: grouping by
-#' `(a, b)` and `(b, a)` gives the same groups.
-#'
-#' `subject` and `individual` name the same kind of thing; both are
-#' recognised because behavioural coding tools (BORIS and its kin) speak
-#' of subjects where tracking tools speak of individuals.
+#' Listed coarsest first. This is detection order, not a hierarchy:
+#' identity variables need not nest, so never read a position in
+#' `variables_what` as a level.
 #'
 #' @return Character vector of column names.
 #' @keywords internal
@@ -77,10 +58,7 @@ list_recognised_variables_what <- function() {
 
 #' Classes owned by dplyr, tibble and base R
 #'
-#' The tail of the class vector that belongs to dplyr rather than to
-#' animovement. `NextMethod()` returns these already set correctly, so
-#' they are never restored from the input — doing so would, for instance,
-#' re-group the result of an [dplyr::ungroup()].
+#' Never restored from the input, or e.g. [dplyr::ungroup()] would re-group.
 #'
 #' @return Character vector of class names.
 #' @keywords internal
@@ -90,20 +68,8 @@ list_base_frame_classes <- function() {
 
 #' Re-clothe a dispatched result with its animovement classes and metadata
 #'
-#' After a generic strips a result down to a plain tibble (via
-#' `NextMethod()`), restore the animovement classes the input carried and
-#' re-attach its metadata.
-#'
-#' dplyr rebuilds only the classes it knows how to reconstruct, so by the
-#' time `NextMethod()` returns, the whole animovement family is gone —
-#' `aniframe` / `anievent` and any subclass a downstream package has built
-#' on top of them. Restoring the *incoming* stack rather than asserting a
-#' fixed one is what lets such a subclass (e.g. `animetric`'s
-#' `aniframe_kin`) survive a pipeline without registering methods of its
-#' own.
-#'
-#' Order is preserved, so a subclass stays ahead of its parent and keeps
-#' dispatch priority over it.
+#' Restores the incoming class stack, so downstream subclasses survive
+#' without registering their own methods.
 #'
 #' @param x The bare result returned by `NextMethod()`.
 #' @param cls Class vector of the original input, captured before dispatch.
@@ -111,16 +77,8 @@ list_base_frame_classes <- function() {
 #'
 #' @return `x` with the animovement classes and metadata restored.
 #' @keywords internal
-#' @details
-#' The metadata goes back through [write_metadata()] rather than
-#' [set_metadata()]: this is a round-trip of metadata that came off a
-#' valid object, structural fields included, and `set_metadata()` refuses
-#' those by design.
 preserve_animovement_class <- function(x, cls, md) {
-  # Lay the incoming animovement classes down in their original order,
-  # then whatever dplyr set on the result. Re-adding only the *missing*
-  # ones would append them at the front instead, putting `aniframe` ahead
-  # of its own subclasses in the methods that strip it before dispatch.
+  # Keep original order so subclasses stay ahead of `aniframe`.
   animovement_cls <- setdiff(cls, list_base_frame_classes())
   class(x) <- c(animovement_cls, setdiff(class(x), animovement_cls))
   write_metadata(x, md)

@@ -1,25 +1,9 @@
-# Sampling interval and regularity (#114)
-#
-# Nothing in the stack knew whether a frame was regularly sampled, or at
-# what interval. `sampling_rate` is set by hand, so it is often absent and
-# never checked against the data. That matters because several downstream
-# functions behave differently depending on the answer -- interpolating on
-# row position rather than on time is only correct when sampling is
-# regular -- and none of them could ask.
-#
-# The interval is derived from the index, which #109 made explicit, so
-# there is now a well-defined column to derive it *from*.
-#
-# Only the interval is stored. Regularity is computed on demand, because a
-# stored logical goes stale the moment somebody filters rows out, and
-# because the tolerance that decides it belongs to the caller rather than
-# to the frame.
+# Sampling interval and regularity (#114). Only the interval is stored;
+# regularity is computed on demand since row filtering would make it stale.
 
 #' The gaps between consecutive index values, within each key
 #'
-#' Diffed per key -- identity plus temporal context -- because the index
-#' restarts in each group. A frame that is perfectly regular within every
-#' track looks wildly irregular pooled.
+#' Per key, because the index restarts in each group.
 #'
 #' @param data An anipoint object.
 #'
@@ -33,13 +17,11 @@ compute_sampling_gaps <- function(data) {
   }
 
   bare <- dplyr::as_tibble(data)
-  # The index is required to be numeric, but this runs during construction --
-  # before that is checked, and on frames a reader may hand over empty or
-  # untyped. Deriving an interval is not worth aborting a constructor over.
+  # Runs during construction, before the index type is checked; don't abort.
   if (!is.numeric(bare[[index]])) {
     return(numeric())
   }
-  key <- intersect(c(md$variables_what, md$variables_when), names(bare))
+  key <- intersect(c(md_what_keys(md), md_when_keys(md)), names(bare))
   values <- if (length(key) == 0L) {
     list(bare[[index]])
   } else {
@@ -53,8 +35,7 @@ compute_sampling_gaps <- function(data) {
 
 #' Derive the sampling interval from the index
 #'
-#' The median gap, which is unmoved by a few dropped frames in a way the
-#' mean is not.
+#' The median gap, robust to a few dropped frames.
 #'
 #' @param data An anipoint object.
 #'
@@ -65,8 +46,7 @@ compute_sampling_interval <- function(data) {
   if (length(gaps) == 0L) {
     return(as.numeric(NA))
   }
-  # `median()` of an odd-length integer vector returns an integer, which
-  # the metadata type check rejects against a numeric field.
+  # `median()` can return integer, which the metadata type check rejects.
   as.numeric(stats::median(gaps))
 }
 
@@ -152,11 +132,7 @@ is_sampling_regular <- function(data, tolerance = 1e-6) {
 
 #' Warn when a declared sampling rate disagrees with the index
 #'
-#' A frame declaring 50 Hz whose timestamps say otherwise is worth
-#' knowing about: it is the same shape as #98, where the metadata claimed
-#' a unit the data was not in. Only checkable when the index is in a real
-#' time unit -- on a frame-indexed recording the rate is the conversion
-#' rather than a claim the gaps can contradict.
+#' Only checkable when the index is in a real time unit, not frames.
 #'
 #' @param data An anipoint object.
 #'
@@ -168,9 +144,9 @@ warn_sampling_rate_mismatch <- function(data) {
   }
 
   md <- get_metadata(data)
-  rate <- md$sampling_rate
+  rate <- md_field(md, "sampling_rate")
   interval <- get_sampling_interval(data)
-  unit <- as.character(md$unit_time)
+  unit <- as.character(md_field(md, "unit_time"))
 
   if (
     is.null(rate) ||

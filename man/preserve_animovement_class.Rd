@@ -17,25 +17,7 @@ preserve_animovement_class(x, cls, md)
 \code{x} with the animovement classes and metadata restored.
 }
 \description{
-After a generic strips a result down to a plain tibble (via
-\code{NextMethod()}), restore the animovement classes the input carried and
-re-attach its metadata.
-}
-\details{
-dplyr rebuilds only the classes it knows how to reconstruct, so by the
-time \code{NextMethod()} returns, the whole animovement family is gone —
-\code{aniframe} / \code{anievent} and any subclass a downstream package has built
-on top of them. Restoring the \emph{incoming} stack rather than asserting a
-fixed one is what lets such a subclass (e.g. \code{animetric}'s
-\code{aniframe_kin}) survive a pipeline without registering methods of its
-own.
-
-Order is preserved, so a subclass stays ahead of its parent and keeps
-dispatch priority over it.
-
-The metadata goes back through \code{\link[=write_metadata]{write_metadata()}} rather than
-\code{\link[=set_metadata]{set_metadata()}}: this is a round-trip of metadata that came off a
-valid object, structural fields included, and \code{set_metadata()} refuses
-those by design.
+Restores the incoming class stack, so downstream subclasses survive
+without registering their own methods.
 }
 \keyword{internal}

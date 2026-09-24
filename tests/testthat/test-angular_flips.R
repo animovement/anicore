@@ -1,8 +1,5 @@
-# Turning an axis over on a frame that stores angles (#134)
-#
-# No column carries the axis, but the angles are measured from it. The
-# reference for every case is the Cartesian round trip: map out, negate the
-# axis, map back.
+# Turning an axis over on a frame that stores angles (#134). Each case is
+# checked against the Cartesian round trip: map out, negate, map back.
 
 polar_frame <- function(rho, phi, unit_angle = "rad") {
   af <- as_anipoint(
@@ -27,7 +24,6 @@ reference_phi <- function(rho, phi, negate) {
   }
   atan2(y, x) %% (2 * pi)
 }
-
 
 # phi ----
 
@@ -83,7 +79,6 @@ test_that("rho is a distance and never moves", {
   expect_equal(set_axis_directions(af, c(y = "down"))$rho, c(1, 2, 3))
 })
 
-
 # The range and unit the frame keeps its angles in ----
 
 test_that("angles in degrees are reflected in degrees", {
@@ -101,7 +96,6 @@ test_that("a frame keeping phi signed gets signed angles back", {
     c(pi / 2, pi / 4, -pi / 4, -pi / 2)
   )
 })
-
 
 # theta ----
 
@@ -128,8 +122,7 @@ test_that("turning z over takes the supplement of theta", {
 })
 
 test_that("theta is a colatitude and is not wrapped onto a full turn", {
-  # Wrapping the supplement as a bearing would send 0 to pi and pi to pi,
-  # which is a different function.
+  # Wrapping the supplement as a bearing would send both 0 and pi to pi.
   af <- spherical_frame(c(0, pi))
 
   expect_equal(set_axis_directions(af, c(z = "forward"))$theta, c(pi, 0))
@@ -146,7 +139,6 @@ test_that("turning x or y over leaves theta alone", {
 
   expect_equal(set_axis_directions(af, c(y = "down"))$theta, af$theta)
 })
-
 
 # What still has nothing to do, and what still refuses ----
 

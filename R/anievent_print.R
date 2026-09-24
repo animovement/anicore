@@ -1,9 +1,6 @@
 #' Custom tibble summary for anievent
 #'
-#' Builds the print header rows shown above an `anievent`. Shows identity
-#' columns (`variables_what`), the unique event channels carried by the
-#' `channel` column, and the standard sampling-rate row inherited from
-#' the metadata substrate.
+#' Print header rows: identity columns, event channels and sampling rate.
 #'
 #' @param x An anievent object.
 #' @param ... Additional arguments (unused).
@@ -18,7 +15,7 @@ tbl_sum.anievent <- function(x, ...) {
   md <- get_metadata(x)
   new_header <- default_header
 
-  identity_vars <- intersect(md$variables_what, names(x))
+  identity_vars <- intersect(md_what_keys(md), names(x))
   for (col in identity_vars) {
     new_header <- c(
       new_header,
@@ -54,7 +51,7 @@ tbl_sum.anievent <- function(x, ...) {
     }
   }
 
-  sampling_rate <- md$sampling_rate
+  sampling_rate <- md_field(md, "sampling_rate")
   if (!is.null(sampling_rate) && !is.na(sampling_rate)) {
     new_header <- c(new_header, "Sampling rate" = paste(sampling_rate, "Hz"))
   }

@@ -13,9 +13,7 @@ get_declared_where(data)
 Named character vector, or a bare one when no roles are known.
 }
 \description{
-\code{get_variables()} strips names, which for \code{where} throws the axis roles
-away. Every path that re-declares the spatial columns has to start from
-the mapping instead, or \code{union()} and \code{setdiff()} silently reduce a
-renamed frame to \code{unknown} (#109).
+Re-declaring from \code{get_variables()} would lose the axis roles and reduce
+the frame to \code{unknown} (#109).
 }
 \keyword{internal}
