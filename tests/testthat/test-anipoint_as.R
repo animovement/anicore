@@ -15,7 +15,7 @@ test_that("as_anipoint detects cylindrical data (rho, phi, z), not cartesian_1d"
     "cylindrical"
   )
   expect_equal(
-    get_variables_where(data),
+    get_variables(data, "where"),
     c("rho", "phi", "z")
   )
 })
@@ -56,7 +56,7 @@ test_that("as_anipoint detects spherical data (rho, phi, theta)", {
     "spherical"
   )
   expect_equal(
-    get_variables_where(data),
+    get_variables(data, "where"),
     c("rho", "phi", "theta")
   )
 })
@@ -76,7 +76,7 @@ test_that("as_anipoint detects polar data (rho, phi)", {
     "polar"
   )
   expect_equal(
-    get_variables_where(data),
+    get_variables(data, "where"),
     c("rho", "phi")
   )
 })
@@ -91,7 +91,7 @@ test_that("as_anipoint does not invent axis extents", {
     y = c(10, 50, 200, 1000)
   )
 
-  expect_length(get_axis_extents(as_anipoint(df)), 0)
+  expect_length(get_metadata(as_anipoint(df), "axis_extents"), 0)
 })
 
 test_that("as_anipoint keeps axis extents the caller supplies", {
@@ -104,7 +104,7 @@ test_that("as_anipoint keeps axis extents the caller supplies", {
 
   data <- as_anipoint(df, metadata = list(axis_extents = c(y = 1080)))
 
-  expect_equal(get_axis_extents(data), c(y = 1080))
+  expect_equal(get_metadata(data, "axis_extents"), c(y = 1080))
 })
 
 test_that("as_anipoint errors when time column missing", {
@@ -322,9 +322,9 @@ test_that("as_anipoint stores variables in metadata", {
   )
 
   result_md <- get_metadata(result)
-  expect_equal(get_variables_what(result), "individual")
-  expect_equal(get_variables_when(result), "trial")
-  expect_equal(get_variables_where(result), c("x", "y"))
+  expect_equal(get_variables(result, "what"), "individual")
+  expect_equal(get_variables(result, "when", "keys"), "trial")
+  expect_equal(get_variables(result, "where"), c("x", "y"))
 })
 
 test_that("as_anipoint respects custom variables_what", {
@@ -352,7 +352,7 @@ test_that("as_anipoint respects custom variables_when with time", {
   result <- as_anipoint(df, variables_when = c("session", "time"))
 
   expect_s3_class(result, "aniframe")
-  expect_equal(get_variables_when(result), "session")
+  expect_equal(get_variables(result, "when", "keys"), "session")
 })
 
 test_that("as_anipoint auto-detects observation as a temporal grouping column", {
@@ -367,7 +367,7 @@ test_that("as_anipoint auto-detects observation as a temporal grouping column", 
   result <- as_anipoint(df)
 
   expect_equal(
-    get_variables_when(result),
+    get_variables(result, "when", "keys"),
     "observation"
   )
 })
@@ -484,7 +484,7 @@ test_that("as_anipoint detects polar coordinates", {
 
   expect_s3_class(result, "aniframe")
   expect_equal(
-    get_variables_where(result),
+    get_variables(result, "where"),
     c("rho", "phi")
   )
   expect_equal(as.character(get_metadata(result, "coordinate_system")), "polar")
@@ -508,13 +508,13 @@ test_that("casting an aniframe keeps a custom identity declaration", {
   # `keypoint = "centroid"` and overwrite the declaration.
   af <- anipoint(keypoint = "centroid", time = 1:4, x = 1:4, y = 1:4) |>
     dplyr::mutate(id = "a") |>
-    add_variables_what("id") |>
-    remove_variables_what("keypoint") |>
+    add_variables(what = "id") |>
+    remove_variables(what = "keypoint") |>
     dplyr::select(-keypoint)
 
   out <- as_anipoint(af)
 
-  expect_equal(get_variables_what(out), "id")
+  expect_equal(get_variables(out, "what"), "id")
   expect_false("keypoint" %in% names(out))
 })
 
@@ -528,7 +528,7 @@ test_that("casting keeps a declared opt-out rather than injecting an identity", 
 
   out <- as_anipoint(af)
 
-  expect_length(get_variables_what(out), 0)
+  expect_length(get_variables(out, "what"), 0)
   expect_false("keypoint" %in% names(out))
 })
 
@@ -539,7 +539,7 @@ test_that("a declaration whose columns are gone falls back to detection", {
 
   out <- as_anipoint(drifted)
 
-  expect_equal(get_variables_where(out), c("x", "y"))
+  expect_equal(get_variables(out, "where"), c("x", "y"))
   expect_equal(
     as.character(get_metadata(out, "coordinate_system")),
     "cartesian_2d"
@@ -552,23 +552,23 @@ test_that("explicit arguments still win over what the frame declares", {
 
   out <- as_anipoint(af, variables_what = "track")
 
-  expect_equal(get_variables_what(out), "track")
+  expect_equal(get_variables(out, "what"), "track")
 })
 
-test_that("the unit setters leave the declarations alone", {
+test_that("unit conversions and declarations leave the variables alone", {
   af <- anipoint(keypoint = "centroid", time = 1:4, x = 1:4, y = 1:4) |>
     dplyr::mutate(id = "a") |>
-    add_variables_what("id") |>
-    remove_variables_what("keypoint") |>
+    add_variables(what = "id") |>
+    remove_variables(what = "keypoint") |>
     dplyr::select(-keypoint)
 
   for (out in list(
-    set_unit_space(af, "cm", calibration_factor = 1 / 394),
-    set_unit_time(af, "s", calibration_factor = 1 / 30),
-    set_sampling_rate(af, 30),
-    set_unit_angle(af, "deg")
+    convert_unit_space(af, "cm", calibration_factor = 1 / 394),
+    convert_unit_time(af, "s", calibration_factor = 1 / 30),
+    set_metadata(af, sampling_rate = 30),
+    convert_unit_angle(af, "deg")
   )) {
-    expect_equal(get_variables_what(out), "id")
+    expect_equal(get_variables(out, "what"), "id")
     expect_false("keypoint" %in% names(out))
   }
 })

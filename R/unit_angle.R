@@ -1,46 +1,25 @@
-#' Set the angular unit of an anipoint object
+#' Convert the angular unit of an anipoint
 #'
 #' @description
-#' Converts angular columns in an anipoint between degrees (`"deg"`) and
-#' radians (`"rad"`), and updates the `unit_angle` metadata to match.
+#' Converts angular columns between radians and degrees and records the new
+#' `unit_angle`. The spatial angular columns `phi` and `theta` are always
+#' converted; other angular columns, such as a heading, are named in `cols`.
 #'
-#' Spatial angular columns (`phi`, `theta`) are converted automatically
-#' whenever they are present in the data, so polar/cylindrical/spherical
-#' coordinates always stay consistent with the declared unit. Additional
-#' angular columns (e.g. heading or orientation columns named outside the
-#' polar family) can be supplied via `cols`.
+#' To declare a unit without changing values, use
+#' `set_metadata(data, unit_angle = "deg")`.
 #'
-#' @param data An anipoint object containing angular data.
-#' @param to_unit Character string specifying the target angular unit. Must
-#'   be one of `c("rad", "deg")` (the levels of
-#'   `list_default_metadata()$unit_angle`).
-#' @param cols Optional character vector of additional angular column names
-#'   to convert. The spatial angular columns `phi` and `theta` are detected
-#'   automatically and need not be listed; pass `cols` only for non-spatial
-#'   angular columns (e.g. `"heading"`). All listed columns must be present
-#'   and numeric.
+#' @param data An anipoint.
+#' @param to_unit `"rad"` or `"deg"`.
+#' @param cols Further numeric angular columns to convert.
 #'
-#' @return An anipoint object with the relevant angular columns converted to
-#'   the specified unit and `unit_angle` metadata updated accordingly.
-#'
-#' @details
-#' If the current `unit_angle` already matches `to_unit`, an informational
-#' message is shown and the data are returned unchanged (apart from the
-#' metadata round-trip).
+#' @return `data`, converted, with `unit_angle` updated.
 #'
 #' @examples
-#' \dontrun{
-#' # Polar data: phi is converted automatically
 #' df <- data.frame(time = 1:3, rho = 1:3, phi = c(0, pi / 2, pi))
-#' anif <- as_anipoint(df)
-#' anif_deg <- set_unit_angle(anif, to_unit = "deg")
-#'
-#' # Custom angular columns alongside the spatial ones
-#' anif2 <- set_unit_angle(anif, to_unit = "deg", cols = "heading")
-#' }
+#' convert_unit_angle(as_anipoint(df), "deg")
 #'
 #' @export
-set_unit_angle <- function(data, to_unit, cols = NULL) {
+convert_unit_angle <- function(data, to_unit, cols = NULL) {
   ensure_is_anipoint(data)
 
   if (!to_unit %in% levels(list_default_metadata()[["unit_angle"]])) {

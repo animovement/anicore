@@ -16,8 +16,8 @@ set_connections(data, connections, variable = "keypoint")
 \item \code{NULL} to clear the connections for \code{variable}.
 }}
 
-\item{variable}{Character scalar. Name of the identity (\code{variables_what})
-or temporal (\code{variables_when}) variable the connections relate to.
+\item{variable}{Character scalar. Name of the \code{what} or \code{when} key the
+connections relate to.
 Defaults to \code{"keypoint"}.}
 }
 \value{

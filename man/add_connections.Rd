@@ -15,7 +15,7 @@ add_connections(data, from, to, variable = "keypoint")
 as \code{from}.}
 
 \item{variable}{Character scalar. Name of the variable the connections
-relate to (must be in \code{variables_what} or \code{variables_when}). Defaults
+relate to (must be a \code{what} or \code{when} key). Defaults
 to \code{"keypoint"}.}
 }
 \value{

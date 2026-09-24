@@ -7,11 +7,9 @@
 #' invariants are therefore checked rather than assumed:
 #'
 #' * the index column is present and numeric — hard error;
-#' * every column named in `variables_what`, `variables_when`,
-#'   `variables_where` and `variables_event` is present in the data —
-#'   hard error;
-#' * every column named in `variables_where` is numeric — hard error;
-#' * `coordinate_system` agrees with `variables_where` — **warning**
+#' * every declared column is present in the data — hard error;
+#' * every position column is numeric — hard error;
+#' * `coordinate_system` agrees with the axis roles — **warning**
 #'   only. The frame is still usable, and the field is derived rather
 #'   than declared, so it can be refreshed;
 #' * identity, temporal context and the index together name one
@@ -68,7 +66,7 @@ warn_duplicate_observations <- function(data) {
     cli::cli_warn(c(
       "{n_duplicated} row{?s} {?is/are} not uniquely identified by {.val {key}}.",
       "i" = "Identity, temporal context and the index together should name one observation.",
-      "i" = "A variable that tells these rows apart is probably undeclared; see {.fn add_variables_what} and {.fn add_variables_when}."
+      "i" = "A variable that tells these rows apart is probably undeclared; see {.fn add_variables}."
     ))
   }
 

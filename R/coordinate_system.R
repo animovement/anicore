@@ -2,9 +2,9 @@
 
 #' The coordinate system an anipoint is in
 #'
-#' Derived from the axis roles rather than declared: [set_axes()] says
+#' Derived from the axis roles rather than declared: [set_variables()] says
 #' which column carries which role, and the system follows from the set of
-#' roles present. It is therefore not writable — see [set_axes()] to say
+#' roles present. It is therefore not writable — see [set_variables()] to say
 #' what the columns mean, or `anispace`'s `map_to_*()` functions to convert
 #' the coordinates themselves.
 #'
@@ -236,7 +236,7 @@ ensure_coordinate_system <- function(data, permitted, wanted) {
 
   actual <- get_coordinate_system(data)
   hint <- if (identical(actual, "unknown")) {
-    "Declare which axis each spatial column carries with {.fn set_axes}."
+    "Declare which axis each spatial column carries with {.code set_variables(data, where = )}."
   } else {
     "Convert the coordinates first; {.pkg anispace} has the transformations."
   }
@@ -267,7 +267,7 @@ infer_coordinate_system <- function(variables_where) {
   hint <- if (length(roles) > 0L && all(roles %in% list_axis_roles())) {
     "Convert the coordinates to a system these axes do form; {.pkg anispace} has the transformations."
   } else {
-    "To keep the coordinate system, say which axis each column carries with {.fn set_axes}."
+    "To keep the coordinate system, say which axis each column carries with {.code set_variables(data, where = )}."
   }
 
   cli::cli_warn(

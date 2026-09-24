@@ -1,38 +1,3 @@
-#' Restructure a frame to match a declaration
-#'
-#' @param data An aniframe or anievent object.
-#' @param variables_what,variables_when,variables_where The full
-#'   declaration to apply.
-#'
-#' @return `data`, restructured, with the declaration recorded.
-#' @keywords internal
-restructure_frame <- function(
-  data,
-  variables_what,
-  variables_when,
-  variables_where,
-  strict = TRUE
-) {
-  if (is_anievent(data)) {
-    if (length(variables_where) > 0) {
-      cli::cli_abort(c(
-        "An {.cls anievent} has no spatial variables.",
-        "i" = "{.field variables_where} is always empty on an anievent; spatial position lives on the {.cls anipoint} it was encoded from."
-      ))
-    }
-    return(restructure_anievent(data, variables_what, variables_when))
-  }
-
-  restructure_anipoint(
-    data,
-    variables_what,
-    variables_when,
-    variables_where,
-    strict = strict
-  )
-}
-
-
 #' Strip a frame back to its dplyr classes
 #'
 #' Avoids dispatching into class-preserving methods and the `ungroup()`
@@ -55,6 +20,7 @@ strip_animovement_class <- function(data) {
 #' @param data An anipoint object.
 #' @param variables_what,variables_when,variables_where The declaration
 #'   to apply.
+#' @param orientation `where$orientation`; `NULL` keeps the current one.
 #'
 #' @return `data`, restructured, with the declaration recorded.
 #' @keywords internal
@@ -63,6 +29,7 @@ restructure_anipoint <- function(
   variables_what,
   variables_when,
   variables_where,
+  orientation = NULL,
   strict = TRUE
 ) {
   cls <- class(data)
@@ -131,10 +98,16 @@ restructure_anipoint <- function(
   )
 
   md <- migrate_metadata_layout(md)
+  where <- list(position = position)
+  orientation <- orientation %||% md$variables$where$orientation
+  if (length(orientation) > 0L) {
+    ensure_has_declared_cols(bare, unname(orientation), "where")
+    where$orientation <- orientation
+  }
   md$variables <- list(
     what = list(keys = variables_what),
     when = list(index = index, keys = variables_when),
-    where = list(position = position),
+    where = where,
     event = md_event(md) %||% list(state = character(), point = character())
   )
   md <- md_field_set(

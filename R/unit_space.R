@@ -1,52 +1,32 @@
-#' Set the spatial unit of an anipoint object
+#' Convert the spatial unit of an anipoint
 #'
 #' @description
-#' Converts the spatial coordinates of an anipoint object to a different unit
-#' of measurement. The function handles both automatic unit conversion between
-#' standard units and custom calibration from pixel or arbitrary units.
+#' Rescales the columns carrying a length and records the new `unit_space`.
+#' Those are the length axes of the coordinate system — `x`, `y`, `z` on a
+#' Cartesian frame, `rho` (and `z`) on a polar, cylindrical or spherical one.
+#' Angular axes are [convert_unit_angle()]'s. Declared `axis_extents` are
+#' rescaled with them.
 #'
-#' The columns converted are the axes of the frame's `coordinate_system` that
-#' carry a **length** — `x`, `y` and `z` on a Cartesian frame, but `rho` on a
-#' polar or spherical one and `rho` and `z` on a cylindrical one. The angular
-#' axes (`phi`, `theta`) are left alone; they are [set_unit_angle()]'s to
-#' convert.
+#' To declare a unit without changing values, use
+#' `set_metadata(data, unit_space = "mm")`.
 #'
-#' @param data An anipoint object containing spatial coordinate data.
-#' @param to_unit Character string specifying the target spatial unit. Must be
-#'   one of the permitted units defined in `list_default_metadata()$unit_space`.
-#' @param calibration_factor Numeric value for scaling spatial coordinates.
-#'   Default is 1. When converting from standard units (mm, cm, m), this is
-#'   ignored and the appropriate conversion factor is calculated automatically.
-#'   When converting from "px" or "unknown", you must provide a calibration factor
-#'   to define the relationship between the current units and the target unit.
+#' @param data An anipoint.
+#' @param to_unit Target unit, one of the levels of `unit_space` in
+#'   [list_default_metadata()].
+#' @param calibration_factor Multiplier from the current unit to `to_unit`.
+#'   Derived between metric units; required when converting from `"px"`.
 #'
-#' @return An anipoint object with spatial coordinates converted to the specified
-#'   unit and updated metadata reflecting the new unit_space.
-#'
-#' @details
-#' The function performs the following operations:
-#' * Validates that `to_unit` is a permitted spatial unit
-#' * Determines the current spatial unit from the object's metadata
-#' * If converting from standard units (mm, cm, m) to another standard unit,
-#'   automatically calculates the conversion factor
-#' * If converting from "px" or "unknown" units with `calibration_factor = 1`,
-#'   issues an informational message and returns data unchanged
-#' * Applies the calibration factor to the length axes of the frame's
-#'   coordinate system
-#' * Updates the object's unit_space metadata
+#' @return `data`, rescaled, with `unit_space` updated.
 #'
 #' @examples
-#' \dontrun{
-#' # Convert from millimeters to centimeters (automatic conversion)
-#' data_cm <- set_unit_space(data, to_unit = "cm")
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #'
-#' # Convert from pixels to millimeters with custom calibration
-#' # (e.g., 1 pixel = 0.5 mm)
-#' data_mm <- set_unit_space(data, to_unit = "mm", calibration_factor = 0.5)
-#' }
+#' # 1 px = 0.5 mm
+#' af_mm <- convert_unit_space(af, "mm", calibration_factor = 0.5)
+#' convert_unit_space(af_mm, "cm")
 #'
 #' @export
-set_unit_space <- function(data, to_unit, calibration_factor = 1) {
+convert_unit_space <- function(data, to_unit, calibration_factor = NULL) {
   ensure_is_anipoint(data)
 
   if (!to_unit %in% levels(list_default_metadata()[["unit_space"]])) {
@@ -55,14 +35,16 @@ set_unit_space <- function(data, to_unit, calibration_factor = 1) {
     )
   }
 
-  current_unit_space <- get_metadata(data, "unit_space")
-  if (calibration_factor == 1 && current_unit_space %in% c("px", "none")) {
-    cli::cli_alert_info(
-      "calibration_factor is not set, data remains unchanged."
-    )
-  } else if (calibration_factor == 1) {
+  from <- as.character(get_metadata(data, "unit_space"))
+  if (is.null(calibration_factor)) {
+    if (any(c(from, to_unit) %in% c("px", "none"))) {
+      cli::cli_abort(c(
+        "Cannot convert from {.val {from}} to {.val {to_unit}} without a {.arg calibration_factor}.",
+        "i" = "To declare the unit without converting, use {.code set_metadata(data, unit_space = \"{to_unit}\")}."
+      ))
+    }
     calibration_factor <- get_conversion_factor_space(
-      from_unit = as.character(current_unit_space),
+      from_unit = from,
       to_unit = to_unit
     )
   }
@@ -80,7 +62,7 @@ set_unit_space <- function(data, to_unit, calibration_factor = 1) {
     cli::cli_warn(c(
       "No length axes found for coordinate system {.val {as.character(get_metadata(data, 'coordinate_system'))}}.",
       "i" = "{.field unit_space} is being set to {.val {to_unit}} but no columns were converted.",
-      "i" = "Declare the spatial columns with {.fn set_variables_where} if this frame has any."
+      "i" = "Declare the spatial columns with {.fn set_variables} if this frame has any."
     ))
   }
 
@@ -94,7 +76,7 @@ set_unit_space <- function(data, to_unit, calibration_factor = 1) {
     )
 
   # An extent is a length, so it is in the unit being converted from.
-  extents <- get_axis_extents(data)
+  extents <- resolve_axis_extents(get_metadata(data))
   if (length(extents) > 0L) {
     data <- set_metadata(data, axis_extents = extents * calibration_factor)
   }

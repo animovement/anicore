@@ -43,7 +43,7 @@ test_that("a frame too short to measure has no interval", {
 test_that("an anievent has no interval, having no index", {
   ae <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     dplyr::mutate(b = factor(rep(c("r", "w"), each = 2))) |>
-    set_variables_event(state = "b") |>
+    set_variables(event = list(state = "b")) |>
     to_anievent()
 
   expect_true(is.na(get_sampling_interval(ae)))

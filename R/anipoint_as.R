@@ -183,13 +183,18 @@ get_declared_if_present <- function(data, field) {
     return(NULL)
   }
 
-  role <- sub("^variables_", "", field)
-  declared <- if (identical(role, "where")) {
+  md <- migrate_metadata_layout(attr(data, "metadata"))
+  declared <- switch(
+    sub("^variables_", "", field),
+    what = md_what_keys(md),
+    when = md_when_keys(md),
     # Keep the role mapping, or renamed axes degrade to "unknown" (#109).
-    get_declared_where(data)
-  } else {
-    get_variables(data, role)
-  }
+    where = if (length(resolve_axes(md)) > 0L) {
+      resolve_axes(md)
+    } else {
+      unname(md_where_position(md))
+    }
+  )
   declared <- declared[!is.na(declared)]
 
   # An empty `variables_what` is a deliberate opt-out, not re-detected.

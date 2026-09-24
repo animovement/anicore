@@ -2,12 +2,11 @@
 % Please edit documentation in R/unit_time.R
 \name{resolve_unit_time_calibration}
 \alias{resolve_unit_time_calibration}
-\title{Resolve the multiplicative factor for a unit_time conversion}
+\title{The multiplier for a unit_time conversion}
 \usage{
 resolve_unit_time_calibration(data, to_unit, calibration_factor)
 }
 \description{
-Returns 1 (values unchanged) when converting from \code{"frame"} or
-\code{"unknown"} without a calibration factor.
+The multiplier for a unit_time conversion
 }
 \keyword{internal}

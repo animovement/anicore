@@ -73,9 +73,9 @@ Every row of an `anipoint` answers three questions:
 
 | Question | Slot          | Resolves   | Default columns          |
 |----------|---------------|------------|--------------------------|
-| **What** is moving? | Identity (`variables_what`) | An entity   | `individual`, `keypoint` |
-| **When**?           | Temporal context (`variables_when`) | A context — which session, which trial | `session`, `trial` |
-| **Where**?          | Spatial (`variables_where`) | A position  | `x`, `y`                 |
+| **What** is moving? | Identity (`what$keys`) | An entity   | `individual`, `keypoint` |
+| **When**?           | Temporal context (`when$keys`) | A context — which session, which trial | `session`, `trial` |
+| **Where**?          | Spatial (`where$position`) | A position  | `x`, `y`                 |
 
 "When" is really two questions, and only the first is answered here:
 which recording session this row belongs to, and where it sits inside
@@ -94,9 +94,10 @@ downstream code can introspect:
 
 ```{r}
 get_index(data)
-get_variables_what(data)
-get_variables_when(data)
-get_variables_where(data)
+get_variables(data, "what")
+get_variables(data, "when")
+get_variables(data, "where")
+get_keys(data)
 ```
 
 ### Customising the slots
@@ -183,7 +184,7 @@ timestamped <- data |>
   set_index("timestamp")
 
 get_index(timestamped)
-get_variables_when(timestamped)
+get_variables(timestamped, "when", "keys")
 dplyr::group_vars(timestamped)
 ```
 

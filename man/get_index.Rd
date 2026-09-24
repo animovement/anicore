@@ -13,17 +13,9 @@ get_index(data)
 Length-one character vector naming the index column.
 }
 \description{
-Exactly one column, of any name, holding the position of each row
-within its temporal context. It is declared separately from
-\code{variables_when}, which holds the context itself — session, trial,
-observation — and which, with \code{variables_what}, is what the frame is
-grouped by. The index is never a grouping variable.
-}
-\details{
-An \code{\link[=anievent]{anievent()}} has none: a bout spans an interval rather than sitting
-at a point, so it is delimited by \code{start} and \code{stop}, which are
-declared temporal columns. Its \code{variables_index} is \code{NA}, and asking
-for it here is an error rather than a guess.
+Exactly one column, of any name, holding the position of each row within
+its temporal context: the \code{when$index} slot. It is never a grouping column.
+An \code{\link[=anievent]{anievent()}} has none, since a bout spans the \code{start}/\code{stop} interval.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
@@ -31,6 +23,6 @@ get_index(af)
 
 }
 \seealso{
-\code{\link[=set_index]{set_index()}} to change it, \code{\link[=get_variables_when]{get_variables_when()}} for the
-full set of temporal columns.
+\code{\link[=set_index]{set_index()}} to change it, \code{\link[=get_variables]{get_variables()}} for the other
+temporal columns.
 }

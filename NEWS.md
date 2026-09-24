@@ -2,13 +2,20 @@
 
 ## Breaking changes
 
+* The accessor API is rebuilt around one rule: `set_*` declares and never changes a value (#155).
+
+  * `get_variables()`, `set_variables()`, `add_variables()` and `remove_variables()` replace the sixteen `*_variables_what/when/where/event()` functions. They take a role and slot — `get_variables(x, "when", "index")`, `set_variables(x, when = list(keys = "trial"))` — or a character vector for a role's main slot (`add_variables(x, what = "id")`). `get_variables(x, "when")` is now the union of the role's slots, index included; the grouping set is the new `get_keys()`. `set_axes()` is gone too: use `set_variables(x, where = c(x = "u", y = "v"))`.
+  * `convert_unit_space()`, `convert_unit_time()` and `convert_unit_angle()` replace `set_unit_space()`, `set_unit_time()` and `set_unit_angle()`. Converting from `px`, `frame` or `unknown` without a `calibration_factor` now errors instead of relabelling the unit, except from `frame` with a declared `sampling_rate`. `convert_unit_time()` also handles `ns` and `us`.
+  * `set_axis_directions()` only records directions. The new `reflect_axis()` turns an axis over: it reflects the column, flips the declared direction and a known handedness.
+  * Removed in favour of `get_metadata()` / `set_metadata()`: `get_/set_unit_space()`, `get_/set_unit_time()`, `get_/set_unit_angle()`, `get_/set_sampling_rate()`, `get_/set_axis_extents()`, `set_handedness()` and `set_angle_direction()`. `set_sampling_rate()` used to convert frames to seconds as well; declare the rate, then call `convert_unit_time(x, "s")`. `set_metadata()` validates `axis_directions` and `axis_extents` and keeps `handedness` in step with three declared directions.
+
 * The metadata list becomes a category tree (#118): `recording` (`source`, `source_version`, `source_format`, `filename`), `time` (`unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime`), `space` (`coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`), `variables`, and `structure` (which now holds what `connections` held), with `spec_version` at the top level. This is a `spec_version` major bump: `aniframe` moves to 3.0.0 and `anievent` to 1.0.0.
 
   Access stays flat, so most code needs no change: `get_metadata(data, "sampling_rate")` finds the field wherever it lives, `set_metadata(data, sampling_rate = 30)` writes it there, and a category name returns the whole category (`get_metadata(data, "space")`). The object `get_metadata()` returns also resolves `$` and `[[` flat, so `get_metadata(data)$sampling_rate` keeps working over the nested storage. What breaks is anything reaching into the raw attribute — `attr(x, "metadata")$sampling_rate` — and the old flat names for the variable declaration: `get_metadata(x, "variables_what")` and friends are refused with a pointer to `get_variables_what()`, `get_index()`, `get_axes()` and `get_connections()`.
 
   The variable roles become lists of named slots — `what$keys`, `when$index` + `when$keys`, `where$position` (the axis-role mapping, absorbing the separate `axes` field), `event$state` + `event$point` — and the frame groups by `c(what$keys, when$keys)`. An anievent's `start`/`stop` get the slot the flat vector could never express, `when$interval`, which is why `get_index()` had to refuse anievents by string comparison before.
 
-  An anievent's spatial "not applicable" is now spelled as an absent `space` category instead of five neutral values (#73): its spatial fields read as `NULL` (`NA` through `get_unit_space()`, `get_unit_angle()` and `get_coordinate_system()`), and writing one errors. Spatial fields passed to `as_anievent()` are dropped silently, so readers written against the flat layout keep working.
+  An anievent's spatial "not applicable" is now spelled as an absent `space` category instead of five neutral values (#73): its spatial fields read as `NULL` (`NA` through `get_coordinate_system()`), and writing one errors. Spatial fields passed to `as_anievent()` are dropped silently, so readers written against the flat layout keep working.
 
   Objects serialised with the flat layout are migrated to the tree, with `spec_version` bumped, whenever their metadata is read or written.
 

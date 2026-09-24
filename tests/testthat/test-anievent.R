@@ -105,9 +105,10 @@ test_that("anievent metadata gets anievent-flavoured defaults", {
     stop = 9
   )
 
-  expect_equal(get_variables_what(ae), "individual")
-  expect_equal(get_variables_when(ae), c("start", "stop"))
-  expect_length(get_variables_where(ae), 0)
+  expect_equal(get_variables(ae, "what"), "individual")
+  expect_equal(get_variables(ae, "when"), c("start", "stop"))
+  expect_length(get_variables(ae, "when", "keys"), 0)
+  expect_length(get_variables(ae, "where"), 0)
   # and no space category at all (#73, #118)
   expect_null(get_metadata(ae, "space"))
 })
@@ -121,7 +122,7 @@ test_that("anievent auto-detects recognised identity columns", {
     stop = c(9, 19)
   )
 
-  expect_equal(get_variables_what(ae), "subject")
+  expect_equal(get_variables(ae, "what"), "subject")
 })
 
 test_that("anievent accepts an explicit non-default identity column", {
@@ -134,7 +135,7 @@ test_that("anievent accepts an explicit non-default identity column", {
     variables_what = "rat"
   )
 
-  expect_equal(get_variables_what(ae), "rat")
+  expect_equal(get_variables(ae, "what"), "rat")
   expect_s3_class(ae$rat, "factor")
 })
 
@@ -147,10 +148,10 @@ test_that("anievent works with no identity column", {
   )
 
   expect_s3_class(ae, "anievent")
-  expect_length(get_variables_what(ae), 0)
+  expect_length(get_variables(ae, "what"), 0)
 })
 
-test_that("anievent auto-detects observation / session / trial into variables_when", {
+test_that("anievent auto-detects observation / session / trial into the when keys", {
   ae <- anievent(
     individual = c(1L, 1L, 1L, 1L),
     observation = c("clip_a", "clip_a", "clip_b", "clip_b"),
@@ -161,8 +162,9 @@ test_that("anievent auto-detects observation / session / trial into variables_wh
     stop = c(9, 19, 5, 12)
   )
 
-  expect_equal(
-    get_variables_when(ae),
+  expect_equal(get_variables(ae, "when", "keys"), c("observation", "trial"))
+  expect_setequal(
+    get_variables(ae, "when"),
     c("observation", "trial", "start", "stop")
   )
 })
@@ -540,7 +542,7 @@ test_that("to_anievent does not carry the host frame's spatial metadata over", {
     y = 1:5,
     behaviour = factor(c("REM", "REM", "wake", "wake", "wake"))
   )
-  af <- set_variables_event(af, state = "behaviour")
+  af <- set_variables(af, event = list(state = "behaviour"))
   af <- set_metadata(af, sampling_rate = 30, unit_time = "s")
 
   ae <- to_anievent(af)

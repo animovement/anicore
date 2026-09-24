@@ -62,7 +62,7 @@ test_that("example_anipoint creates 1D data with only x", {
   expect_true("x" %in% names(result))
   expect_false("y" %in% names(result))
   expect_false("z" %in% names(result))
-  expect_equal(get_variables_where(result), "x")
+  expect_equal(get_variables(result, "where"), "x")
 })
 
 test_that("example_anipoint creates 2D data with x and y", {
@@ -70,7 +70,7 @@ test_that("example_anipoint creates 2D data with x and y", {
 
   expect_true(all(c("x", "y") %in% names(result)))
   expect_false("z" %in% names(result))
-  expect_equal(get_variables_where(result), c("x", "y"))
+  expect_equal(get_variables(result, "where"), c("x", "y"))
 })
 
 test_that("example_anipoint creates 3D data with x, y, and z", {
@@ -78,7 +78,7 @@ test_that("example_anipoint creates 3D data with x, y, and z", {
 
   expect_true(all(c("x", "y", "z") %in% names(result)))
   expect_equal(
-    get_variables_where(result),
+    get_variables(result, "where"),
     c("x", "y", "z")
   )
 })
@@ -112,9 +112,9 @@ test_that("example_anipoint respects n_trials and n_sessions", {
 test_that("example_anipoint sets correct metadata variables", {
   result <- example_anipoint()
 
-  expect_equal(get_variables_what(result), c("individual", "keypoint"))
+  expect_equal(get_variables(result, "what"), c("individual", "keypoint"))
   expect_equal(
-    get_variables_when(result),
+    get_variables(result, "when", "keys"),
     # The index is declared separately and is not temporal *context*.
     c("session", "trial")
   )

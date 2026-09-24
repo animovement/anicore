@@ -141,8 +141,8 @@ social <- example_anipoint(n_individuals = 3) |>
 get_connections(social)
 ```
 
-The `variable` argument must be a column listed in `variables_what` or
-`variables_when` — `set_connections()` errors otherwise to catch
+The `variable` argument must be a column declared as a `what` or
+`when` key — `set_connections()` errors otherwise to catch
 typos.
 
 ## Catching typos

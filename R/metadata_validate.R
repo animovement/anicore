@@ -116,16 +116,12 @@ list_optional_metadata_fields <- function() {
   c("source_format", "sampling_interval")
 }
 
-# NULL/empty/all-NA collapse to character(); wrong types are left for the
-# validator to reject.
+# Empty and all-NA collapse to character().
 normalise_variables_event_entry <- function(v) {
-  if (is.null(v) || length(v) == 0L || all(is.na(v))) {
+  if (length(v) == 0L || all(is.na(v))) {
     return(character())
   }
-  if (is.character(v)) {
-    return(v[!is.na(v)])
-  }
-  v
+  v[!is.na(v)]
 }
 
 normalise_variables_event <- function(x) {
@@ -147,11 +143,6 @@ ensure_valid_variables_event <- function(x) {
       "{.field variables_event} must be a list with entries {.val state} and {.val point}.",
       "i" = "Got names: {.val {names(x)}}."
     ))
-  }
-  if (!is.character(x$state) || !is.character(x$point)) {
-    cli::cli_abort(
-      "Both {.field variables_event$state} and {.field variables_event$point} must be character vectors."
-    )
   }
   overlap <- intersect(x$state, x$point)
   if (length(overlap) > 0) {

@@ -78,7 +78,7 @@ list_direction_vectors <- function() {
 #' af <- set_axis_directions(af, c(x = "right", y = "up"))
 #' get_axis_directions(af)
 #'
-#' @seealso [set_axis_directions()], [get_axis_extents()]
+#' @seealso [set_axis_directions()], [reflect_axis()]
 #' @export
 get_axis_directions <- function(data) {
   ensure_is_aniframe(data)
@@ -106,74 +106,87 @@ resolve_axis_directions <- function(md) {
 #'
 #' @description
 #' Records the direction of one or more axes, keyed by axis role. Roles not
-#' named keep the direction they had, so flipping one axis leaves the rest
-#' alone.
-#'
-#' Turning an axis to its opposite reflects that column around the axis
-#' extent, so the data ends up expressed in the direction being declared.
-#' Any other change is a re-description and leaves the values untouched.
+#' named keep the direction they had. This only declares: the values are left
+#' alone. To turn an axis over and keep the data describing the same scene,
+#' use [reflect_axis()].
 #'
 #' @param data An anipoint object.
 #' @param directions Named character vector, axis role to direction — one of
 #'   `right`, `left`, `up`, `down`, `back` or `forward`. `NA` clears an axis.
 #'
-#' @return The anipoint, with reflected coordinates for any axis turned to
-#'   its opposite and the new directions recorded.
+#' @return The anipoint, with the new directions recorded.
 #'
 #' @details
 #' Directions are read from where the recording was made: `right`/`left`
 #' across the view, `up`/`down` within it, `back`/`forward` toward and away
-#' from the viewer. No two axes may point along the same pair.
-#'
-#' An axis runs from zero to its extent, so turning it over gives
-#' `new = extent - old`. An axis with no declared extent is centred on its
-#' origin instead, and turning it over negates it. Declare one with
-#' [set_axis_extents()] for data that is measured from a corner, such as
-#' video.
-#'
-#' On a frame that stores angles there is no column to reflect, but `phi`
-#' and `theta` are measured from the axes and are recomputed instead.
+#' from the viewer. No two axes may point along the same pair. Three declared
+#' directions fix the handedness, which is recorded too.
 #'
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
-#' af <- set_axis_extents(af, c(y = 1080))
 #' af <- set_axis_directions(af, c(x = "right", y = "down"))
-#'
-#' # Turning y over reflects it
-#' af <- set_axis_directions(af, c(y = "up"))
 #' get_axis_directions(af)
+#' get_angle_direction(af)
 #'
-#' @seealso [get_axis_directions()], [set_axis_extents()],
+#' @seealso [get_axis_directions()], [reflect_axis()],
 #'   [get_angle_direction()]
 #' @export
 set_axis_directions <- function(data, directions) {
   ensure_is_anipoint(data)
   ensure_valid_axis_directions(directions)
+  set_metadata(
+    data,
+    axis_directions = merge_axis_map(get_axis_directions(data), directions)
+  )
+}
 
-  current <- get_axis_directions(data)
-  wanted <- merge_axis_map(current, directions)
-  ensure_unopposed_axis_directions(wanted)
 
-  flipped <- names(wanted)[vapply(
-    names(wanted),
-    function(role) {
-      identical(
-        unname(current[role]),
-        unname(list_direction_opposites()[wanted[[role]]])
-      )
-    },
-    logical(1)
-  )]
+#' Turn an axis over
+#'
+#' @description
+#' Reflects the column carrying an axis role and flips its declared
+#' direction, so the data describes the same scene with the axis pointing
+#' the other way — for example converting image coordinates, where `y` runs
+#' down, to a `y` that runs up.
+#'
+#' An axis runs from zero to its extent, so turning it over gives
+#' `new = extent - old`. An axis with no declared `axis_extents` is centred
+#' on its origin, and turning it over negates it. On a frame that stores
+#' angles there is no column to reflect, and `phi` and `theta` are
+#' recomputed instead.
+#'
+#' A declared handedness flips with any linear axis.
+#'
+#' @param data An anipoint object.
+#' @param axis An axis role: `"x"`, `"y"` or `"z"`.
+#'
+#' @return The anipoint, reflected, with its orientation metadata updated.
+#'
+#' @examples
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- set_metadata(af, axis_extents = c(y = 1080))
+#' af <- set_axis_directions(af, c(x = "right", y = "down"))
+#'
+#' af <- reflect_axis(af, "y")
+#' get_axis_directions(af)
+#'
+#' @seealso [set_axis_directions()], [get_handedness()]
+#' @export
+reflect_axis <- function(data, axis) {
+  ensure_is_anipoint(data)
+  ensure_is_one_of(axis, list_linear_axis_roles(), "axis")
 
-  for (role in flipped) {
-    data <- reflect_axis_role(data, role)
+  handedness <- get_handedness(data)
+  data <- reflect_axis_role(data, axis)
+
+  directions <- get_axis_directions(data)
+  if (axis %in% names(directions)) {
+    directions[[axis]] <- unname(list_direction_opposites()[directions[[axis]]])
+    data <- set_metadata(data, axis_directions = directions)
   }
-
-  data <- set_metadata(data, axis_directions = wanted)
-
-  settled <- derive_handedness(wanted)
-  if (!identical(settled, "unknown")) {
-    data <- set_metadata(data, handedness = settled)
+  if (handedness %in% c("right", "left")) {
+    flipped <- setdiff(c("right", "left"), handedness)
+    data <- set_metadata(data, handedness = flipped)
   }
   data
 }
@@ -194,12 +207,12 @@ reflect_axis_role <- function(data, role) {
   }
 
   # Mirror is `extent - v`; without a declared extent, reflect about the origin.
-  extents <- get_axis_extents(data)
+  extents <- resolve_axis_extents(get_metadata(data))
   reference <- if (role %in% names(extents)) extents[[role]] else 0
 
   column <- axes[[role]]
   ensure_has_column(data, column)
-  reflect_axis(data, axis = column, reference = reference)
+  reflect_column(data, axis = column, reference = reference)
 }
 
 
@@ -311,7 +324,7 @@ ensure_named_axis_map <- function(x, arg, example, call = rlang::caller_env()) {
 #'
 #' @return The data with `axis` replaced by `reference - data[[axis]]`.
 #' @keywords internal
-reflect_axis <- function(data, axis, reference) {
+reflect_column <- function(data, axis, reference) {
   if (!is.character(axis) || length(axis) != 1) {
     cli::cli_abort("{.arg axis} must be a single column name.")
   }
@@ -358,12 +371,12 @@ reflect_angular_axis <- function(data, role) {
   }
 
   # A mirror off the origin changes `rho`, which no angle change can express.
-  extents <- get_axis_extents(data)
+  extents <- resolve_axis_extents(get_metadata(data))
   if (role %in% names(extents) && extents[[role]] != 0) {
     cli::cli_abort(c(
       "Cannot turn the {.field {role}} axis over around an extent on a {.val {get_coordinate_system(data)}} frame.",
       "i" = "Reflecting around {.val {extents[[role]]}} would move every point's distance from the origin, which {.field rho} would have to change to express.",
-      "i" = "Clear the extent with {.code set_axis_extents(data, c({role} = NA))} to turn the axis over about the origin."
+      "i" = "Clear the extent from {.field axis_extents} with {.fn set_metadata} to turn the axis over about the origin."
     ))
   }
 
@@ -376,7 +389,7 @@ reflect_angular_axis <- function(data, role) {
   data[[column]] <- reflect_angle(
     data[[column]],
     about = if (is_colatitude || identical(role, "x")) "half_turn" else "zero",
-    unit = get_unit_angle(data),
+    unit = as.character(get_metadata(data, "unit_angle")),
     wrap = !is_colatitude,
     signed = any(data[[column]] < 0, na.rm = TRUE)
   )

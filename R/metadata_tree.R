@@ -232,12 +232,6 @@ md_what_keys <- function(md) {
 md_when_keys <- function(md) {
   as.character(md_variables(md)$when$keys %||% character())
 }
-
-#' @keywords internal
-md_when_interval <- function(md) {
-  as.character(md_variables(md)$when$interval %||% character())
-}
-
 #' @keywords internal
 md_event <- function(md) {
   md_variables(md)$event

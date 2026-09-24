@@ -7,7 +7,7 @@
 ensure_valid_axis_extents(extents)
 }
 \arguments{
-\item{extents}{Value supplied to \code{\link[=set_axis_extents]{set_axis_extents()}}.}
+\item{extents}{A proposed \code{axis_extents} value.}
 }
 \value{
 \code{TRUE}, invisibly.

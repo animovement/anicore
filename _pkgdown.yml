@@ -48,55 +48,48 @@ reference:
       - ensure_is_anievent
       - validate_anievent
 
-  - title: "Metadata handling"
+  - title: "Metadata"
     desc: >
-      Functions for reading, setting, and retrieving the metadata
-      attached to aniframe or anievent objects.
+      Read and declare metadata. `set_*` only declares; it never changes a
+      value.
     contents:
       - get_metadata
       - set_metadata
-      - get_unit_time
-      - set_unit_time
-      - get_unit_space
-      - set_unit_space
-      - get_unit_angle
-      - set_unit_angle
-      - get_sampling_rate
-      - set_sampling_rate
+      - list_default_metadata
       - get_sampling_interval
       - is_sampling_regular
       - get_axis_directions
       - set_axis_directions
-      - get_axis_extents
-      - set_axis_extents
       - get_angle_direction
-      - set_angle_direction
       - get_handedness
-      - set_handedness
-      - list_default_metadata
+      - get_coordinate_system
 
   - title: "Declaring variables"
     desc: >
-      Declare which columns carry identity, time and position. These are
-      the frame's structure rather than a description of it, so the
-      setters restructure the frame to match — coercing column types,
-      relocating, reordering, regrouping, and refreshing derived fields.
-      `set_metadata()` refuses these fields for that reason.
+      Declare which columns carry identity, time, position and events. The
+      setters restructure the frame to match, so `set_metadata()` refuses
+      these fields.
     contents:
       - variables
-      - variables_event
+      - get_keys
       - get_index
       - set_index
       - get_axes
-      - set_axes
-      - get_coordinate_system
+
+  - title: "Transforming values"
+    desc: >
+      Functions that change values and update the metadata to match.
+    contents:
+      - convert_unit_space
+      - convert_unit_time
+      - convert_unit_angle
+      - reflect_axis
 
   - title: "Connections"
     desc: >
       Manage connections between identity or temporal variables (e.g.
       skeleton edges between keypoints, or social-network edges between
-      individuals). Stored as a named list of `from`/`to` tibbles in
-      `metadata$connections`.
+      individuals). Stored in the `structure` metadata category.
     contents:
       - set_connections
       - get_connections
@@ -106,8 +99,8 @@ reference:
   - title: "Spatial checks"
     desc: |
       These functions provide checks for your coordinate system.
-      `is_spatial()` and `ensure_is_spatial()` check that the columns named
-      in `variables_where` are present and numeric; the `is_cartesian*()`
+      `is_spatial()` and `ensure_is_spatial()` check that the declared
+      position columns are present and numeric; the `is_cartesian*()`
       family reports which coordinate system the frame is in, which follows
       from the axis roles it declares.
     contents:

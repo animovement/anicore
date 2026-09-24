@@ -14,8 +14,8 @@
 #'   * a 2-column data.frame with columns `from` and `to`,
 #'   * a list of length-2 character vectors (each `c(from, to)`),
 #'   * `NULL` to clear the connections for `variable`.
-#' @param variable Character scalar. Name of the identity (`variables_what`)
-#'   or temporal (`variables_when`) variable the connections relate to.
+#' @param variable Character scalar. Name of the `what` or `when` key the
+#'   connections relate to.
 #'   Defaults to `"keypoint"`.
 #'
 #' @return The anipoint with updated `connections` metadata.
@@ -133,7 +133,7 @@ get_connections <- function(data, variable = NULL) {
 #' @param to Character vector of target endpoints. Must be the same length
 #'   as `from`.
 #' @param variable Character scalar. Name of the variable the connections
-#'   relate to (must be in `variables_what` or `variables_when`). Defaults
+#'   relate to (must be a `what` or `when` key). Defaults
 #'   to `"keypoint"`.
 #'
 #' @return The anipoint with the new connections appended.

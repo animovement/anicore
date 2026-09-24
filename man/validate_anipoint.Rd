@@ -22,11 +22,9 @@ invariants are therefore checked rather than assumed:
 \details{
 \itemize{
 \item the index column is present and numeric — hard error;
-\item every column named in \code{variables_what}, \code{variables_when},
-\code{variables_where} and \code{variables_event} is present in the data —
-hard error;
-\item every column named in \code{variables_where} is numeric — hard error;
-\item \code{coordinate_system} agrees with \code{variables_where} — \strong{warning}
+\item every declared column is present in the data — hard error;
+\item every position column is numeric — hard error;
+\item \code{coordinate_system} agrees with the axis roles — \strong{warning}
 only. The frame is still usable, and the field is derived rather
 than declared, so it can be refreshed;
 \item identity, temporal context and the index together name one

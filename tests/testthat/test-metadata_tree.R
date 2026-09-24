@@ -202,17 +202,17 @@ test_that("get_connections() answers empty on legacy flat metadata", {
   expect_equal(get_connections(data), list())
 })
 
-test_that("get_unit_angle() is NA on an anievent", {
-  expect_true(is.na(get_unit_angle(ae())))
+test_that("unit_angle is absent on an anievent", {
+  expect_null(get_metadata(ae(), "unit_angle"))
 })
 
 test_that("the flat variables names are refused with a redirect", {
-  expect_error(get_metadata(af(), "variables_what"), "get_variables_what")
+  expect_error(get_metadata(af(), "variables_what"), "get_variables")
   expect_error(get_metadata(af(), "connections"), "get_connections")
 })
 
-test_that("set_metadata() refuses axes with a pointer at set_axes", {
-  expect_error(set_metadata(af(), axes = c(x = "x")), "set_axes")
+test_that("set_metadata() refuses axes with a pointer at set_variables", {
+  expect_error(set_metadata(af(), axes = c(x = "x")), "set_variables")
 })
 
 test_that("md_field_set() rejects an unknown field", {
@@ -296,8 +296,8 @@ test_that("setters that edit the variables work on legacy flat metadata", {
   expect_equal(get_index(x), "frame")
   expect_equal(get_metadata(x, "sampling_rate"), 25)
 
-  x <- set_variables_event(dplyr::mutate(af, b = "a"), state = "b")
-  expect_equal(get_variables_event(x)$state, "b")
+  x <- set_variables(dplyr::mutate(af, b = "a"), event = list(state = "b"))
+  expect_equal(get_variables(x)$event$state, "b")
 
   x <- suppressWarnings(set_connections(af, list(c("head", "tail"))))
   expect_length(get_connections(x), 1)
@@ -322,7 +322,7 @@ test_that("a pre-#73 anievent with spatial fields migrates and stays writable", 
 
 test_that("to_anievent() works from an anipoint with legacy metadata", {
   af <- legacy_anipoint(sampling_rate = 25)
-  af <- set_variables_event(dplyr::mutate(af, b = "r"), state = "b")
+  af <- set_variables(dplyr::mutate(af, b = "r"), event = list(state = "b"))
   expect_equal(get_metadata(to_anievent(af), "sampling_rate"), 25)
 })
 
@@ -335,7 +335,7 @@ test_that("$<- and [[<- on the metadata object write into the tree", {
 
   x <- set_metadata(af(), metadata = md)
   expect_equal(get_metadata(x, "sampling_rate"), 99)
-  expect_equal(get_unit_space(x), "mm")
+  expect_equal(as.character(get_metadata(x, "unit_space")), "mm")
   expect_error(md$not_a_field <- 1, "not a metadata field")
 })
 

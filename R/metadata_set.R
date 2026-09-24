@@ -37,11 +37,14 @@ ensure_no_declaration_fields <- function(user_md) {
         switch(
           field,
           variables_index = "set_index",
-          variables = "set_variables_what",
-          axes = "set_axes",
+          variables = ,
+          variables_what = ,
+          variables_when = ,
+          variables_where = ,
+          variables_event = ,
+          axes = "set_variables",
           structure = "set_connections",
-          connections = "set_connections",
-          paste0("set_", field)
+          connections = "set_connections"
         )
       },
       character(1)
@@ -169,7 +172,7 @@ set_metadata <- function(data, ..., metadata = NULL) {
     if (is.factor(default_val)) {
       if (is.character(user_md[[n]]) || is.factor(user_md[[n]])) {
         value <- as.character(user_md[[n]])
-        if (!value %in% levels(default_val)) {
+        if (length(value) != 1L || !value %in% levels(default_val)) {
           cli::cli_abort(
             "Metadata field {.field {n}} can only be {.val {levels(default_val)}} not {.val {value}}."
           )
@@ -201,6 +204,44 @@ set_metadata <- function(data, ..., metadata = NULL) {
   for (n in names(user_md)) {
     new_md <- md_field_set(new_md, n, user_md[[n]])
   }
+  new_md <- check_orientation_fields(data, new_md, user_md)
 
   write_metadata(data, new_md)
+}
+
+
+#' Validate the orientation fields being written, and keep handedness in step
+#'
+#' @param data The frame being written to.
+#' @param md The metadata about to be written.
+#' @param user_md The fields the caller supplied.
+#'
+#' @return `md`.
+#' @keywords internal
+check_orientation_fields <- function(data, md, user_md) {
+  if ("axis_extents" %in% names(user_md)) {
+    ensure_valid_axis_extents(user_md$axis_extents)
+    extents <- user_md$axis_extents
+    extents <- stats::setNames(as.numeric(extents), names(extents))
+    md <- md_field_set(md, "axis_extents", extents[!is.na(extents)])
+    if (has_metadata(data)) {
+      warn_short_axis_extents(data, md_field(md, "axis_extents"))
+    }
+  }
+  if ("axis_directions" %in% names(user_md)) {
+    directions <- user_md$axis_directions
+    ensure_valid_axis_directions(directions)
+    directions <- stats::setNames(as.character(directions), names(directions))
+    directions <- directions[!is.na(directions)]
+    md <- md_field_set(md, "axis_directions", directions)
+    settled <- derive_handedness(directions)
+    if (!identical(settled, "unknown") && !"handedness" %in% names(user_md)) {
+      md <- md_field_set(
+        md,
+        "handedness",
+        as_metadata_factor(settled, "handedness")
+      )
+    }
+  }
+  md
 }

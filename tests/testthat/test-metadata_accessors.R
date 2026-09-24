@@ -1,47 +1,45 @@
-# Getters for the fields that already had setters (#121), so downstream
-# stops naming metadata fields as literals.
+# Metadata written by the setters and converters reads back (#121).
 
-test_that("every field with a setter has a getter that reads it back", {
+test_that("get_axis_directions() reads the stored field", {
   af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1)
-
-  expect_equal(get_sampling_rate(af), get_metadata(af, "sampling_rate"))
   expect_equal(get_axis_directions(af), get_metadata(af, "axis_directions"))
-  expect_equal(get_axis_extents(af), get_metadata(af, "axis_extents"))
-  expect_equal(get_unit_space(af), as.character(get_metadata(af, "unit_space")))
-  expect_equal(get_unit_time(af), as.character(get_metadata(af, "unit_time")))
-  expect_equal(get_unit_angle(af), as.character(get_metadata(af, "unit_angle")))
 })
 
-test_that("the getters see what their setters wrote", {
+test_that("metadata reads back what the setters and converters wrote", {
   af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1)
 
-  expect_equal(get_sampling_rate(set_sampling_rate(af, 30)), 30)
-  expect_equal(get_axis_extents(set_axis_extents(af, c(y = 1080))), c(y = 1080))
+  expect_equal(
+    get_metadata(set_metadata(af, sampling_rate = 30), "sampling_rate"),
+    30
+  )
+  expect_equal(
+    get_metadata(set_metadata(af, axis_extents = c(y = 1080)), "axis_extents"),
+    c(y = 1080)
+  )
   expect_equal(
     get_axis_directions(set_axis_directions(af, c(x = "right")))[["x"]],
     "right"
   )
   expect_equal(
-    get_unit_space(set_unit_space(af, "mm", calibration_factor = 10)),
+    as.character(get_metadata(
+      convert_unit_space(af, "mm", calibration_factor = 10),
+      "unit_space"
+    )),
     "mm"
   )
   expect_equal(
-    get_unit_time(set_unit_time(af, "s", calibration_factor = 1 / 30)),
+    as.character(get_metadata(
+      convert_unit_time(af, "s", calibration_factor = 1 / 30),
+      "unit_time"
+    )),
     "s"
   )
 })
 
 test_that("the factor-backed getters return a bare character", {
-  # Returned as character so downstream needn't wrap them in as.character().
   af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
-  for (value in list(
-    get_unit_space(af),
-    get_unit_time(af),
-    get_unit_angle(af),
-    get_handedness(af),
-    get_angle_direction(af)
-  )) {
+  for (value in list(get_handedness(af), get_angle_direction(af))) {
     expect_type(value, "character")
     expect_length(value, 1)
   }
@@ -50,21 +48,21 @@ test_that("the factor-backed getters return a bare character", {
 test_that("the getters reject a plain data frame", {
   df <- data.frame(x = 1)
 
-  expect_error(get_sampling_rate(df), "not an aniframe")
-  expect_error(get_unit_space(df), "not an aniframe")
-  expect_error(get_axis_extents(df), "not an aniframe")
+  expect_error(get_metadata(df, "sampling_rate"), "hasn't been initiated")
+  expect_error(get_metadata(df, "unit_space"), "hasn't been initiated")
   expect_error(get_handedness(df), "not an aniframe")
+  expect_error(get_axis_directions(df), "not an aniframe")
 })
 
 test_that("they work on an anievent too, where the field applies", {
   ae <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     dplyr::mutate(b = factor(rep(c("r", "w"), each = 2))) |>
-    set_variables_event(state = "b") |>
+    set_variables(event = list(state = "b")) |>
     to_anievent()
 
-  expect_equal(get_unit_time(ae), as.character(get_metadata(ae, "unit_time")))
+  expect_type(as.character(get_metadata(ae, "unit_time")), "character")
   # An anievent has no spatial component, so these read as "not applicable".
-  expect_true(is.na(get_unit_space(ae)))
+  expect_null(get_metadata(ae, "unit_space"))
   expect_length(get_axis_directions(ae), 0)
   expect_equal(get_handedness(ae), "unknown")
 })

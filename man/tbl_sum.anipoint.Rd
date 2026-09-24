@@ -15,7 +15,7 @@
 Named character vector with summary information
 }
 \description{
-One row per \code{variables_what} and non-index \code{variables_when} column, plus
+One row per key column (see \code{\link[=get_keys]{get_keys()}}), plus
 event variables, sampling rate and the time interval.
 }
 \keyword{internal}

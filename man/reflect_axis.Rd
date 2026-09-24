@@ -2,21 +2,41 @@
 % Please edit documentation in R/axis_directions.R
 \name{reflect_axis}
 \alias{reflect_axis}
-\title{Reflect a spatial axis around a reference value}
+\title{Turn an axis over}
 \usage{
-reflect_axis(data, axis, reference)
+reflect_axis(data, axis)
 }
 \arguments{
-\item{data}{A data frame (typically an anipoint) containing \code{axis}.}
+\item{data}{An anipoint object.}
 
-\item{axis}{Name of the column to reflect.}
-
-\item{reference}{A single finite value to reflect around.}
+\item{axis}{An axis role: \code{"x"}, \code{"y"} or \code{"z"}.}
 }
 \value{
-The data with \code{axis} replaced by \code{reference - data[[axis]]}.
+The anipoint, reflected, with its orientation metadata updated.
 }
 \description{
-Reflect a spatial axis around a reference value
+Reflects the column carrying an axis role and flips its declared
+direction, so the data describes the same scene with the axis pointing
+the other way — for example converting image coordinates, where \code{y} runs
+down, to a \code{y} that runs up.
+
+An axis runs from zero to its extent, so turning it over gives
+\code{new = extent - old}. An axis with no declared \code{axis_extents} is centred
+on its origin, and turning it over negates it. On a frame that stores
+angles there is no column to reflect, and \code{phi} and \code{theta} are
+recomputed instead.
+
+A declared handedness flips with any linear axis.
 }
-\keyword{internal}
+\examples{
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- set_metadata(af, axis_extents = c(y = 1080))
+af <- set_axis_directions(af, c(x = "right", y = "down"))
+
+af <- reflect_axis(af, "y")
+get_axis_directions(af)
+
+}
+\seealso{
+\code{\link[=set_axis_directions]{set_axis_directions()}}, \code{\link[=get_handedness]{get_handedness()}}
+}

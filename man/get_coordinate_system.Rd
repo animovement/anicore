@@ -15,9 +15,9 @@ Length-one character vector: one of \code{"cartesian_1d"},
 \code{"spherical"} or \code{"unknown"}.
 }
 \description{
-Derived from the axis roles rather than declared: \code{\link[=set_axes]{set_axes()}} says
+Derived from the axis roles rather than declared: \code{\link[=set_variables]{set_variables()}} says
 which column carries which role, and the system follows from the set of
-roles present. It is therefore not writable — see \code{\link[=set_axes]{set_axes()}} to say
+roles present. It is therefore not writable — see \code{\link[=set_variables]{set_variables()}} to say
 what the columns mean, or \code{anispace}'s \verb{map_to_*()} functions to convert
 the coordinates themselves.
 }

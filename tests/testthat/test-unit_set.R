@@ -1,6 +1,6 @@
-# Test set_unit_space ----
+# Test convert_unit_space ----
 
-test_that("set_unit_space converts between standard units correctly", {
+test_that("convert_unit_space converts between standard units correctly", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     y = c(15, 25, 35),
@@ -10,7 +10,7 @@ test_that("set_unit_space converts between standard units correctly", {
     as_anipoint() |>
     set_metadata(unit_space = "mm")
 
-  result <- set_unit_space(data, to_unit = "cm")
+  result <- convert_unit_space(data, to_unit = "cm")
 
   expect_equal(result$x, c(1, 2, 3))
   expect_equal(result$y, c(1.5, 2.5, 3.5))
@@ -18,7 +18,7 @@ test_that("set_unit_space converts between standard units correctly", {
   expect_equal(get_metadata(result, "unit_space") |> as.character(), "cm")
 })
 
-test_that("set_unit_space converts mm to m correctly", {
+test_that("convert_unit_space converts mm to m correctly", {
   data <- dplyr::tibble(
     x = c(1000, 2000, 3000),
     y = c(500, 1000, 1500),
@@ -27,14 +27,14 @@ test_that("set_unit_space converts mm to m correctly", {
     as_anipoint() |>
     set_metadata(unit_space = "mm")
 
-  result <- set_unit_space(data, to_unit = "m")
+  result <- convert_unit_space(data, to_unit = "m")
 
   expect_equal(result$x, c(1, 2, 3))
   expect_equal(result$y, c(0.5, 1, 1.5))
   expect_equal(get_metadata(result, "unit_space") |> as.character(), "m")
 })
 
-test_that("set_unit_space converts cm to mm correctly", {
+test_that("convert_unit_space converts cm to mm correctly", {
   data <- dplyr::tibble(
     x = c(1, 2, 3),
     y = c(1.5, 2.5, 3.5),
@@ -43,14 +43,14 @@ test_that("set_unit_space converts cm to mm correctly", {
     as_anipoint() |>
     set_metadata(unit_space = "cm")
 
-  result <- set_unit_space(data, to_unit = "mm")
+  result <- convert_unit_space(data, to_unit = "mm")
 
   expect_equal(result$x, c(10, 20, 30))
   expect_equal(result$y, c(15, 25, 35))
   expect_equal(get_metadata(result, "unit_space") |> as.character(), "mm")
 })
 
-test_that("set_unit_space handles custom calibration factor", {
+test_that("convert_unit_space handles custom calibration factor", {
   data <- dplyr::tibble(
     x = c(100, 200, 300),
     y = c(150, 250, 350),
@@ -60,14 +60,14 @@ test_that("set_unit_space handles custom calibration factor", {
     set_metadata(unit_space = "px")
 
   # 1 pixel = 0.5 mm
-  result <- set_unit_space(data, to_unit = "mm", calibration_factor = 0.5)
+  result <- convert_unit_space(data, to_unit = "mm", calibration_factor = 0.5)
 
   expect_equal(result$x, c(50, 100, 150))
   expect_equal(result$y, c(75, 125, 175))
   expect_equal(get_metadata(result, "unit_space") |> as.character(), "mm")
 })
 
-test_that("set_unit_space warns when calibration_factor is 1 for px/unknown", {
+test_that("convert_unit_space from px errors without a calibration_factor", {
   data <- dplyr::tibble(
     x = c(100, 200, 300),
     y = c(150, 250, 350),
@@ -76,13 +76,10 @@ test_that("set_unit_space warns when calibration_factor is 1 for px/unknown", {
     as_anipoint() |>
     set_metadata(unit_space = "px")
 
-  expect_message(
-    set_unit_space(data, to_unit = "mm", calibration_factor = 1),
-    "calibration_factor is not set"
-  )
+  expect_error(convert_unit_space(data, to_unit = "mm"), "calibration_factor")
 })
 
-test_that("set_unit_space errors on invalid to_unit", {
+test_that("convert_unit_space errors on invalid to_unit", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1, 2, 3)
@@ -91,12 +88,12 @@ test_that("set_unit_space errors on invalid to_unit", {
     set_metadata(unit_space = "mm")
 
   expect_error(
-    set_unit_space(data, to_unit = "invalid_unit"),
+    convert_unit_space(data, to_unit = "invalid_unit"),
     "Space unit can only be"
   )
 })
 
-test_that("set_unit_space handles missing spatial columns gracefully", {
+test_that("convert_unit_space handles missing spatial columns gracefully", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1, 2, 3)
@@ -104,14 +101,14 @@ test_that("set_unit_space handles missing spatial columns gracefully", {
     as_anipoint() |>
     set_metadata(unit_space = "mm")
 
-  result <- set_unit_space(data, to_unit = "cm")
+  result <- convert_unit_space(data, to_unit = "cm")
 
   expect_equal(result$x, c(1, 2, 3))
   expect_false("y" %in% names(result))
   expect_false("z" %in% names(result))
 })
 
-test_that("set_unit_space preserves non-spatial columns", {
+test_that("convert_unit_space preserves non-spatial columns", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     y = c(15, 25, 35),
@@ -122,16 +119,16 @@ test_that("set_unit_space preserves non-spatial columns", {
     as_anipoint() |>
     set_metadata(unit_space = "mm")
 
-  result <- set_unit_space(data, to_unit = "cm")
+  result <- convert_unit_space(data, to_unit = "cm")
 
   expect_equal(result$id, c("a", "b", "c"))
   expect_equal(result$value, c(100, 200, 300))
   expect_equal(result$time, c(1, 2, 3))
 })
 
-# Test set_unit_time ----
+# Test convert_unit_time ----
 
-test_that("set_unit_time converts between standard units correctly", {
+test_that("convert_unit_time converts between standard units correctly", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     y = c(15, 25, 35),
@@ -140,13 +137,13 @@ test_that("set_unit_time converts between standard units correctly", {
     as_anipoint() |>
     set_metadata(unit_time = "s")
 
-  result <- set_unit_time(data, to_unit = "ms")
+  result <- convert_unit_time(data, to_unit = "ms")
 
   expect_equal(result$time, c(1000, 2000, 3000))
   expect_equal(get_metadata(result, "unit_time") |> as.character(), "ms")
 })
 
-test_that("set_unit_time converts ms to s correctly", {
+test_that("convert_unit_time converts ms to s correctly", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1000, 2000, 3000)
@@ -154,13 +151,13 @@ test_that("set_unit_time converts ms to s correctly", {
     as_anipoint() |>
     set_metadata(unit_time = "ms")
 
-  result <- set_unit_time(data, to_unit = "s")
+  result <- convert_unit_time(data, to_unit = "s")
 
   expect_equal(result$time, c(1, 2, 3))
   expect_equal(get_metadata(result, "unit_time") |> as.character(), "s")
 })
 
-test_that("set_unit_time converts s to m correctly", {
+test_that("convert_unit_time converts s to m correctly", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(60, 120, 180)
@@ -168,13 +165,13 @@ test_that("set_unit_time converts s to m correctly", {
     as_anipoint() |>
     set_metadata(unit_time = "s")
 
-  result <- set_unit_time(data, to_unit = "m")
+  result <- convert_unit_time(data, to_unit = "m")
 
   expect_equal(result$time, c(1, 2, 3))
   expect_equal(get_metadata(result, "unit_time") |> as.character(), "m")
 })
 
-test_that("set_unit_time converts m to h correctly", {
+test_that("convert_unit_time converts m to h correctly", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(60, 120, 180)
@@ -182,13 +179,13 @@ test_that("set_unit_time converts m to h correctly", {
     as_anipoint() |>
     set_metadata(unit_time = "m")
 
-  result <- set_unit_time(data, to_unit = "h")
+  result <- convert_unit_time(data, to_unit = "h")
 
   expect_equal(result$time, c(1, 2, 3))
   expect_equal(get_metadata(result, "unit_time") |> as.character(), "h")
 })
 
-test_that("set_unit_time converts h to s correctly", {
+test_that("convert_unit_time converts h to s correctly", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1, 2, 3)
@@ -196,13 +193,13 @@ test_that("set_unit_time converts h to s correctly", {
     as_anipoint() |>
     set_metadata(unit_time = "h")
 
-  result <- set_unit_time(data, to_unit = "s")
+  result <- convert_unit_time(data, to_unit = "s")
 
   expect_equal(result$time, c(3600, 7200, 10800))
   expect_equal(get_metadata(result, "unit_time") |> as.character(), "s")
 })
 
-test_that("set_unit_time handles custom calibration factor", {
+test_that("convert_unit_time handles custom calibration factor", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(0, 1, 2)
@@ -211,13 +208,13 @@ test_that("set_unit_time handles custom calibration factor", {
     set_metadata(unit_time = "frame")
 
   # 30 fps
-  result <- set_unit_time(data, to_unit = "s", calibration_factor = 1 / 30)
+  result <- convert_unit_time(data, to_unit = "s", calibration_factor = 1 / 30)
 
   expect_equal(result$time, c(0, 1 / 30, 2 / 30))
   expect_equal(get_metadata(result, "unit_time") |> as.character(), "s")
 })
 
-test_that("set_unit_time warns when calibration_factor is 1 for frame/unknown", {
+test_that("convert_unit_time from frame errors without a calibration_factor or rate", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1, 2, 3)
@@ -225,13 +222,10 @@ test_that("set_unit_time warns when calibration_factor is 1 for frame/unknown", 
     as_anipoint() |>
     set_metadata(unit_time = "frame")
 
-  expect_message(
-    set_unit_time(data, to_unit = "s", calibration_factor = 1),
-    "calibration_factor is not set"
-  )
+  expect_error(convert_unit_time(data, to_unit = "s"), "calibration_factor")
 })
 
-test_that("set_unit_time errors on invalid to_unit", {
+test_that("convert_unit_time errors on invalid to_unit", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     time = c(1, 2, 3)
@@ -240,12 +234,12 @@ test_that("set_unit_time errors on invalid to_unit", {
     set_metadata(unit_time = "s")
 
   expect_error(
-    set_unit_time(data, to_unit = "invalid_unit"),
-    "Time unit can only be"
+    convert_unit_time(data, to_unit = "invalid_unit"),
+    "can only be converted to"
   )
 })
 
-test_that("set_unit_time preserves spatial and other columns", {
+test_that("convert_unit_time preserves spatial and other columns", {
   data <- dplyr::tibble(
     x = c(10, 20, 30),
     y = c(15, 25, 35),
@@ -257,7 +251,7 @@ test_that("set_unit_time preserves spatial and other columns", {
     as_anipoint() |>
     set_metadata(unit_time = "s")
 
-  result <- set_unit_time(data, to_unit = "ms")
+  result <- convert_unit_time(data, to_unit = "ms")
 
   expect_equal(result$x, c(10, 20, 30))
   expect_equal(result$y, c(15, 25, 35))
@@ -295,39 +289,6 @@ test_that("list_conversion_factors_space has correct conversion values", {
   expect_equal(result["cm", "m"], 100)
 })
 
-# Test list_conversion_factors_time ----
-
-test_that("list_conversion_factors_time returns correct matrix structure", {
-  result <- list_conversion_factors_time()
-
-  expect_true(is.matrix(result))
-  expect_equal(dim(result), c(4, 4))
-  expect_equal(rownames(result), c("ms", "s", "m", "h"))
-  expect_equal(colnames(result), c("ms", "s", "m", "h"))
-})
-
-test_that("list_conversion_factors_time has correct diagonal values", {
-  result <- list_conversion_factors_time()
-
-  expect_equal(diag(result) |> as.vector(), c(1, 1, 1, 1))
-})
-
-test_that("list_conversion_factors_time has correct conversion values", {
-  result <- list_conversion_factors_time()
-
-  # Indexed [to, from].
-  expect_equal(result["s", "ms"], 1 / 1000)
-  expect_equal(result["m", "ms"], 1 / (1000 * 60))
-  expect_equal(result["h", "ms"], 1 / (1000 * 60 * 60))
-  expect_equal(result["ms", "s"], 1000)
-  expect_equal(result["m", "s"], 1 / 60)
-  expect_equal(result["h", "s"], 1 / (60 * 60))
-  expect_equal(result["s", "m"], 60)
-  expect_equal(result["h", "m"], 1 / 60)
-  expect_equal(result["m", "h"], 60)
-  expect_equal(result["s", "h"], 60 * 60)
-})
-
 # Test get_conversion_factor_space ----
 
 test_that("get_conversion_factor_space returns correct values", {
@@ -358,6 +319,20 @@ test_that("get_conversion_factor_time returns correct values", {
   expect_equal(get_conversion_factor_time("h", "s"), 3600)
 })
 
+test_that("get_conversion_factor_time covers ns and us", {
+  expect_equal(get_conversion_factor_time("ns", "s"), 1e-9)
+  expect_equal(get_conversion_factor_time("us", "ms"), 1e-3)
+  expect_equal(get_conversion_factor_time("s", "us"), 1e6)
+})
+
+test_that("convert_unit_time refuses frame and unknown as targets", {
+  data <- dplyr::tibble(x = 1:3, time = c(1, 2, 3)) |>
+    as_anipoint() |>
+    set_metadata(unit_time = "s")
+  expect_error(convert_unit_time(data, "frame"), "can only be converted to")
+  expect_error(convert_unit_time(data, "unknown"), "can only be converted to")
+})
+
 test_that("get_conversion_factor_time returns 1 for same units", {
   expect_equal(get_conversion_factor_time("ms", "ms"), 1)
   expect_equal(get_conversion_factor_time("s", "s"), 1)
@@ -367,7 +342,7 @@ test_that("get_conversion_factor_time returns 1 for same units", {
 
 # Length axes vs angular axes (#98) ----
 
-test_that("set_unit_space converts rho on a polar frame", {
+test_that("convert_unit_space converts rho on a polar frame", {
   data <- anipoint(
     individual = "a",
     time = 1:3,
@@ -375,15 +350,19 @@ test_that("set_unit_space converts rho on a polar frame", {
     phi = c(0, 1, 2)
   )
 
-  result <- set_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10)
+  result <- convert_unit_space(
+    data,
+    to_unit = "cm",
+    calibration_factor = 1 / 10
+  )
 
-  # phi is an angle, owned by set_unit_angle().
+  # phi is an angle, owned by convert_unit_angle().
   expect_equal(result$rho, c(10, 20, 30))
   expect_equal(result$phi, c(0, 1, 2))
   expect_equal(as.character(get_metadata(result, "unit_space")), "cm")
 })
 
-test_that("set_unit_space converts both length axes of a cylindrical frame", {
+test_that("convert_unit_space converts both length axes of a cylindrical frame", {
   # Selecting by name used to convert z but not rho, leaving one system in
   # two units (#98).
   data <- anipoint(
@@ -394,14 +373,18 @@ test_that("set_unit_space converts both length axes of a cylindrical frame", {
     z = c(10, 20, 30)
   )
 
-  result <- set_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10)
+  result <- convert_unit_space(
+    data,
+    to_unit = "cm",
+    calibration_factor = 1 / 10
+  )
 
   expect_equal(result$rho, c(10, 20, 30))
   expect_equal(result$z, c(1, 2, 3))
   expect_equal(result$phi, c(0, 1, 2))
 })
 
-test_that("set_unit_space converts rho on a spherical frame and leaves both angles", {
+test_that("convert_unit_space converts rho on a spherical frame and leaves both angles", {
   data <- anipoint(
     individual = "a",
     time = 1:3,
@@ -410,14 +393,18 @@ test_that("set_unit_space converts rho on a spherical frame and leaves both angl
     theta = c(0, 0.5, 1)
   )
 
-  result <- set_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10)
+  result <- convert_unit_space(
+    data,
+    to_unit = "cm",
+    calibration_factor = 1 / 10
+  )
 
   expect_equal(result$rho, c(10, 20, 30))
   expect_equal(result$phi, c(0, 1, 2))
   expect_equal(result$theta, c(0, 0.5, 1))
 })
 
-test_that("set_unit_space warns rather than silently claiming a unit it did not apply", {
+test_that("convert_unit_space warns rather than silently claiming a unit it did not apply", {
   # With coordinate_system "unknown" a length can't be told from an angle, so
   # converting nothing while updating the metadata would repeat #98.
   data <- suppressWarnings(as_anipoint(
@@ -426,7 +413,7 @@ test_that("set_unit_space warns rather than silently claiming a unit it did not 
   ))
 
   expect_warning(
-    set_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10),
+    convert_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10),
     "No length axes found"
   )
 })
@@ -437,4 +424,16 @@ test_that("get_system_axes() splits each coordinate system into lengths and angl
   expect_equal(get_system_axes("cylindrical"), c("rho", "z"))
   expect_equal(get_system_axes("spherical"), "rho")
   expect_equal(get_system_axes("unknown"), character())
+})
+
+test_that("convert_unit_space() to px needs a calibration factor", {
+  af <- set_metadata(example_anipoint(n_obs = 3), unit_space = "mm")
+  expect_error(convert_unit_space(af, "px"), "calibration_factor")
+  expect_equal(
+    as.character(get_metadata(
+      convert_unit_space(af, "px", calibration_factor = 2),
+      "unit_space"
+    )),
+    "px"
+  )
 })
