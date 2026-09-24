@@ -1,9 +1,6 @@
 # Spatial columns that are missing or not numeric
 
-The shared kernel behind
-[`is_spatial()`](https://animovement.dev/anicore/reference/is_spatial.md)
-and
-[`ensure_is_spatial()`](https://animovement.dev/anicore/reference/ensure_is_spatial.md).
+Spatial columns that are missing or not numeric
 
 ## Usage
 
@@ -15,7 +12,7 @@ find_spatial_problems(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 

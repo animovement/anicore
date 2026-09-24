@@ -1,8 +1,6 @@
 # String-keyed kernel shared by `to_anievent` methods
 
-Walks `state_cols` and `point_cols`, encodes each via the run-length /
-point-pick helpers, binds the bouts together, and casts the result via
-[`as_anievent()`](https://animovement.dev/anicore/reference/as_anievent.md).
+String-keyed kernel shared by `to_anievent` methods
 
 ## Usage
 

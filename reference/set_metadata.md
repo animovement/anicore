@@ -5,32 +5,16 @@ can be provided either as named arguments or as a list. If the object
 already has metadata, the new values will be merged with existing
 values, with new values taking precedence.
 
+Fields are written by their own name wherever they live in the category
+tree (see
+[`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md)):
+`set_metadata(data, sampling_rate = 30)` lands in `time`,
+`set_metadata(data, handedness = "left")` in `space`. Categories
+themselves are not writable, and the variable declaration goes through
+its dedicated setters.
+
 Character values for factor fields will be automatically converted to
 factors if they match allowed levels.
-
-Default metadata fields include:
-
-- `source`: Data source identifier
-
-- `source_version`: Version of the software that wrote the file, where
-  the file states one
-
-- `source_format`: The export layout the file was read as
-
-- `filename`: Original filename(s) — accepts a character vector (length
-  1 or more) for readers that load from multiple files
-
-- `sampling_rate`: Sampling rate in Hz
-
-- `start_datetime`: Start date and time of recording
-
-- `reference_frame`: Reference frame (default: "allocentric")
-
-- `coordinate_system`: Coordinate system (default: "cartesian")
-
-- `axis_directions`: Which way each axis points, keyed by axis role
-
-- `axis_extents`: How far each axis runs, keyed by axis role
 
 ## Usage
 

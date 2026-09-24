@@ -1,8 +1,6 @@
 # The gaps between consecutive index values, within each key
 
-Diffed per key – identity plus temporal context – because the index
-restarts in each group. A frame that is perfectly regular within every
-track looks wildly irregular pooled.
+Per key, because the index restarts in each group.
 
 ## Usage
 
@@ -14,7 +12,7 @@ compute_sampling_gaps(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,9 +38,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/aniframe-structure.html">The aniframe data structure</a></li>
+<li><a class="dropdown-item" href="../articles/aniframe-structure.html">The anipoint data structure</a></li>
     <li><a class="dropdown-item" href="../articles/aniframe-metadata.html">Metadata on an aniframe</a></li>
-    <li><a class="dropdown-item" href="../articles/aniframe-connections.html">Connections</a></li>
+    <li><a class="dropdown-item" href="../articles/orientation.html">Orientation</a></li>
+    <li><a class="dropdown-item" href="../articles/structures.html">Structures</a></li>
     <li><a class="dropdown-item" href="../articles/anievent-structure.html">The anievent data structure</a></li>
   </ul>
 </li>
@@ -101,9 +102,9 @@
 </div>
 <section class="level2"><h2 id="at-a-glance">At a glance<a class="anchor" aria-label="anchor" href="#at-a-glance"></a>
 </h2>
-<p>An <code>anievent</code> is the sibling of <a href="aniframe-structure.html"><code>aniframe</code></a> for <strong>behavioural events</strong>: sleep bouts, vocalisations, manual scoring from BORIS, the output of segmentation models.</p>
-<p>Each row is one <strong>event</strong>. An event sits in a <strong>channel</strong> (where it is, as a soft convention, mutually exclusive with other events on the same channel), has a <strong>type</strong> — either <code>"state"</code> (durative) or <code>"point"</code> (instant) — and carries a <strong>label</strong> identifying which event it is. Each event has a <strong>start</strong> and a <strong>stop</strong> time (identical for point events). Just like an <code>aniframe</code>, the event is <em>performed by something</em> (identity columns, declared via <code>variables_what</code>) at <em>some time</em> (temporal-grouping columns, declared via <code>variables_when</code>).</p>
-<p>The class is a true sibling — it does <strong>not</strong> inherit from <code>aniframe</code>, but it shares the metadata substrate, so <code><a href="../reference/get_metadata.html">get_metadata()</a></code>, <code><a href="../reference/set_metadata.html">set_metadata()</a></code>, and the rest of the metadata API work on both.</p>
+<p>An <code>anievent</code> is the sibling of <a href="aniframe-structure.html"><code>anipoint</code></a> for <strong>behavioural events</strong>: sleep bouts, vocalisations, manual scoring from BORIS, the output of segmentation models.</p>
+<p>Each row is one <strong>event</strong>. An event sits in a <strong>channel</strong> (where it is, as a soft convention, mutually exclusive with other events on the same channel), has a <strong>type</strong> — either <code>"state"</code> (durative) or <code>"point"</code> (instant) — and carries a <strong>label</strong> identifying which event it is. Each event has a <strong>start</strong> and a <strong>stop</strong> time (identical for point events). Just like an <code>anipoint</code>, the event is <em>performed by something</em> (identity columns, the <code>what</code> keys) at <em>some time</em> (temporal-grouping columns, the <code>when</code> keys).</p>
+<p>Both classes inherit from the abstract <code>aniframe</code> parent, which carries the shared substrate — so <code><a href="../reference/get_metadata.html">get_metadata()</a></code>, <code><a href="../reference/set_metadata.html">set_metadata()</a></code>, the dplyr methods, and the rest of the family API work on both.</p>
 </section><section class="level2"><h2 id="channels">Channels<a class="anchor" aria-label="anchor" href="#channels"></a>
 </h2>
 <p>A <strong>channel</strong> is a single mutually-exclusive categorical track of behaviour. Within one channel, a subject can carry only one label at a time: a sleep-state channel is either <code>REM</code> or <code>wake</code>, never both simultaneously. If two behaviours <strong>can</strong> co-occur — say grooming while walking — they belong on <strong>separate channels</strong>, not as two values of the same channel. That mutual-exclusivity constraint is what makes a channel a channel.</p>
@@ -199,11 +200,11 @@
 </tr>
 </tbody>
 </table>
-<p>Identity columns are auto-detected from a known list (<code>model</code>, <code>individual</code>, <code>subject</code>, <code>track</code>, <code>keypoint</code>) — the same list <code>aniframe</code> uses, so identity means the same thing on both sides — or you can supply any name via <code>variables_what</code>. An <code>anievent</code> with no identity column at all is fine for single-subject experiments.</p>
+<p>Identity columns are auto-detected from a known list (<code>model</code>, <code>individual</code>, <code>subject</code>, <code>track</code>, <code>keypoint</code>) — the same list <code>anipoint</code> uses, so identity means the same thing on both sides — or you can supply any name via <code>variables_what</code>. An <code>anievent</code> with no identity column at all is fine for single-subject experiments.</p>
 <p><code>type</code> is auto-derived from <code>start</code>/<code>stop</code> at construction. Classification is <strong>per <code>(channel, label)</code> group</strong>, not per row: a group is labelled <code>"point"</code> only when <em>all</em> of its bouts have <code>start == stop</code>. If even one bout in the group is durative, the whole group is <code>"state"</code> — so the same behaviour stays consistently typed across its occurrences. Pass <code>type</code> explicitly to override this default.</p>
 <section class="level3"><h3 id="multiple-observations-trials-sessions">Multiple observations / trials / sessions<a class="anchor" aria-label="anchor" href="#multiple-observations-trials-sessions"></a>
 </h3>
-<p>Behavioural coding often spans several clips or trials, each with its own time origin (<code>start = 0</code> means “the start of <em>this</em> clip”, not “the start of the experiment”). To carry that context, add an <code>observation</code>, <code>session</code>, or <code>trial</code> column — those three names are auto-detected into <code>variables_when</code> alongside <code>start</code> and <code>stop</code>, and the column is coerced to factor / integer the same way aniframe does it:</p>
+<p>Behavioural coding often spans several clips or trials, each with its own time origin (<code>start = 0</code> means “the start of <em>this</em> clip”, not “the start of the experiment”). To carry that context, add an <code>observation</code>, <code>session</code>, or <code>trial</code> column — those three names are auto-detected as <code>when</code> keys, next to the <code>start</code>/<code>stop</code> interval, and the column is coerced to factor / integer the same way anipoint does it:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ae_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anievent.html">anievent</a></span><span class="op">(</span></span>
@@ -214,8 +215,8 @@
 <span>  start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">14</span>, <span class="fl">1</span>, <span class="fl">7</span><span class="op">)</span>,</span>
 <span>  stop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9</span>, <span class="fl">19</span>, <span class="fl">5</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">ae_multi</span>, <span class="st">"variables_when"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "observation" "start"       "stop"</span></span>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">ae_multi</span>, <span class="st">"when"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "start"       "stop"        "observation"</span></span>
 <span><span class="va">ae_multi</span></span>
 <span><span class="co">#&gt; # anievent:       4 × 7</span></span>
 <span><span class="co">#&gt; # Individuals:    1</span></span>
@@ -231,7 +232,7 @@
 <p>The <code>start</code>/<code>stop</code> values are local to each observation — both clips have an event starting near the beginning, but those are separate moments in real time. Anything downstream that needs to combine clips onto a shared timeline (plots, cross-clip metrics) will need an observation-level offset table; the class itself just carries the key.</p>
 </section><section class="level3"><h3 id="time-unit">Time unit<a class="anchor" aria-label="anchor" href="#time-unit"></a>
 </h3>
-<p><code>unit_time</code> is carried in the shared metadata substrate, so an <code>anievent</code> declares the unit of its <code>start</code>/<code>stop</code> values just like an <code>aniframe</code> declares the unit of its <a href="aniframe-structure.html#the-index">index column</a> (<code>"frame"</code>, <code>"ms"</code>, <code>"s"</code>, <code>"m"</code>, <code>"h"</code>, …). <code><a href="../reference/set_unit_time.html">set_unit_time()</a></code> and <code><a href="../reference/set_sampling_rate.html">set_sampling_rate()</a></code> dispatch on both classes — on an anievent they scale <code>start</code> and <code>stop</code> instead of the index:</p>
+<p><code>unit_time</code> is carried in the shared metadata substrate, so an <code>anievent</code> declares the unit of its <code>start</code>/<code>stop</code> values just like an <code>anipoint</code> declares the unit of its <a href="aniframe-structure.html#the-index">index column</a> (<code>"frame"</code>, <code>"ms"</code>, <code>"s"</code>, <code>"m"</code>, <code>"h"</code>, …). <code><a href="../reference/convert_unit_time.html">convert_unit_time()</a></code> works on both classes — on an anievent it scales <code>start</code> and <code>stop</code> instead of the index:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ae_frames</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anievent.html">anievent</a></span><span class="op">(</span></span>
@@ -241,7 +242,9 @@
 <span>  start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">150</span><span class="op">)</span>,</span>
 <span>  stop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">ae_seconds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_sampling_rate.html">set_sampling_rate</a></span><span class="op">(</span><span class="va">ae_frames</span>, sampling_rate <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">ae_seconds</span> <span class="op">&lt;-</span> <span class="va">ae_frames</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/set_metadata.html">set_metadata</a></span><span class="op">(</span>sampling_rate <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/convert_unit_time.html">convert_unit_time</a></span><span class="op">(</span><span class="st">"s"</span><span class="op">)</span></span>
 <span><span class="va">ae_seconds</span></span>
 <span><span class="co">#&gt; # anievent:       2 × 6</span></span>
 <span><span class="co">#&gt; # Individuals:    1</span></span>
@@ -265,11 +268,11 @@
 <p>The <code>anievent</code> class is intentionally <strong>type-agnostic</strong>: it does not require you to declare which channels are state and which are point. The <code>channel</code> column already names the channels, and the duration of each row tells you everything the class needs.</p>
 <p>Type only becomes load-bearing at conversion / plotting / metric time:</p>
 <ul>
-<li>when converting an <code>anievent</code> to a per-frame <code>aniframe</code> (so the conversion knows whether to fill the whole interval or just a single frame),</li>
+<li>when converting an <code>anievent</code> to a per-frame <code>anipoint</code> (so the conversion knows whether to fill the whole interval or just a single frame),</li>
 <li>when plotting (state → coloured band; point → marker),</li>
 <li>when computing metrics that differ by type.</li>
 </ul>
-<p>Those operations live in companion packages (<code>animetric</code>, <code>anivis</code>) and will accept type declarations at call time. On the <code>aniframe</code> side the distinction can be recorded explicitly with <code>set_variables_event(state = ..., point = ...)</code>, but the <code>anievent</code> class itself does not enforce it — an anievent has no <code>variables_event</code> of its own, since its events are already encoded in <code>channel</code> and <code>label</code>.</p>
+<p>Those operations live in companion packages (<code>animetric</code>, <code>anivis</code>) and will accept type declarations at call time. On the <code>anipoint</code> side the distinction can be recorded explicitly with <code>set_variables(event = list(state = ..., point = ...))</code>, but the <code>anievent</code> class itself does not enforce it — an anievent has no <code>event</code> role of its own, since its events are already encoded in <code>channel</code> and <code>label</code>.</p>
 </section><section class="level2"><h2 id="modifiers">Modifiers<a class="anchor" aria-label="anchor" href="#modifiers"></a>
 </h2>
 <p>A <strong>modifier</strong> is a per-event attribute set at coding time — in BORIS, the values chosen from a behaviour’s modifier sets. A grooming bout might carry the values <code>"limb"</code> and <code>"whisker"</code>; an alarm call might carry <code>"high"</code>.</p>
@@ -378,13 +381,13 @@
 <code>call</code> is a sparse factor passed to <code>point</code> → one bout per non-<code>NA</code> frame with <code>start == stop</code>.</li>
 </ul>
 <p>The channel name always comes from the column name. Use <code>state</code> vs <code>point</code> to pick how the column is interpreted — the value-shape (factor / character / logical) is handled internally.</p>
-</section><section class="level3"><h3 id="from-an-aniframe">From an <code>aniframe</code>
-<a class="anchor" aria-label="anchor" href="#from-an-aniframe"></a>
+</section><section class="level3"><h3 id="from-an-anipoint">From an <code>anipoint</code>
+<a class="anchor" aria-label="anchor" href="#from-an-anipoint"></a>
 </h3>
-<p>If you already have an <code>aniframe</code> with <code>variables_event</code> declared in metadata, <code><a href="../reference/to_anievent.html">to_anievent()</a></code> reads everything from there:</p>
+<p>If you already have an <code>anipoint</code> with an <code>event</code> role declared in metadata, <code><a href="../reference/to_anievent.html">to_anievent()</a></code> reads everything from there:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">8</span><span class="op">)</span>,</span>
 <span>  time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,</span>
 <span>  x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,</span>
@@ -394,7 +397,7 @@
 <span>    levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"REM"</span>, <span class="st">"wake"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variables_event.html">set_variables_event</a></span><span class="op">(</span><span class="va">af</span>, state <span class="op">=</span> <span class="st">"behaviour"</span><span class="op">)</span></span>
+<span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variables.html">set_variables</a></span><span class="op">(</span><span class="va">af</span>, event <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>state <span class="op">=</span> <span class="st">"behaviour"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/to_anievent.html">to_anievent</a></span><span class="op">(</span><span class="va">af</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # anievent:       3 × 6</span></span>
 <span><span class="co">#&gt; # Individuals:    1</span></span>
@@ -407,7 +410,7 @@
 <span><span class="co">#&gt; 3          1     6     7 behaviour state REM</span></span></code></pre></div>
 </div>
 <p>The resulting anievent inherits <code>unit_time</code> and <code>sampling_rate</code> from the host. <code>stop</code> is the time of the last frame of each bout (inclusive, frame-aligned). If a <code>&lt;col&gt;_modifiers</code> list-column is present alongside an event column, its cells are gathered into the anievent’s <code>modifiers</code> column, one entry per emitted bout.</p>
-<p>The reverse direction (<code>anievent</code> → <code>aniframe</code>) is intentionally not provided yet — the anievent’s loose mutual-exclusion semantics don’t map onto an aniframe’s per-frame columns without a design decision about how to resolve overlap, and that design is still pending.</p>
+<p>The reverse direction (<code>anievent</code> → <code>anipoint</code>) is intentionally not provided yet — the anievent’s loose mutual-exclusion semantics don’t map onto an anipoint’s per-frame columns without a design decision about how to resolve overlap, and that design is still pending.</p>
 </section></section><section class="level2"><h2 id="where-things-live-in-the-ecosystem">Where things live in the ecosystem<a class="anchor" aria-label="anchor" href="#where-things-live-in-the-ecosystem"></a>
 </h2>
 <table class="table caption-top" style="width:100%;">
@@ -424,18 +427,18 @@
 <tbody>
 <tr class="odd">
 <td>The <code>anievent</code> class</td>
-<td><code>aniframe</code></td>
+<td><code>anipoint</code></td>
 <td>✅ implemented</td>
 </tr>
 <tr class="even">
 <td>Encoding per-frame data (<code><a href="../reference/to_anievent.html">to_anievent()</a></code>)</td>
-<td><code>aniframe</code></td>
+<td><code>anipoint</code></td>
 <td>✅ implemented</td>
 </tr>
 <tr class="odd">
-<td>Conversion to <code>aniframe</code>
+<td>Conversion to <code>anipoint</code>
 </td>
-<td><code>aniframe</code></td>
+<td><code>anipoint</code></td>
 <td>planned</td>
 </tr>
 <tr class="even">

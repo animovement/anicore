@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,9 +38,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/aniframe-structure.html">The aniframe data structure</a></li>
+<li><a class="dropdown-item" href="../articles/aniframe-structure.html">The anipoint data structure</a></li>
     <li><a class="dropdown-item" href="../articles/aniframe-metadata.html">Metadata on an aniframe</a></li>
-    <li><a class="dropdown-item" href="../articles/aniframe-connections.html">Connections</a></li>
+    <li><a class="dropdown-item" href="../articles/orientation.html">Orientation</a></li>
+    <li><a class="dropdown-item" href="../articles/structures.html">Structures</a></li>
     <li><a class="dropdown-item" href="../articles/anievent-structure.html">The anievent data structure</a></li>
   </ul>
 </li>
@@ -101,129 +102,138 @@
 </div>
 <section class="level2"><h2 id="why-an-attribute-not-columns">Why an attribute, not columns?<a class="anchor" aria-label="anchor" href="#why-an-attribute-not-columns"></a>
 </h2>
-<p>Every <code>aniframe</code> carries a metadata list as an R attribute alongside the data columns. The metadata records the things that are true of the recording as a whole rather than of any single observation: the source software, the sampling rate, what units the spatial coordinates are in, which way its axes point, and so on.</p>
+<p>Every <code>anipoint</code> carries a metadata list as an R attribute alongside the data columns. The metadata records the things that are true of the recording as a whole rather than of any single observation: the source software, the sampling rate, what units the spatial coordinates are in, which way its axes point, and so on.</p>
 <p>Keeping this information attached to the object — rather than living in a separate file or being passed around as extra arguments — is what lets the rest of the <em>animovement</em> ecosystem stay loosely coupled. A reader (in <em>aniread</em>) populates the metadata at load time, and any downstream tool can read it back without a hand-off.</p>
-<p>This article covers the metadata attribute and the functions that read and update it. For the data-column structure see <a href="aniframe-structure.html">The aniframe data structure</a>; for the <code>connections</code> field specifically see <a href="aniframe-connections.html">Connections</a>.</p>
+<p>This article covers the metadata attribute and the functions that read and update it. For the data-column structure see <a href="aniframe-structure.html">The aniframe data structure</a>; for connections, which live in the <code>structure</code> category, see <a href="structures.html">Structures</a>; for axis directions and orientation, see <a href="orientation.html">Orientation</a>.</p>
 </section><section class="level2"><h2 id="the-metadata-attribute">The metadata attribute<a class="anchor" aria-label="anchor" href="#the-metadata-attribute"></a>
 </h2>
 <p>You can see the full metadata by printing it directly:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_aniframe.html">example_aniframe</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_anipoint.html">example_anipoint</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── animovement metadata ────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; source            (character) : &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; source_version    (character) : &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; source_format     (character) : &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; filename          (character) : &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; sampling_rate     (numeric)   : &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; sampling_interval (numeric)   : 1</span></span>
-<span><span class="co">#&gt; start_datetime    (POSIXct)   : &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; variables_index   (character) : "time"</span></span>
-<span><span class="co">#&gt; variables_what    (character) : "individual, keypoint"</span></span>
-<span><span class="co">#&gt; variables_when    (character) : "session, trial"</span></span>
-<span><span class="co">#&gt; variables_where   (character) : "x, y"</span></span>
-<span><span class="co">#&gt; variables_event   (list)      : "character(0), character(0)"</span></span>
-<span><span class="co">#&gt; axes              (character) : "x, y"</span></span>
+<span><span class="co">#&gt; spec_version: aniframe 3.0.0, anievent 1.0.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── recording </span></span>
+<span><span class="co">#&gt; source         (character) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; source_version (character) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; source_format  (character) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; filename       (character) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── time </span></span>
+<span><span class="co">#&gt; unit_time         (factor)  : "frame"</span></span>
+<span><span class="co">#&gt;                               [levels: unknown, frame, ns, us, ms, s, m, h]</span></span>
+<span><span class="co">#&gt; sampling_rate     (numeric) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; sampling_interval (numeric) : 1</span></span>
+<span><span class="co">#&gt; start_datetime    (POSIXct) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── space </span></span>
+<span><span class="co">#&gt; coordinate_system (factor)    : "cartesian_2d"</span></span>
+<span><span class="co">#&gt;                                 [levels: unknown, cartesian_1d, cartesian_2d, cartesian_3d, polar, cylindrical, spherical]</span></span>
+<span><span class="co">#&gt; reference_frame   (factor)    : "allocentric"</span></span>
+<span><span class="co">#&gt;                                 [levels: allocentric, egocentric, none]</span></span>
+<span><span class="co">#&gt; handedness        (factor)    : "unknown"</span></span>
+<span><span class="co">#&gt;                                 [levels: right, left, unknown]</span></span>
+<span><span class="co">#&gt; axis_directions   (character) : </span></span>
+<span><span class="co">#&gt; axis_extents      (numeric)   : </span></span>
 <span><span class="co">#&gt; unit_space        (factor)    : "px"</span></span>
 <span><span class="co">#&gt;                                 [levels: px, none, nm, um, mm, cm, m, km]</span></span>
 <span><span class="co">#&gt; unit_angle        (factor)    : "rad"</span></span>
 <span><span class="co">#&gt;                                 [levels: rad, deg, none]</span></span>
-<span><span class="co">#&gt; unit_time         (factor)    : "frame"</span></span>
-<span><span class="co">#&gt;                                 [levels: unknown, frame, ns, us, ms, s, m, h]</span></span>
-<span><span class="co">#&gt; reference_frame   (factor)    : "allocentric"</span></span>
-<span><span class="co">#&gt;                                 [levels: allocentric, egocentric, none]</span></span>
-<span><span class="co">#&gt; coordinate_system (factor)    : "cartesian_2d"</span></span>
-<span><span class="co">#&gt;                                 [levels: unknown, cartesian_1d, cartesian_2d, cartesian_3d, polar, cylindrical, spherical]</span></span>
-<span><span class="co">#&gt; axis_directions   (character) : </span></span>
-<span><span class="co">#&gt; axis_extents      (numeric)   : </span></span>
-<span><span class="co">#&gt; handedness        (factor)    : "unknown"</span></span>
-<span><span class="co">#&gt;                                 [levels: right, left, unknown]</span></span>
-<span><span class="co">#&gt; connections       (list)      : </span></span>
-<span><span class="co">#&gt; spec_version      (list)      : "2.1.0, 0.4.0"</span></span></code></pre></div>
+<span><span class="co">#&gt; euler_sequence    (character) : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; euler_intrinsic   (logical)   : &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── variables </span></span>
+<span><span class="co">#&gt; what   keys: individual, keypoint</span></span>
+<span><span class="co">#&gt; when   index: time | keys: session, trial</span></span>
+<span><span class="co">#&gt; where  position: x = x, y = y</span></span>
+<span><span class="co">#&gt; event  state: - | point: -</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── structure </span></span>
+<span><span class="co">#&gt; (empty)</span></span></code></pre></div>
 </div>
-<p>The fields and their defaults are defined in one place, <code><a href="../reference/list_default_metadata.html">list_default_metadata()</a></code> — that’s the canonical source of truth for what an <code>aniframe</code>’s metadata looks like.</p>
+<p>The fields and their defaults are defined in one place, <code><a href="../reference/list_default_metadata.html">list_default_metadata()</a></code> — that’s the canonical source of truth for what an <code>anipoint</code>’s metadata looks like.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/list_default_metadata.html">list_default_metadata</a></span><span class="op">(</span><span class="op">)</span>, max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 23</span></span>
-<span><span class="co">#&gt;  $ source           : chr NA</span></span>
-<span><span class="co">#&gt;  $ source_version   : chr NA</span></span>
-<span><span class="co">#&gt;  $ source_format    : chr NA</span></span>
-<span><span class="co">#&gt;  $ filename         : chr NA</span></span>
-<span><span class="co">#&gt;  $ sampling_rate    : num NA</span></span>
-<span><span class="co">#&gt;  $ sampling_interval: num NA</span></span>
-<span><span class="co">#&gt;  $ start_datetime   : POSIXct[1:1], format: NA</span></span>
-<span><span class="co">#&gt;  $ variables_index  : chr "time"</span></span>
-<span><span class="co">#&gt;  $ variables_what   : chr [1:2] "individual" "keypoint"</span></span>
-<span><span class="co">#&gt;  $ variables_when   : chr(0) </span></span>
-<span><span class="co">#&gt;  $ variables_where  : chr [1:2] "x" "y"</span></span>
-<span><span class="co">#&gt;  $ variables_event  :List of 2</span></span>
-<span><span class="co">#&gt;  $ axes             : Named chr [1:2] "x" "y"</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:2] "x" "y"</span></span>
-<span><span class="co">#&gt;  $ unit_space       : Factor w/ 8 levels "px","none","nm",..: 1</span></span>
-<span><span class="co">#&gt;  $ unit_angle       : Factor w/ 3 levels "rad","deg","none": 1</span></span>
-<span><span class="co">#&gt;  $ unit_time        : Factor w/ 8 levels "unknown","frame",..: 2</span></span>
-<span><span class="co">#&gt;  $ reference_frame  : Factor w/ 3 levels "allocentric",..: 1</span></span>
-<span><span class="co">#&gt;  $ coordinate_system: Factor w/ 7 levels "unknown","cartesian_1d",..: 3</span></span>
-<span><span class="co">#&gt;  $ axis_directions  : Named chr(0) </span></span>
-<span><span class="co">#&gt;   ..- attr(*, "names")= chr(0) </span></span>
-<span><span class="co">#&gt;  $ axis_extents     : Named num(0) </span></span>
-<span><span class="co">#&gt;   ..- attr(*, "names")= chr(0) </span></span>
-<span><span class="co">#&gt;  $ handedness       : Factor w/ 3 levels "right","left",..: 3</span></span>
-<span><span class="co">#&gt;  $ connections      : list()</span></span>
-<span><span class="co">#&gt;  $ spec_version     :List of 2</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/list_default_metadata.html">list_default_metadata</a></span><span class="op">(</span><span class="op">)</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 6</span></span>
+<span><span class="co">#&gt;  $ spec_version:List of 2</span></span>
+<span><span class="co">#&gt;   ..$ aniframe: chr "3.0.0"</span></span>
+<span><span class="co">#&gt;   ..$ anievent: chr "1.0.0"</span></span>
+<span><span class="co">#&gt;  $ recording   :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ source        : chr NA</span></span>
+<span><span class="co">#&gt;   ..$ source_version: chr NA</span></span>
+<span><span class="co">#&gt;   ..$ source_format : chr NA</span></span>
+<span><span class="co">#&gt;   ..$ filename      : chr NA</span></span>
+<span><span class="co">#&gt;  $ time        :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ unit_time        : Factor w/ 8 levels "unknown","frame",..: 2</span></span>
+<span><span class="co">#&gt;   ..$ sampling_rate    : num NA</span></span>
+<span><span class="co">#&gt;   ..$ sampling_interval: num NA</span></span>
+<span><span class="co">#&gt;   ..$ start_datetime   : POSIXct[1:1], format: NA</span></span>
+<span><span class="co">#&gt;  $ space       :List of 9</span></span>
+<span><span class="co">#&gt;   ..$ coordinate_system: Factor w/ 7 levels "unknown","cartesian_1d",..: 3</span></span>
+<span><span class="co">#&gt;   ..$ reference_frame  : Factor w/ 3 levels "allocentric",..: 1</span></span>
+<span><span class="co">#&gt;   ..$ handedness       : Factor w/ 3 levels "right","left",..: 3</span></span>
+<span><span class="co">#&gt;   ..$ axis_directions  : Named chr(0) </span></span>
+<span><span class="co">#&gt;   .. ..- attr(*, "names")= chr(0) </span></span>
+<span><span class="co">#&gt;   ..$ axis_extents     : Named num(0) </span></span>
+<span><span class="co">#&gt;   .. ..- attr(*, "names")= chr(0) </span></span>
+<span><span class="co">#&gt;   ..$ unit_space       : Factor w/ 8 levels "px","none","nm",..: 1</span></span>
+<span><span class="co">#&gt;   ..$ unit_angle       : Factor w/ 3 levels "rad","deg","none": 1</span></span>
+<span><span class="co">#&gt;   ..$ euler_sequence   : chr NA</span></span>
+<span><span class="co">#&gt;   ..$ euler_intrinsic  : logi NA</span></span>
+<span><span class="co">#&gt;  $ variables   :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ what :List of 1</span></span>
+<span><span class="co">#&gt;   ..$ when :List of 2</span></span>
+<span><span class="co">#&gt;   ..$ where:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ event:List of 2</span></span>
+<span><span class="co">#&gt;  $ structure   : list()</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr "aniframe_metadata"</span></span></code></pre></div>
 </div>
-<p>The fields fall into a few groups:</p>
+<p>The fields are grouped into <strong>categories</strong>, each answering one kind of question:</p>
 <table class="table caption-top">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 77%">
+<col style="width: 17%">
+<col style="width: 82%">
 </colgroup>
 <thead><tr class="header">
-<th>Group</th>
+<th>Category</th>
 <th>Fields</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><strong>Provenance</strong></td>
-<td>
-<code>source</code>, <code>source_version</code>, <code>filename</code>, <code>start_datetime</code>
+<td><code>recording</code></td>
+<td>provenance: <code>source</code>, <code>source_version</code>, <code>source_format</code>, <code>filename</code>
 </td>
 </tr>
 <tr class="even">
-<td><strong>Sampling</strong></td>
-<td><code>sampling_rate</code></td>
-</tr>
-<tr class="odd">
-<td><strong>Units</strong></td>
+<td><code>time</code></td>
 <td>
-<code>unit_space</code>, <code>unit_time</code>, <code>unit_angle</code>
-</td>
-</tr>
-<tr class="even">
-<td><strong>Frame of reference</strong></td>
-<td>
-<code>reference_frame</code>, <code>coordinate_system</code>, <code>axes</code>, <code>axis_directions</code>, <code>axis_extents</code>, <code>handedness</code>
+<code>unit_time</code>, <code>sampling_rate</code>, <code>sampling_interval</code>, <code>start_datetime</code>
 </td>
 </tr>
 <tr class="odd">
-<td><strong>Slot vocabulary</strong></td>
+<td><code>space</code></td>
 <td>
-<code>variables_index</code>, <code>variables_what</code>, <code>variables_when</code>, <code>variables_where</code>
+<code>coordinate_system</code>, <code>reference_frame</code>, <code>handedness</code>, <code>axis_directions</code>, <code>axis_extents</code>, <code>unit_space</code>, <code>unit_angle</code>, <code>euler_sequence</code>, <code>euler_intrinsic</code>
 </td>
 </tr>
 <tr class="even">
-<td><strong>Relationships</strong></td>
-<td><code>connections</code></td>
+<td><code>variables</code></td>
+<td>which columns play which role: <code>what</code>, <code>when</code>, <code>where</code>, <code>event</code>, each a list of named slots</td>
+</tr>
+<tr class="odd">
+<td><code>structure</code></td>
+<td>relationships between levels of a variable — today’s connections</td>
 </tr>
 </tbody>
 </table>
+<p><code>spec_version</code> sits above the categories: it is metadata about the metadata, versioning the contract they describe. <code>space</code> is the one category a class can lack — an <code>anievent</code> has no spatial component, so its metadata simply has no <code>space</code> rather than a set of “none” values.</p>
 <p><code>filename</code> accepts a character vector — readers like <code>aniread::read_trackball()</code> populate it with all source paths.</p>
 </section><section class="level2"><h2 id="reading-and-writing-metadata">Reading and writing metadata<a class="anchor" aria-label="anchor" href="#reading-and-writing-metadata"></a>
 </h2>
-<p><code><a href="../reference/get_metadata.html">get_metadata()</a></code> and <code><a href="../reference/set_metadata.html">set_metadata()</a></code> are the workhorses.</p>
+<p><code><a href="../reference/get_metadata.html">get_metadata()</a></code> and <code><a href="../reference/set_metadata.html">set_metadata()</a></code> are the workhorses. The categories group the storage, but access stays <strong>flat</strong>: a field is found and written by its own name wherever it lives, and a category name returns the whole category.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"sampling_rate"</span><span class="op">)</span></span>
@@ -233,190 +243,137 @@
 <span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"sampling_rate"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 30</span></span>
 <span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"source"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "deeplabcut"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "deeplabcut"</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"space"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "coordinate_system" "reference_frame"   "handedness"       </span></span>
+<span><span class="co">#&gt; [4] "axis_directions"   "axis_extents"      "unit_space"       </span></span>
+<span><span class="co">#&gt; [7] "unit_angle"        "euler_sequence"    "euler_intrinsic"</span></span></code></pre></div>
 </div>
 <p><code><a href="../reference/set_metadata.html">set_metadata()</a></code> validates the input — factor fields are checked against their permitted levels, and unknown fields are rejected.</p>
-<p>For fields whose update has side effects on the data columns (or on related fields), prefer the dedicated setters listed below.</p>
+<p><code>set_*</code> functions only declare: they record a fact about the data and never change a value. Operations that change values have their own verbs and update the metadata to match:</p>
 <table class="table caption-top">
 <colgroup>
-<col style="width: 26%">
-<col style="width: 73%">
+<col style="width: 28%">
+<col style="width: 71%">
 </colgroup>
 <thead><tr class="header">
-<th>Setter</th>
-<th>Touches</th>
+<th>Function</th>
+<th>Does</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code><a href="../reference/set_unit_space.html">set_unit_space()</a></code></td>
-<td>converts <code>x</code>/<code>y</code>/<code>z</code> between length units</td>
+<td><code><a href="../reference/convert_unit_space.html">convert_unit_space()</a></code></td>
+<td>rescales the length axes to another unit</td>
 </tr>
 <tr class="even">
-<td><code><a href="../reference/set_unit_time.html">set_unit_time()</a></code></td>
-<td>converts the index column between time units</td>
+<td><code><a href="../reference/convert_unit_time.html">convert_unit_time()</a></code></td>
+<td>rescales the index to another unit, using <code>sampling_rate</code> from frames</td>
 </tr>
 <tr class="odd">
-<td><code><a href="../reference/set_unit_angle.html">set_unit_angle()</a></code></td>
-<td>converts <code>phi</code>/<code>theta</code> (auto) and any extra <code>cols</code> you supply</td>
+<td><code><a href="../reference/convert_unit_angle.html">convert_unit_angle()</a></code></td>
+<td>converts <code>phi</code>/<code>theta</code> (and any <code>cols</code>) between rad and deg</td>
 </tr>
 <tr class="even">
-<td><code><a href="../reference/set_sampling_rate.html">set_sampling_rate()</a></code></td>
-<td>flips <code>unit_time</code> from frames to seconds and rescales the index</td>
-</tr>
-<tr class="odd">
-<td><code><a href="../reference/set_index.html">set_index()</a></code></td>
-<td>changes which column the frame is indexed by, and re-orders it</td>
-</tr>
-<tr class="even">
-<td><code><a href="../reference/set_axes.html">set_axes()</a></code></td>
-<td>declares which column carries which axis role</td>
-</tr>
-<tr class="odd">
-<td><code><a href="../reference/set_axis_directions.html">set_axis_directions()</a></code></td>
-<td>says which way each axis points, reflecting one turned over</td>
-</tr>
-<tr class="even">
-<td><code><a href="../reference/set_axis_extents.html">set_axis_extents()</a></code></td>
-<td>says how far each axis runs, which a reflection turns around</td>
-</tr>
-<tr class="odd">
-<td><code><a href="../reference/set_handedness.html">set_handedness()</a></code></td>
-<td>says whether the frame is right- or left-handed</td>
+<td><code><a href="../reference/reflect_axis.html">reflect_axis()</a></code></td>
+<td>turns an axis over, reflecting its column</td>
 </tr>
 </tbody>
 </table>
-<p>The temporal setters follow the frame’s own declaration rather than a column called <code>time</code> — see <a href="aniframe-structure.html#the-index">the index</a>.</p>
+<p><code><a href="../reference/convert_unit_time.html">convert_unit_time()</a></code> follows the frame’s own index rather than a column called <code>time</code> — see <a href="aniframe-structure.html#the-index">the index</a>.</p>
 </section><section class="level2"><h2 id="declaring-the-slot-vocabulary">Declaring the slot vocabulary<a class="anchor" aria-label="anchor" href="#declaring-the-slot-vocabulary"></a>
 </h2>
-<p><code>variables_index</code>, <code>variables_what</code>, <code>variables_when</code>, <code>variables_where</code>, <code>variables_event</code> and <code>axes</code> are a special case: they name columns rather than describing values, so a name that matches nothing is a promise the frame can’t keep. All but <code>variables_event</code> go further — they are not a description of the frame, they <em>are</em> its structure. <code><a href="../reference/as_aniframe.html">as_aniframe()</a></code> uses them to coerce column types, order columns and rows, group the frame, and derive <code>coordinate_system</code>. Writing them without redoing that work would leave the frame and its own metadata disagreeing — the print header would update while the grouping still reflected the old declaration.</p>
-<p><code><a href="../reference/set_metadata.html">set_metadata()</a></code> therefore refuses all six, and points you at the setters that do the whole job:</p>
+<p>The <code>variables</code> category is a special case: its roles name columns rather than describing values, so a name that matches nothing is a promise the frame can’t keep. All but the <code>event</code> role go further — they are not a description of the frame, they <em>are</em> its structure. <code><a href="../reference/as_anipoint.html">as_anipoint()</a></code> uses them to coerce column types, order columns and rows, group the frame, and derive <code>coordinate_system</code>. Writing them without redoing that work would leave the frame and its own metadata disagreeing — the print header would update while the grouping still reflected the old declaration.</p>
+<p>The category holds one list per role, each with named slots: <code>what$keys</code> (identity), <code>when$index</code> and <code>when$keys</code> (the position within a context, and the context itself — an <code>anievent</code> has <code>when$interval</code> instead of an index), <code>where$position</code> (the axis-role mapping), and <code>event$state</code> / <code>event$point</code>. The frame groups by <code>c(what$keys, when$keys)</code> and nothing else.</p>
+<p><code><a href="../reference/set_metadata.html">set_metadata()</a></code> refuses the whole category, and points you at the setters that do the whole job:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/set_metadata.html">set_metadata</a></span><span class="op">(</span>variables_what <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in `ensure_no_declaration_fields()`:</span></span>
 <span><span class="co">#&gt; ! `set_metadata()` cannot write variables_what directly.</span></span>
-<span><span class="co">#&gt; ℹ This field declares which columns carry identity, time, position and events.</span></span>
-<span><span class="co">#&gt;   Writing it here would leave the metadata naming columns the frame may not</span></span>
-<span><span class="co">#&gt;   have, and the frame ordered and grouped as it was before.</span></span>
-<span><span class="co">#&gt; ℹ Use `set_variables_what()` instead, which validate the columns exist and</span></span>
+<span><span class="co">#&gt; ℹ This entry declares which columns carry identity, time, position and events,</span></span>
+<span><span class="co">#&gt;   or how levels connect. Writing it here would leave the metadata naming</span></span>
+<span><span class="co">#&gt;   columns the frame may not have, and the frame ordered and grouped as it was</span></span>
+<span><span class="co">#&gt;   before.</span></span>
+<span><span class="co">#&gt; ℹ Use `set_variables()` instead, which validate the columns exist and</span></span>
 <span><span class="co">#&gt;   restructure the frame to match.</span></span>
 <span><span class="co">#&gt; ℹ A complete metadata object can still be restored wholesale, as in</span></span>
 <span><span class="co">#&gt;   `set_metadata(data, metadata = get_metadata(x))`.</span></span></code></pre></div>
 </div>
-<p>The three structural roles have the same four verbs as <code>connections</code>: <code>get_variables_*()</code>, <code>set_variables_*()</code>, <code>add_variables_*()</code> and <code>remove_variables_*()</code>. <code>variables_index</code> has only two — <code><a href="../reference/get_index.html">get_index()</a></code> and <code><a href="../reference/set_index.html">set_index()</a></code> — because a frame has exactly one index, leaving nothing for <code>add_</code> and <code>remove_</code> to do. The column has to exist before it can be declared, so the order is always create-then-declare:</p>
+<p>The category has one family of verbs: <code><a href="../reference/variables.html">get_variables()</a></code>, <code><a href="../reference/variables.html">set_variables()</a></code>, <code><a href="../reference/variables.html">add_variables()</a></code> and <code><a href="../reference/variables.html">remove_variables()</a></code>, each taking a role and, for the setters, a list of slots or a character vector for the role’s main slot. <code><a href="../reference/set_index.html">set_index()</a></code> and <code><a href="../reference/get_keys.html">get_keys()</a></code> are shorthands. The column has to exist before it can be declared, so the order is always create-then-declare:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tagged</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"trial_1"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/variables.html">add_variables_what</a></span><span class="op">(</span><span class="st">"id"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/variables.html">add_variables</a></span><span class="op">(</span>what <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/variables.html">get_variables_what</a></span><span class="op">(</span><span class="va">tagged</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">tagged</span>, <span class="st">"what"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "individual" "keypoint"   "id"</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_data.html" class="external-link">group_vars</a></span><span class="op">(</span><span class="va">tagged</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "individual" "keypoint"   "id"         "session"    "trial"</span></span></code></pre></div>
 </div>
-<p><code>add_variables_*()</code> appends to the declaration, so you don’t have to restate what is already there — forgetting to would quietly demote an existing identity variable and regroup the frame without it.</p>
+<p><code><a href="../reference/variables.html">add_variables()</a></code> appends to the declaration, so you don’t have to restate what is already there — forgetting to would quietly demote an existing identity variable and regroup the frame without it.</p>
 <p>Declaring a spatial column refreshes the fields derived from it:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/variables.html">add_variables_where</a></span><span class="op">(</span><span class="st">"z"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/variables.html">add_variables</a></span><span class="op">(</span>where <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="st">"coordinate_system"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] cartesian_3d</span></span>
 <span><span class="co">#&gt; 7 Levels: unknown cartesian_1d cartesian_2d cartesian_3d polar ... spherical</span></span></code></pre></div>
 </div>
-<p><code>variables_event</code> is the fourth role, and the one that doesn’t change the frame’s shape: it declares which columns carry per-frame event labels, split into interval-valued <code>state</code> columns and instantaneous <code>point</code> columns. <code><a href="../reference/to_anievent.html">to_anievent()</a></code> reads it to know what to encode.</p>
+<p><code>event</code> is the fourth role, and the one that doesn’t change the frame’s shape: it declares which columns carry per-frame event labels, split into interval-valued <code>state</code> columns and instantaneous <code>point</code> columns. <code><a href="../reference/to_anievent.html">to_anievent()</a></code> reads it to know what to encode.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>behaviour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="st">"rest"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/variables_event.html">set_variables_event</a></span><span class="op">(</span>state <span class="op">=</span> <span class="st">"behaviour"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/variables_event.html">get_variables_event</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $state</span></span>
-<span><span class="co">#&gt; [1] "behaviour"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $point</span></span>
-<span><span class="co">#&gt; character(0)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/variables.html">set_variables</a></span><span class="op">(</span>event <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>state <span class="op">=</span> <span class="st">"behaviour"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="st">"event"</span>, <span class="st">"state"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "behaviour"</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h2 id="which-way-the-axes-point">Which way the axes point<a class="anchor" aria-label="anchor" href="#which-way-the-axes-point"></a>
 </h2>
-<p>For 2D image-derived data there’s an annoying convention split: most image and video tooling counts y <strong>downward</strong> from the top of the frame, while plotting and most maths counts it <strong>upward</strong>. What differs is not where <code>(0, 0)</code> sits — it is a corner either way — but the direction y increases in, so that is what <code>aniframe</code> records.</p>
-<p><code>axis_directions</code> maps each axis role to one of six words, in three opposed pairs, read from where the recording was made: <code>right</code>/<code>left</code> across the view, <code>up</code>/<code>down</code> within it, and <code>back</code>/<code>forward</code> toward and away from the viewer.</p>
-<p>Turning an axis to its opposite reflects that column, so the data ends up expressed the way you just declared. An axis runs from zero to its <code>axis_extents</code> value, so the reflection is <code>extent - old</code> — and an axis with no declared extent is centred on its origin instead, so turning it over negates it.</p>
+<p><code>axis_directions</code> records which way each axis points, read from where the recording was made — <code>right</code>/<code>left</code>, <code>up</code>/<code>down</code>, <code>back</code>/<code>forward</code> — and <code>axis_extents</code> how far it runs. <code><a href="../reference/set_axis_directions.html">set_axis_directions()</a></code> declares the directions; <code><a href="../reference/reflect_axis.html">reflect_axis()</a></code> turns an axis over and changes the data to match. The sense of rotation and the handedness are derived from them by <code><a href="../reference/get_angle_direction.html">get_angle_direction()</a></code> and <code><a href="../reference/get_handedness.html">get_handedness()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
-<span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span>
-<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span>,</span>
-<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">150</span>, <span class="fl">200</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/set_axis_extents.html">set_axis_extents</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">1080</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/set_axis_directions.html">set_axis_directions</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"right"</span>, y <span class="op">=</span> <span class="st">"down"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">img</span><span class="op">$</span><span class="va">y</span></span>
-<span><span class="co">#&gt; [1]  50 100 150 200</span></span>
-<span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_axis_directions.html">set_axis_directions</a></span><span class="op">(</span><span class="va">img</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">img</span><span class="op">$</span><span class="va">y</span> <span class="co"># reflected: 1080 - original y</span></span>
-<span><span class="co">#&gt; [1] 1030  980  930  880</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/set_axis_directions.html">set_axis_directions</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"right"</span>, y <span class="op">=</span> <span class="st">"down"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/get_angle_direction.html">get_angle_direction</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "clockwise"</span></span></code></pre></div>
 </div>
-<section class="level3"><h3 id="what-follows-from-the-directions">What follows from the directions<a class="anchor" aria-label="anchor" href="#what-follows-from-the-directions"></a>
-</h3>
-<p>Two things are read off them rather than recorded separately, so they cannot go on claiming a convention the axes no longer have.</p>
-<p><code><a href="../reference/get_angle_direction.html">get_angle_direction()</a></code> says which way angles run. <code>atan2(y, x)</code> counts counter-clockwise, so the same physical heading comes out mirrored between a y-down and a y-up frame — which is exactly the comparison that goes wrong silently without this.</p>
-<p><code><a href="../reference/get_handedness.html">get_handedness()</a></code> needs three axes. Two directions leave it open, so a frame with only <code>x</code> and <code>y</code> has none until it says which side it was observed from — and that is not a detail. A rodent filmed from above and the same rodent filmed from below through a glass floor give images whose <code>x</code> and <code>y</code> are declared identically, but whose rotations run opposite ways. The depth axis is the only thing that tells them apart.</p>
+<p><a href="orientation.html">Orientation</a> sets out the model, including why the depth axis matters even for 2D data.</p>
+</section><section class="level2"><h2 id="units">Units<a class="anchor" aria-label="anchor" href="#units"></a>
+</h2>
+<p>Declare a unit with <code><a href="../reference/set_metadata.html">set_metadata()</a></code>; convert values with <code>convert_unit_*()</code>. Factors between standard units are derived; converting from <code>px</code> or <code>unknown</code> needs a <code>calibration_factor</code>, and from <code>frame</code> a declared <code>sampling_rate</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">above</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_axis_directions.html">set_axis_directions</a></span><span class="op">(</span><span class="va">img</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>z <span class="op">=</span> <span class="st">"back"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">below</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_axis_directions.html">set_axis_directions</a></span><span class="op">(</span><span class="va">img</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>z <span class="op">=</span> <span class="st">"forward"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>above <span class="op">=</span> <span class="fu"><a href="../reference/get_angle_direction.html">get_angle_direction</a></span><span class="op">(</span><span class="va">above</span><span class="op">)</span>, below <span class="op">=</span> <span class="fu"><a href="../reference/get_angle_direction.html">get_angle_direction</a></span><span class="op">(</span><span class="va">below</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               above               below </span></span>
-<span><span class="co">#&gt; "counter_clockwise"         "clockwise"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>above <span class="op">=</span> <span class="fu"><a href="../reference/get_handedness.html">get_handedness</a></span><span class="op">(</span><span class="va">above</span><span class="op">)</span>, below <span class="op">=</span> <span class="fu"><a href="../reference/get_handedness.html">get_handedness</a></span><span class="op">(</span><span class="va">below</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   above   below </span></span>
-<span><span class="co">#&gt; "right"  "left"</span></span></code></pre></div>
-</div>
-<p>Since <code>det[x y z]</code> is <code>(x × y) · z</code>, a right-handed frame counts counter-clockwise about its own depth axis — always. The two answers are one fact seen twice.</p>
-<p>A frame can also state the convention without spelling the axes out, which is how most 3D recordings are described:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_handedness.html">set_handedness</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_handedness.html">get_handedness</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># right-handed by default</span></span>
-<span><span class="co">#&gt; [1] "right"</span></span></code></pre></div>
-</div>
-</section></section><section class="level2"><h2 id="units">Units<a class="anchor" aria-label="anchor" href="#units"></a>
-</h2>
-<p>Spatial, temporal, and angular units each have their own setter. Conversions between standard units are automatic; conversions from unknown / <code>frame</code> / <code>px</code> units require an explicit calibration factor (or, for time, a <code>sampling_rate</code>).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_aniframe.html">example_aniframe</a></span><span class="op">(</span>n_dims <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_anipoint.html">example_anipoint</a></span><span class="op">(</span>n_dims <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/set_metadata.html">set_metadata</a></span><span class="op">(</span>unit_space <span class="op">=</span> <span class="st">"mm"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">data_cm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_unit_space.html">set_unit_space</a></span><span class="op">(</span><span class="va">data</span>, to_unit <span class="op">=</span> <span class="st">"cm"</span><span class="op">)</span></span>
+<span><span class="va">data_cm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_unit_space.html">convert_unit_space</a></span><span class="op">(</span><span class="va">data</span>, to_unit <span class="op">=</span> <span class="st">"cm"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data_cm</span>, <span class="st">"unit_space"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] cm</span></span>
 <span><span class="co">#&gt; Levels: px none nm um mm cm m km</span></span></code></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_aniframe.html">example_aniframe</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># default unit_time = "frame"</span></span>
-<span><span class="va">data_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_sampling_rate.html">set_sampling_rate</a></span><span class="op">(</span><span class="va">data</span>, sampling_rate <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data_s</span>, <span class="st">"unit_time"</span><span class="op">)</span> <span class="co"># now "s"</span></span>
-<span><span class="co">#&gt; [1] s</span></span>
-<span><span class="co">#&gt; Levels: unknown frame ns us ms s m h</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_anipoint.html">example_anipoint</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># default unit_time = "frame"</span></span>
+<span>  <span class="fu"><a href="../reference/set_metadata.html">set_metadata</a></span><span class="op">(</span>sampling_rate <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">data_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_unit_time.html">convert_unit_time</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"s"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">data_s</span><span class="op">$</span><span class="va">time</span><span class="op">)</span> <span class="co"># frames divided by fps</span></span>
 <span><span class="co">#&gt; [1] 0.03333333 1.66666667</span></span></code></pre></div>
 </div>
-<p>Spatial angular columns (<code>phi</code>, <code>theta</code>) are converted automatically by <code><a href="../reference/set_unit_angle.html">set_unit_angle()</a></code> whenever they’re present. Pass <code>cols</code> only for non-spatial angular columns (e.g. heading direction).</p>
+<p>Spatial angular columns (<code>phi</code>, <code>theta</code>) are converted automatically by <code><a href="../reference/convert_unit_angle.html">convert_unit_angle()</a></code> whenever they’re present. Pass <code>cols</code> only for non-spatial angular columns (e.g. heading direction).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span>
 <span>  rho <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, phi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">pol</span><span class="op">$</span><span class="va">phi</span></span>
 <span><span class="co">#&gt; [1] 0.000000 1.570796 3.141593</span></span>
-<span><span class="va">pol_deg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_unit_angle.html">set_unit_angle</a></span><span class="op">(</span><span class="va">pol</span>, to_unit <span class="op">=</span> <span class="st">"deg"</span><span class="op">)</span></span>
+<span><span class="va">pol_deg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_unit_angle.html">convert_unit_angle</a></span><span class="op">(</span><span class="va">pol</span>, to_unit <span class="op">=</span> <span class="st">"deg"</span><span class="op">)</span></span>
 <span><span class="va">pol_deg</span><span class="op">$</span><span class="va">phi</span></span>
 <span><span class="co">#&gt; [1]   0  90 180</span></span></code></pre></div>
 </div>

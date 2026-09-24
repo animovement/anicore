@@ -9,7 +9,7 @@ every column it names is present and numeric."><meta property="og:image" content
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,9 +20,10 @@ every column it names is present and numeric."><meta property="og:image" content
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Reference"><span class="fa fa-file-code"></span> Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/aniframe-structure.html">The aniframe data structure</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/aniframe-structure.html">The anipoint data structure</a></li>
     <li><a class="dropdown-item" href="../articles/aniframe-metadata.html">Metadata on an aniframe</a></li>
-    <li><a class="dropdown-item" href="../articles/aniframe-connections.html">Connections</a></li>
+    <li><a class="dropdown-item" href="../articles/orientation.html">Orientation</a></li>
+    <li><a class="dropdown-item" href="../articles/structures.html">Structures</a></li>
     <li><a class="dropdown-item" href="../articles/anievent-structure.html">The anievent data structure</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html" aria-label="News"><span class="fa fa-newspaper"></span> News</a></li>
@@ -55,7 +56,7 @@ every column it names is present and numeric."><meta property="og:image" content
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Test whether the spatial columns match the metadata</h1>
-      <small class="dont-index">Source: <a href="https://github.com/animovement/anicore/blob/main/R/aniframe_validate.R" class="external-link"><code>R/aniframe_validate.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/animovement/anicore/blob/main/R/anipoint_validate.R" class="external-link"><code>R/anipoint_validate.R</code></a></small>
       <div class="d-none name"><code>is_spatial.Rd</code></div>
     </div>
 
@@ -74,7 +75,7 @@ every column it names is present and numeric.</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>An aniframe object.</p></dd>
+<dd><p>An anipoint object.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -92,12 +93,12 @@ types. A frame that has lost its <code>x</code> column still satisfies
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="ensure_is_spatial.html">ensure_is_spatial()</a></code>, <code><a href="validate_aniframe.html">validate_aniframe()</a></code>.</p></div>
+    <div class="dont-index"><p><code><a href="ensure_is_spatial.html">ensure_is_spatial()</a></code>, <code><a href="validate_anipoint.html">validate_anipoint()</a></code>.</p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="aniframe.html">aniframe</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="anipoint.html">anipoint</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">is_spatial</span><span class="op">(</span><span class="va">af</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>

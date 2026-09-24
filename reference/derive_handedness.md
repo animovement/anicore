@@ -1,7 +1,6 @@
-# Work out handedness from three axis directions
+# Work out handedness from three axis directions (sign of the determinant)
 
-The sign of the determinant of the three direction vectors: positive is
-the right-handed orientation, the one `right`, `up` and `back` are in.
+Work out handedness from three axis directions (sign of the determinant)
 
 ## Usage
 

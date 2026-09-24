@@ -2,7 +2,118 @@
 
 ## anicore (development version)
 
+### Breaking changes
+
+- The position frame is now `anipoint`, and `aniframe` is the abstract
+  parent of every frame class: `anipoint`, `anisegment`, `anijoint` and
+  `anievent`
+  ([\#154](https://github.com/animovement/anicore/issues/154)).
+  - [`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md),
+    [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md),
+    [`example_anipoint()`](https://animovement.dev/anicore/reference/example_anipoint.md)
+    and
+    [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
+    replace the
+    [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
+    versions, which remain as soft-deprecated aliases for one release.
+  - [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
+    is now `TRUE` for any frame, including an anievent. Test the grain
+    with
+    [`is_anipoint()`](https://animovement.dev/anicore/reference/is_anipoint.md)
+    or
+    [`ensure_is_anipoint()`](https://animovement.dev/anicore/reference/ensure_is_anipoint.md);
+    functions that need coordinates now reject other grains.
+  - Re-cast objects saved with earlier versions with
+    [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md)
+    or
+    [`as_anievent()`](https://animovement.dev/anicore/reference/as_anievent.md).
+- Metadata is grouped into categories — `recording`, `time`, `space`,
+  `variables` and `structure` — and `spec_version` becomes 3.0.0 for
+  anipoint frames and 1.0.0 for anievents
+  ([\#118](https://github.com/animovement/anicore/issues/118)). Access
+  stays flat: `get_metadata(x, "sampling_rate")`,
+  `get_metadata(x)$sampling_rate` and
+  `set_metadata(x, sampling_rate = 30)` work as before, and a category
+  name returns the whole category. Reading `attr(x, "metadata")`
+  directly no longer works. Objects in the old layout are migrated when
+  read.
+  - An anievent has no `space` category: its spatial fields read `NULL`,
+    and spatial fields passed to
+    [`as_anievent()`](https://animovement.dev/anicore/reference/as_anievent.md)
+    are dropped
+    ([\#73](https://github.com/animovement/anicore/issues/73)).
+  - [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md)
+    with several names returns a plain list, and setting a field to
+    `NULL` errors (use `NA`).
+- `set_*()` functions now only declare; operations that change values
+  have their own verbs
+  ([\#155](https://github.com/animovement/anicore/issues/155)).
+  - [`get_variables()`](https://animovement.dev/anicore/reference/variables.md),
+    [`set_variables()`](https://animovement.dev/anicore/reference/variables.md),
+    [`add_variables()`](https://animovement.dev/anicore/reference/variables.md)
+    and
+    [`remove_variables()`](https://animovement.dev/anicore/reference/variables.md)
+    replace the sixteen `*_variables_*()` functions and `set_axes()`.
+    They take a role and a slot,
+    e.g. `set_variables(x, when = list(keys = "trial"))`.
+    `get_variables(x, "when")` now includes the index; the grouping
+    columns are
+    [`get_keys()`](https://animovement.dev/anicore/reference/get_keys.md).
+  - [`convert_unit_space()`](https://animovement.dev/anicore/reference/convert_unit_space.md),
+    [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md)
+    and
+    [`convert_unit_angle()`](https://animovement.dev/anicore/reference/convert_unit_angle.md)
+    replace `set_unit_*()`. Converting from `px`, `frame` or `unknown`
+    now needs a `calibration_factor`, or, from `frame`, a declared
+    `sampling_rate`.
+  - [`set_axis_directions()`](https://animovement.dev/anicore/reference/set_axis_directions.md)
+    only records directions;
+    [`reflect_axis()`](https://animovement.dev/anicore/reference/reflect_axis.md)
+    turns an axis over and reflects the data.
+  - The unit and sampling-rate getters and setters,
+    `get_/set_axis_extents()`, `set_handedness()` and
+    `set_angle_direction()` are removed; use
+    [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md)
+    and
+    [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md).
+    `set_sampling_rate()` also converted frames to seconds: use
+    `set_metadata(x, sampling_rate = r) |> convert_unit_time("s")`.
+- Structures replace connections
+  ([\#154](https://github.com/animovement/anicore/issues/154)). An
+  [`anistructure()`](https://animovement.dev/anicore/reference/anistructure.md)
+  holds points, segments with optional expected lengths, and joints:
+  angles between two segments, with optional limits. A frame can hold
+  several named structures, including several over one variable, through
+  [`set_structure()`](https://animovement.dev/anicore/reference/structures.md),
+  [`get_structure()`](https://animovement.dev/anicore/reference/structures.md)
+  and
+  [`remove_structure()`](https://animovement.dev/anicore/reference/structures.md).
+  The `*_connections()` functions are removed; stored connection tables
+  become structures.
+
 ### Added
+
+- [`as_anisegment()`](https://animovement.dev/anicore/reference/as_anisegment.md)
+  gives one row per segment of a structure: its `length` and unit
+  direction
+  ([\#154](https://github.com/animovement/anicore/issues/154)).
+  `as_anipoint(seg, root = )` rebuilds positions from segments, for
+  example after holding lengths constant.
+
+- [`as_anijoint()`](https://animovement.dev/anicore/reference/as_anijoint.md)
+  gives one angle per joint of a structure
+  ([\#154](https://github.com/animovement/anicore/issues/154)).
+  [`angle_between()`](https://animovement.dev/anicore/reference/angle_between.md)
+  is the underlying computation.
+
+- Orientation can be declared alongside position: `yaw` in 2D, or a unit
+  quaternion in 3D
+  ([\#46](https://github.com/animovement/anicore/issues/46)).
+  [`reflect_axis()`](https://animovement.dev/anicore/reference/reflect_axis.md)
+  and
+  [`convert_unit_angle()`](https://animovement.dev/anicore/reference/convert_unit_angle.md)
+  handle it, and `euler_sequence` and `euler_intrinsic` record the Euler
+  convention a source uses.
 
 - [`convert_inf_to_na()`](https://animovement.dev/anicore/reference/convert_inf_to_na.md),
   the sibling of
@@ -13,8 +124,6 @@
   Left in place an `Inf` propagates through arithmetic silently, so one
   untracked frame turns a mean or a speed into `Inf` rather than into a
   missing value (animovement/aniread#116).
-
-### Added
 
 - A `source_format` metadata field, recording which export layout a file
   was read as (animovement/aniread#118). Tracking software changes its
@@ -64,11 +173,8 @@
 
 ### Changed
 
-- `spec_version` moves to `aniframe = "2.1.0"` and `anievent = "0.4.0"`.
-  Minor for both: each gains `source_format` as `NA`. Objects serialised
-  before the field existed continue to validate.
-
-- The order of `variables_what` no longer asserts a hierarchy
+- The order of the identity keys (formerly `variables_what`) no longer
+  asserts a hierarchy
   ([\#140](https://github.com/animovement/anicore/issues/140),
   [\#141](https://github.com/animovement/anicore/issues/141)). It was
   documented as coarse to fine, which reads naturally for the names that
@@ -78,10 +184,10 @@
   sense in which one is finer than the next.
 
   The order is now documented as what auto-detection emits, not
-  something a frame asserts. Nothing should read a position in
-  `variables_what` as meaning a level; a function that needs to know
-  which variable to act on asks for it — `animetric::add_centroid()`
-  takes `across`, `anispace::translate_coords()` takes `level`.
+  something a frame asserts. Nothing should read a position among the
+  identity keys as meaning a level; a function that needs to know which
+  variable to act on asks for it — `animetric::add_centroid()` takes
+  `across`, `anispace::translate_coords()` takes `level`.
 
   No behaviour changes. Detection emits the same order, and the order
   still carries through to column order and grouping, which is
@@ -104,7 +210,7 @@
   arrive.
 
   **The `aniframe` class keeps its name**, as do
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md),
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md),
   [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
   and every other function. Only the package changes:
   [`library(anicore)`](https://animovement.dev/anicore/), `anicore::`,
@@ -113,7 +219,7 @@
   Done now rather than at 1.0.0 because a rename only ever gets more
   expensive, and there are no external users yet to carry the cost.
 
-- [`?aniframe`](https://animovement.dev/anicore/reference/aniframe.md)
+- [`?aniframe`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   is the constructor again. The package documentation had claimed the
   same help topic, so the two were merged into one page; it is now
   [`?anicore`](https://animovement.dev/anicore/reference/anicore.md).
@@ -128,18 +234,16 @@
   reads it,
   [`set_index()`](https://animovement.dev/anicore/reference/set_index.md)
   changes it and re-orders the frame, and
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   and
-  [`aniframe()`](https://animovement.dev/anicore/reference/aniframe.md)
+  [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   take an `index` argument. A frame has exactly one index, and it is
   never a grouping variable.
 
-  [`set_unit_time()`](https://animovement.dev/anicore/reference/set_unit_time.md),
-  [`set_sampling_rate()`](https://animovement.dev/anicore/reference/set_sampling_rate.md)
-  and
+  `set_unit_time()`, `set_sampling_rate()` and
   [`to_anievent()`](https://animovement.dev/anicore/reference/to_anievent.md)
   act on the declared index rather than a column named `time`, and
-  [`validate_aniframe()`](https://animovement.dev/anicore/reference/validate_aniframe.md)
+  [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   checks it is present and numeric.
 
   An `anievent` has no index, since a bout is delimited by `start` and
@@ -164,18 +268,14 @@
   floating-point timestamps are not called irregular over the last
   decimal place.
 
-  [`validate_aniframe()`](https://animovement.dev/anicore/reference/validate_aniframe.md)
+  [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   warns when a declared `sampling_rate` disagrees with the measured
   spacing — the same shape as
   [\#98](https://github.com/animovement/anicore/issues/98), where the
   metadata claimed a unit the data was not in.
 
-- [`get_sampling_rate()`](https://animovement.dev/anicore/reference/get_sampling_rate.md),
-  [`get_unit_space()`](https://animovement.dev/anicore/reference/get_unit_space.md),
-  [`get_unit_time()`](https://animovement.dev/anicore/reference/get_unit_time.md)
-  and
-  [`get_unit_angle()`](https://animovement.dev/anicore/reference/get_unit_angle.md)
-  read the fields that already had setters
+- `get_sampling_rate()`, `get_unit_space()`, `get_unit_time()` and
+  `get_unit_angle()` read the fields that already had setters
   ([\#121](https://github.com/animovement/anicore/issues/121)). Every
   field with a dedicated setter now has a dedicated getter, so reading
   one no longer means naming it as a string. The factor-backed ones
@@ -186,27 +286,22 @@
   reads the coordinate system a frame is in
   ([\#109](https://github.com/animovement/anicore/issues/109)). There is
   deliberately no setter: the field is derived from the axis roles, so
-  [`set_axes()`](https://animovement.dev/anicore/reference/set_axes.md)
-  says what the columns mean and `anispace`’s `map_to_*()` functions
-  convert the coordinates.
+  `set_axes()` says what the columns mean and `anispace`’s `map_to_*()`
+  functions convert the coordinates.
 
 - An `axes` metadata field records which column carries which axis role,
   so coordinates may be carried by columns of any name
   ([\#109](https://github.com/animovement/anicore/issues/109)).
   [`get_axes()`](https://animovement.dev/anicore/reference/get_axes.md)
-  reads it,
-  [`set_axes()`](https://animovement.dev/anicore/reference/set_axes.md)
-  changes it, and
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
-  and
-  [`set_variables_where()`](https://animovement.dev/anicore/reference/variables.md)
-  accept the same mapping — `c(x = "u", y = "v")`. `coordinate_system`
-  follows from it, and
-  [`set_unit_space()`](https://animovement.dev/anicore/reference/set_unit_space.md)
-  and the axis extents resolve through it. The roles are a closed set:
-  `x`, `y`, `z`, `rho`, `phi`, `theta`, and one that forms no coordinate
-  system is rejected by name at declaration. Declaring spatial columns
-  without roles keeps its old meaning, the column name being the role.
+  reads it, `set_axes()` changes it, and
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
+  and `set_variables_where()` accept the same mapping —
+  `c(x = "u", y = "v")`. `coordinate_system` follows from it, and
+  `set_unit_space()` and the axis extents resolve through it. The roles
+  are a closed set: `x`, `y`, `z`, `rho`, `phi`, `theta`, and one that
+  forms no coordinate system is rejected by name at declaration.
+  Declaring spatial columns without roles keeps its old meaning, the
+  column name being the role.
 
 - Axis directions and extents record how a frame is laid out, replacing
   `origin` and `y_height`
@@ -216,14 +311,12 @@
   `axis_extents` maps each to how far it runs.
   [`get_axis_directions()`](https://animovement.dev/anicore/reference/get_axis_directions.md),
   [`set_axis_directions()`](https://animovement.dev/anicore/reference/set_axis_directions.md),
-  [`get_axis_extents()`](https://animovement.dev/anicore/reference/get_axis_extents.md)
-  and
-  [`set_axis_extents()`](https://animovement.dev/anicore/reference/set_axis_extents.md)
-  read and write them. Turning an axis to its opposite reflects that
-  column: around the axis extent where one is declared, around zero
-  where none is. The column is found by role, so a frame whose vertical
-  axis is called something else is handled, and an angular frame refuses
-  rather than leaving every stored angle facing the wrong way.
+  `get_axis_extents()` and `set_axis_extents()` read and write them.
+  Turning an axis to its opposite reflects that column: around the axis
+  extent where one is declared, around zero where none is. The column is
+  found by role, so a frame whose vertical axis is called something else
+  is handled, and an angular frame refuses rather than leaving every
+  stored angle facing the wrong way.
 
 - [`get_angle_direction()`](https://animovement.dev/anicore/reference/get_angle_direction.md)
   says which way angles run, derived from the axis directions rather
@@ -234,21 +327,17 @@
   which convention a number was in.
 
 - [`get_handedness()`](https://animovement.dev/anicore/reference/get_handedness.md)
-  and
-  [`set_handedness()`](https://animovement.dev/anicore/reference/set_handedness.md)
-  say whether a frame is right- or left-handed
+  and `set_handedness()` say whether a frame is right- or left-handed
   ([\#124](https://github.com/animovement/anicore/issues/124)). Three
   declared axis directions determine it and are read in preference to
   the `handedness` field, which carries the convention for a frame that
-  states one without spelling the axes out.
-  [`set_handedness()`](https://animovement.dev/anicore/reference/set_handedness.md)
-  defaults to right-handed and completes the third axis when two are
-  declared.
+  states one without spelling the axes out. `set_handedness()` defaults
+  to right-handed and completes the third axis when two are declared.
 
-- [`set_angle_direction()`](https://animovement.dev/anicore/reference/set_angle_direction.md)
-  asks for a sense of rotation and declares the axis directions that
-  give it ([\#124](https://github.com/animovement/anicore/issues/124)),
-  turning the vertical axis over when both are already declared.
+- `set_angle_direction()` asks for a sense of rotation and declares the
+  axis directions that give it
+  ([\#124](https://github.com/animovement/anicore/issues/124)), turning
+  the vertical axis over when both are already declared.
 
 - [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
   and
@@ -309,17 +398,15 @@
   declaration is no longer reported as spherical. The guards say which
   system the frame is in and how to get to the one you need.
 
-- [`add_variables_where()`](https://animovement.dev/anicore/reference/variables.md)
-  and
-  [`remove_variables_where()`](https://animovement.dev/anicore/reference/variables.md)
-  carry the axis roles through
+- `add_variables_where()` and `remove_variables_where()` carry the axis
+  roles through
   ([\#109](https://github.com/animovement/anicore/issues/109)). They
   combined bare column names, so on a frame with declared roles every
   addition or removal reduced it to `unknown`. Removing an axis until
   the remainder forms no coordinate system warns rather than aborting;
   declaring such a set outright still aborts.
 
-- [`validate_aniframe()`](https://animovement.dev/anicore/reference/validate_aniframe.md)
+- [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   warns when identity, temporal context and the index together do not
   name one observation per row
   ([\#49](https://github.com/animovement/anicore/issues/49)). A repeat
@@ -348,15 +435,13 @@
   `set_y_height()`
   ([\#124](https://github.com/animovement/anicore/issues/124)). Use
   [`set_axis_directions()`](https://animovement.dev/anicore/reference/set_axis_directions.md)
-  and
-  [`set_axis_extents()`](https://animovement.dev/anicore/reference/set_axis_extents.md).
-  `origin` recorded a corner, but the origin is `(0, 0)` in both of its
-  values — what differed was the direction y increases in, which is what
-  is recorded now. It also had nothing to say for 3D data or for a
-  recording with no frame corners at all. The deprecated
-  `point_of_reference` alias goes with the field it aliased.
+  and `set_axis_extents()`. `origin` recorded a corner, but the origin
+  is `(0, 0)` in both of its values — what differed was the direction y
+  increases in, which is what is recorded now. It also had nothing to
+  say for 3D data or for a recording with no frame corners at all. The
+  deprecated `point_of_reference` alias goes with the field it aliased.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   no longer fills in an axis extent from the data
   ([\#124](https://github.com/animovement/anicore/issues/124)).
   `y_height` fell back to `max(y)`, which is the highest tracked point
@@ -374,35 +459,29 @@
 
 ### Fixed
 
-- [`set_unit_space()`](https://animovement.dev/anicore/reference/set_unit_space.md)
-  converts the axis extents along with the coordinates
+- `set_unit_space()` converts the axis extents along with the
+  coordinates
   ([\#124](https://github.com/animovement/anicore/issues/124)). An
   extent is a length, so converting cm to m left the frame claiming a
   height in the unit it no longer used.
 
-- [`set_unit_space()`](https://animovement.dev/anicore/reference/set_unit_space.md)
-  converts the length axes of the frame’s coordinate system rather than
-  whichever of `x`, `y` and `z` are present
+- `set_unit_space()` converts the length axes of the frame’s coordinate
+  system rather than whichever of `x`, `y` and `z` are present
   ([\#98](https://github.com/animovement/anicore/issues/98)). `rho` is a
   length on polar, cylindrical and spherical frames and was never
   converted, while the metadata was updated to claim the new unit.
-  Angular axes remain
-  [`set_unit_angle()`](https://animovement.dev/anicore/reference/set_unit_angle.md)’s
-  to convert. Where the coordinate system is `unknown` a length cannot
-  be told from an angle, and the function now warns rather than silently
-  converting nothing.
+  Angular axes remain `set_unit_angle()`’s to convert. Where the
+  coordinate system is `unknown` a length cannot be told from an angle,
+  and the function now warns rather than silently converting nothing.
 
-- [`set_unit_space()`](https://animovement.dev/anicore/reference/set_unit_space.md),
-  [`set_unit_angle()`](https://animovement.dev/anicore/reference/set_unit_angle.md),
-  [`set_unit_time()`](https://animovement.dev/anicore/reference/set_unit_time.md)
-  and
-  [`set_sampling_rate()`](https://animovement.dev/anicore/reference/set_sampling_rate.md)
-  no longer re-inject a `keypoint` column and overwrite `variables_what`
-  with it ([\#96](https://github.com/animovement/anicore/issues/96)). A
-  frame given a custom identity such as `id` was silently regrouped on a
+- `set_unit_space()`, `set_unit_angle()`, `set_unit_time()` and
+  `set_sampling_rate()` no longer re-inject a `keypoint` column and
+  overwrite `variables_what` with it
+  ([\#96](https://github.com/animovement/anicore/issues/96)). A frame
+  given a custom identity such as `id` was silently regrouped on a
   constant column.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   keeps the roles a frame already declares rather than re-deriving them,
   so casting an aniframe is no longer destructive
   ([\#96](https://github.com/animovement/anicore/issues/96)). A
@@ -413,18 +492,15 @@
 
 ### Added
 
-- [`set_variables_what()`](https://animovement.dev/anicore/reference/variables.md),
-  [`set_variables_when()`](https://animovement.dev/anicore/reference/variables.md),
-  [`set_variables_where()`](https://animovement.dev/anicore/reference/variables.md)
-  and
-  [`set_variables_event()`](https://animovement.dev/anicore/reference/variables_event.md)
-  declare the variable roles, each with `get_`, `add_` and `remove_`
-  verbs ([\#82](https://github.com/animovement/anicore/issues/82)). They
+- `set_variables_what()`, `set_variables_when()`,
+  `set_variables_where()` and `set_variables_event()` declare the
+  variable roles, each with `get_`, `add_` and `remove_` verbs
+  ([\#82](https://github.com/animovement/anicore/issues/82)). They
   declare the role *and* restructure the frame to match, so the metadata
   and the frame cannot drift apart. `add_variables_*()` appends, so
   adding one identity column no longer means restating the others.
 
-- [`validate_aniframe()`](https://animovement.dev/anicore/reference/validate_aniframe.md)
+- [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   re-checks that the metadata still describes the frame: every declared
   column present, `time` and the spatial columns numeric
   ([\#79](https://github.com/animovement/anicore/issues/79)).
@@ -447,7 +523,7 @@
   before, so operations silently integrated across identities. A
   complete metadata object can still be restored wholesale.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   errors when `variables_what` names a column that is not in the data,
   as it already did for `variables_when` and `variables_where`
   ([\#77](https://github.com/animovement/anicore/issues/77)).
@@ -460,7 +536,7 @@
 
 ### Removed
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   no longer adds a `keypoint = "centroid"` column to data that already
   has an identity column
   ([\#77](https://github.com/animovement/anicore/issues/77)). Results
@@ -529,14 +605,11 @@
   ([\#65](https://github.com/animovement/anicore/issues/65)). Older
   serialised objects without it continue to validate.
 
-- [`set_unit_time()`](https://animovement.dev/anicore/reference/set_unit_time.md)
-  and
-  [`set_sampling_rate()`](https://animovement.dev/anicore/reference/set_sampling_rate.md)
-  are S3 generics with `aniframe` and `anievent` methods. On an anievent
-  the calibration factor applies to `start` and `stop` rather than
-  `time`.
+- `set_unit_time()` and `set_sampling_rate()` are S3 generics with
+  `aniframe` and `anievent` methods. On an anievent the calibration
+  factor applies to `start` and `stop` rather than `time`.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   auto-detects `observation` as a temporal grouping column, alongside
   `session` and `trial`.
 
@@ -573,7 +646,7 @@
 - `set_y_height()` sets the y-axis frame height that `set_origin()`
   uses, validated against the data range, and a `y_height` metadata
   field to hold it. Readers populate it from the source;
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   falls back to `max(y)` when missing, and never overwrites an existing
   value.
 
@@ -582,13 +655,9 @@
   Stored as a named list keyed by the relevant identity or temporal
   variable — typically `keypoint`, but `individual` for social networks
   — with each entry a 2-column `from`/`to` tibble whose order is
-  preserved. Manage it with
-  [`set_connections()`](https://animovement.dev/anicore/reference/set_connections.md),
-  [`get_connections()`](https://animovement.dev/anicore/reference/get_connections.md),
-  [`add_connections()`](https://animovement.dev/anicore/reference/add_connections.md)
-  and
-  [`remove_connections()`](https://animovement.dev/anicore/reference/remove_connections.md).
-  Endpoints missing from the corresponding column warn but are kept.
+  preserved. Manage it with `set_connections()`, `get_connections()`,
+  `add_connections()` and `remove_connections()`. Endpoints missing from
+  the corresponding column warn but are kept.
 
 - A “Time” row in the print summary showing the tracked interval as
   `HH:MM:SS to HH:MM:SS`, or as absolute datetimes when `start_datetime`
@@ -600,16 +669,14 @@
 
 ### Changed
 
-- [`set_unit_angle()`](https://animovement.dev/anicore/reference/set_unit_angle.md)
-  converts the spatial angular columns `phi` and `theta` whenever they
-  are present, so polar, cylindrical and spherical coordinates stay
-  consistent with the declared `unit_angle`
+- `set_unit_angle()` converts the spatial angular columns `phi` and
+  `theta` whenever they are present, so polar, cylindrical and spherical
+  coordinates stay consistent with the declared `unit_angle`
   ([\#21](https://github.com/animovement/anicore/issues/21)). These were
   previously assumed to be radians and left alone. The signature becomes
   `set_unit_angle(data, to_unit, cols = NULL)`, matching
-  [`set_unit_time()`](https://animovement.dev/anicore/reference/set_unit_time.md);
-  pass `cols` only for additional non-spatial angular columns.
-  Positional callers need to swap their arguments.
+  `set_unit_time()`; pass `cols` only for additional non-spatial angular
+  columns. Positional callers need to swap their arguments.
 
 - The print summary is driven by `variables_what` and `variables_when`
   rather than hard-coded column names
@@ -638,7 +705,7 @@
 
 ### Fixed
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   no longer mis-classifies cylindrical (`rho`, `phi`, `z`) and spherical
   (`rho`, `phi`, `theta`) data as Cartesian
   ([\#44](https://github.com/animovement/anicore/issues/44)). Detection
@@ -652,16 +719,16 @@
 ### Fixed
 
 - Corrected metadata written by
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md).
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md).
 
 ## anicore 0.4.0 (as aniframe)
 
 ### Added
 
 - `variables_what`, `variables_when` and `variables_where` arguments to
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   and
-  [`example_aniframe()`](https://animovement.dev/anicore/reference/example_aniframe.md),
+  [`example_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md),
   written into the frame’s metadata. These declare which columns carry
   identity, temporal position and spatial position, and are the basis
   for how the frame is typed, ordered and grouped.
@@ -801,12 +868,8 @@ converting between systems becomes anispace’s job.
 
 ### Added
 
-- Unit handling:
-  [`set_unit_space()`](https://animovement.dev/anicore/reference/set_unit_space.md),
-  [`set_unit_angle()`](https://animovement.dev/anicore/reference/set_unit_angle.md),
-  [`set_unit_time()`](https://animovement.dev/anicore/reference/set_unit_time.md)
-  and
-  [`set_sampling_rate()`](https://animovement.dev/anicore/reference/set_sampling_rate.md).
+- Unit handling: `set_unit_space()`, `set_unit_angle()`,
+  `set_unit_time()` and `set_sampling_rate()`.
 - Coordinate transformations: `map_to_cartesian()`, `map_to_polar()`,
   `map_to_cylindrical()` and `map_to_spherical()`, with the component
   converters `cartesian_to_rho()`, `cartesian_to_phi()`,
@@ -828,8 +891,8 @@ converting between systems becomes anispace’s job.
 
 ### Changed
 
-- [`tbl_sum.aniframe()`](https://animovement.dev/anicore/reference/tbl_sum.aniframe.md)
-  is registered as an S3 method rather than exported.
+- `tbl_sum.aniframe()` is registered as an S3 method rather than
+  exported.
 
 ## anicore 0.1.0 (2025-10-13, as aniframe)
 
@@ -839,13 +902,13 @@ columns hold identity, time and position.
 
 ### Added
 
-- [`aniframe()`](https://animovement.dev/anicore/reference/aniframe.md)
+- [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   and
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/as_aniframe.md)
+  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   to construct a frame,
   [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
   to test one, and
-  [`example_aniframe()`](https://animovement.dev/anicore/reference/example_aniframe.md)
+  [`example_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
   to generate one.
 - [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md),
   [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md)

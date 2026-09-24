@@ -1,7 +1,6 @@
 # Ensure the index column is present and numeric
 
-Which column that is comes from the frame's own declaration; `time` is
-its default, not a requirement (#109).
+Ensure the index column is present and numeric
 
 ## Usage
 
@@ -13,7 +12,7 @@ ensure_has_index(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 

@@ -1,10 +1,10 @@
 # Print method for animovement metadata
 
-Renders the metadata as a single block, captured via
-[`cli::cli_format_method()`](https://cli.r-lib.org/reference/cli_format_method.html)
-and emitted with [`cat()`](https://rdrr.io/r/base/cat.html). Field names
-and types are padded to fixed widths so the values line up in aligned
-columns, similar to [`str()`](https://rdrr.io/r/utils/str.html).
+Shared by
+[`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md)
+and
+[`anievent()`](https://animovement.dev/anicore/reference/anievent.md)
+despite the class name.
 
 ## Usage
 
@@ -26,12 +26,3 @@ print(x, ...)
 ## Value
 
 `x`, invisibly.
-
-## Details
-
-The S3 class is named `aniframe_metadata` for historical reasons, but
-the metadata substrate is shared by both
-[`aniframe()`](https://animovement.dev/anicore/reference/aniframe.md)
-and
-[`anievent()`](https://animovement.dev/anicore/reference/anievent.md)
-objects.

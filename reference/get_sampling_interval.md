@@ -14,7 +14,7 @@ get_sampling_interval(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
   Refreshed whenever the frame is re-declared, so like
   `coordinate_system` it can lag raw dplyr edits.
@@ -33,13 +33,12 @@ sampling.
 
 ## See also
 
-[`is_sampling_regular()`](https://animovement.dev/anicore/reference/is_sampling_regular.md),
-[`get_sampling_rate()`](https://animovement.dev/anicore/reference/get_sampling_rate.md)
+[`is_sampling_regular()`](https://animovement.dev/anicore/reference/is_sampling_regular.md)
 
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 5, n_individuals = 2, n_keypoints = 1)
+af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 get_sampling_interval(af)
 #> [1] 1
 ```

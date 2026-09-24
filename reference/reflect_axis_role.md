@@ -12,7 +12,7 @@ reflect_axis_role(data, role)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 - role:
 

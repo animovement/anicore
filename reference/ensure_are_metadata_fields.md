@@ -12,7 +12,7 @@ ensure_are_metadata_fields(fields, call = rlang::caller_env())
 
 - fields:
 
-  Character vector of field names, or `NULL`.
+  Character vector of field or category names, or `NULL`.
 
 ## Value
 

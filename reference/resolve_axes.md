@@ -1,9 +1,6 @@
 # Resolve the axis mapping from a metadata list
 
-Objects serialised before the field existed have no `axes`, but their
-`variables_where` was matched against the role names to infer a
-coordinate system, so the column name *was* the role. Reading it that
-way here keeps those frames working untouched.
+An unnamed position vector is read with the column name as the role.
 
 ## Usage
 

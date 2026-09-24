@@ -1,7 +1,6 @@
-# The axis roles that can point somewhere
+# The axis roles that can point somewhere (the Cartesian ones)
 
-The Cartesian axes. `rho` is a distance and `phi` and `theta` are
-angles, so none of them has a direction of its own.
+The axis roles that can point somewhere (the Cartesian ones)
 
 ## Usage
 

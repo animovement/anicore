@@ -1,6 +1,12 @@
 # Check if object is an aniframe
 
-Check if object is an aniframe
+`aniframe` is the abstract parent of every animovement frame class, so
+this tests for the whole family: an
+[anipoint](https://animovement.dev/anicore/reference/is_anipoint.md), an
+[anievent](https://animovement.dev/anicore/reference/is_anievent.md),
+and any subclass built on them all pass. Use
+[`is_anipoint()`](https://animovement.dev/anicore/reference/is_anipoint.md)
+to test for the position grain specifically.
 
 ## Usage
 
@@ -21,7 +27,7 @@ Logical: TRUE if x inherits from aniframe
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_aniframe(af)
 #> [1] TRUE
 

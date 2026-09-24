@@ -22,12 +22,12 @@ declares none.
 ## See also
 
 [`set_axis_directions()`](https://animovement.dev/anicore/reference/set_axis_directions.md),
-[`get_axis_extents()`](https://animovement.dev/anicore/reference/get_axis_extents.md)
+[`reflect_axis()`](https://animovement.dev/anicore/reference/reflect_axis.md)
 
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_axis_directions(af, c(x = "right", y = "up"))
 get_axis_directions(af)
 #>       x       y 

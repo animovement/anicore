@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,10 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Reference"><span class="fa fa-file-code"></span> Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/aniframe-structure.html">The aniframe data structure</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/aniframe-structure.html">The anipoint data structure</a></li>
     <li><a class="dropdown-item" href="../articles/aniframe-metadata.html">Metadata on an aniframe</a></li>
-    <li><a class="dropdown-item" href="../articles/aniframe-connections.html">Connections</a></li>
+    <li><a class="dropdown-item" href="../articles/orientation.html">Orientation</a></li>
+    <li><a class="dropdown-item" href="../articles/structures.html">Structures</a></li>
     <li><a class="dropdown-item" href="../articles/anievent-structure.html">The anievent data structure</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html" aria-label="News"><span class="fa fa-newspaper"></span> News</a></li>
@@ -56,9 +57,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="creating-and-converting-aniframe-objects">Creating and converting aniframe objects<a class="anchor" aria-label="anchor" href="#creating-and-converting-aniframe-objects"></a></h2>
+      <h2 id="creating-and-converting-anipoint-objects">Creating and converting anipoint objects<a class="anchor" aria-label="anchor" href="#creating-and-converting-anipoint-objects"></a></h2>
 
-      <div class="section-desc"><p>Functions that create an aniframe, coerce other objects to aniframe, or provide example data.</p></div>
+      <div class="section-desc"><p>Functions that create an anipoint (the position-grain frame), coerce other objects to anipoint, or provide example data. <code>aniframe</code> is the abstract parent class shared by anipoint and anievent.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -67,24 +68,38 @@
 
       <dl><dt>
 
-          <code><a href="as_aniframe.html">as_aniframe()</a></code>
+          <code><a href="as_anipoint.html">as_anipoint()</a></code>
 
         </dt>
-        <dd>Convert a data frame to aniframe</dd>
+        <dd>Convert a data frame to anipoint</dd>
 
         <dt>
 
-          <code><a href="aniframe.html">aniframe()</a></code>
+          <code><a href="anipoint.html">anipoint()</a></code>
 
         </dt>
-        <dd>Create an aniframe data frame</dd>
+        <dd>Create an anipoint data frame</dd>
 
         <dt>
 
-          <code><a href="example_aniframe.html">example_aniframe()</a></code>
+          <code><a href="example_anipoint.html">example_anipoint()</a></code>
 
         </dt>
-        <dd>Create example aniframe data</dd>
+        <dd>Create example anipoint data</dd>
+
+        <dt>
+
+          <code><a href="is_anipoint.html">is_anipoint()</a></code>
+
+        </dt>
+        <dd>Check if object is an anipoint</dd>
+
+        <dt>
+
+          <code><a href="ensure_is_anipoint.html">ensure_is_anipoint()</a></code>
+
+        </dt>
+        <dd>Ensure object is an anipoint</dd>
 
         <dt>
 
@@ -102,10 +117,17 @@
 
         <dt>
 
-          <code><a href="validate_aniframe.html">validate_aniframe()</a></code>
+          <code><a href="validate_anipoint.html">validate_anipoint()</a></code>
 
         </dt>
-        <dd>Validate an aniframe</dd>
+        <dd>Validate an anipoint</dd>
+
+        <dt>
+
+          <code><a href="anicore-deprecated.html">aniframe()</a></code> <code><a href="anicore-deprecated.html">as_aniframe()</a></code> <code><a href="anicore-deprecated.html">example_aniframe()</a></code> <code><a href="anicore-deprecated.html">validate_aniframe()</a></code>
+
+        </dt>
+        <dd>Deprecated aniframe constructors</dd>
       </dl></div><div class="section level2">
       <h2 id="creating-and-converting-anievent-objects">Creating and converting anievent objects<a class="anchor" aria-label="anchor" href="#creating-and-converting-anievent-objects"></a></h2>
 
@@ -158,9 +180,9 @@
         </dt>
         <dd>Validate an anievent</dd>
       </dl></div><div class="section level2">
-      <h2 id="metadata-handling">Metadata handling<a class="anchor" aria-label="anchor" href="#metadata-handling"></a></h2>
+      <h2 id="metadata">Metadata<a class="anchor" aria-label="anchor" href="#metadata"></a></h2>
 
-      <div class="section-desc"><p>Functions for reading, setting, and retrieving the metadata attached to aniframe or anievent objects.</p></div>
+      <div class="section-desc"><p>Read and declare metadata. <code>set_*</code> only declares; it never changes a value.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -183,59 +205,10 @@
 
         <dt>
 
-          <code><a href="get_unit_time.html">get_unit_time()</a></code>
+          <code><a href="list_default_metadata.html">list_default_metadata()</a></code>
 
         </dt>
-        <dd>The unit the index or bout boundaries are in</dd>
-
-        <dt>
-
-          <code><a href="set_unit_time.html">set_unit_time()</a></code>
-
-        </dt>
-        <dd>Set the temporal unit of an aniframe or anievent</dd>
-
-        <dt>
-
-          <code><a href="get_unit_space.html">get_unit_space()</a></code>
-
-        </dt>
-        <dd>The unit the spatial coordinates are in</dd>
-
-        <dt>
-
-          <code><a href="set_unit_space.html">set_unit_space()</a></code>
-
-        </dt>
-        <dd>Set the spatial unit of an aniframe object</dd>
-
-        <dt>
-
-          <code><a href="get_unit_angle.html">get_unit_angle()</a></code>
-
-        </dt>
-        <dd>The unit the angular axes are in</dd>
-
-        <dt>
-
-          <code><a href="set_unit_angle.html">set_unit_angle()</a></code>
-
-        </dt>
-        <dd>Set the angular unit of an aniframe object</dd>
-
-        <dt>
-
-          <code><a href="get_sampling_rate.html">get_sampling_rate()</a></code>
-
-        </dt>
-        <dd>The sampling rate, in Hz</dd>
-
-        <dt>
-
-          <code><a href="set_sampling_rate.html">set_sampling_rate()</a></code>
-
-        </dt>
-        <dd>Set the sampling rate of an aniframe or anievent</dd>
+        <dd>Default metadata structure</dd>
 
         <dt>
 
@@ -267,31 +240,10 @@
 
         <dt>
 
-          <code><a href="get_axis_extents.html">get_axis_extents()</a></code>
-
-        </dt>
-        <dd>Get how far each axis runs</dd>
-
-        <dt>
-
-          <code><a href="set_axis_extents.html">set_axis_extents()</a></code>
-
-        </dt>
-        <dd>Say how far each axis runs</dd>
-
-        <dt>
-
           <code><a href="get_angle_direction.html">get_angle_direction()</a></code>
 
         </dt>
         <dd>Which way angles run</dd>
-
-        <dt>
-
-          <code><a href="set_angle_direction.html">set_angle_direction()</a></code>
-
-        </dt>
-        <dd>Say which way angles run</dd>
 
         <dt>
 
@@ -302,21 +254,14 @@
 
         <dt>
 
-          <code><a href="set_handedness.html">set_handedness()</a></code>
+          <code><a href="get_coordinate_system.html">get_coordinate_system()</a></code>
 
         </dt>
-        <dd>Say whether the frame is right- or left-handed</dd>
-
-        <dt>
-
-          <code><a href="list_default_metadata.html">list_default_metadata()</a></code>
-
-        </dt>
-        <dd>Default metadata structure</dd>
+        <dd>The coordinate system an anipoint is in</dd>
       </dl></div><div class="section level2">
       <h2 id="declaring-variables">Declaring variables<a class="anchor" aria-label="anchor" href="#declaring-variables"></a></h2>
 
-      <div class="section-desc"><p>Declare which columns carry identity, time and position. These are the frame’s structure rather than a description of it, so the setters restructure the frame to match — coercing column types, relocating, reordering, regrouping, and refreshing derived fields. <code><a href="../reference/set_metadata.html">set_metadata()</a></code> refuses these fields for that reason.</p></div>
+      <div class="section-desc"><p>Declare which columns carry identity, time, position and events. The setters restructure the frame to match, so <code><a href="../reference/set_metadata.html">set_metadata()</a></code> refuses these fields.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -325,56 +270,42 @@
 
       <dl><dt>
 
-          <code><a href="variables.html">get_variables_what()</a></code> <code><a href="variables.html">get_variables_when()</a></code> <code><a href="variables.html">get_variables_where()</a></code> <code><a href="variables.html">set_variables_what()</a></code> <code><a href="variables.html">set_variables_when()</a></code> <code><a href="variables.html">set_variables_where()</a></code> <code><a href="variables.html">add_variables_what()</a></code> <code><a href="variables.html">add_variables_when()</a></code> <code><a href="variables.html">add_variables_where()</a></code> <code><a href="variables.html">remove_variables_what()</a></code> <code><a href="variables.html">remove_variables_when()</a></code> <code><a href="variables.html">remove_variables_where()</a></code>
+          <code><a href="variables.html">get_variables()</a></code> <code><a href="variables.html">set_variables()</a></code> <code><a href="variables.html">add_variables()</a></code> <code><a href="variables.html">remove_variables()</a></code>
 
         </dt>
-        <dd>Declare which columns carry identity, time and position</dd>
+        <dd>Read and declare which columns carry identity, time, position and events</dd>
 
         <dt>
 
-          <code><a href="variables_event.html">get_variables_event()</a></code> <code><a href="variables_event.html">set_variables_event()</a></code> <code><a href="variables_event.html">add_variables_event()</a></code> <code><a href="variables_event.html">remove_variables_event()</a></code>
+          <code><a href="get_keys.html">get_keys()</a></code>
 
         </dt>
-        <dd>Declare which columns carry per-frame event labels</dd>
+        <dd>The grouping columns of a frame</dd>
 
         <dt>
 
           <code><a href="get_index.html">get_index()</a></code>
 
         </dt>
-        <dd>The column an aniframe is indexed by</dd>
+        <dd>The column an anipoint is indexed by</dd>
 
         <dt>
 
           <code><a href="set_index.html">set_index()</a></code>
 
         </dt>
-        <dd>Declare which column an aniframe is indexed by</dd>
+        <dd>Declare which column an anipoint is indexed by</dd>
 
         <dt>
 
           <code><a href="get_axes.html">get_axes()</a></code>
 
         </dt>
-        <dd>The axis roles of an aniframe, and the columns carrying them</dd>
-
-        <dt>
-
-          <code><a href="set_axes.html">set_axes()</a></code>
-
-        </dt>
-        <dd>Declare which column carries which axis role</dd>
-
-        <dt>
-
-          <code><a href="get_coordinate_system.html">get_coordinate_system()</a></code>
-
-        </dt>
-        <dd>The coordinate system an aniframe is in</dd>
+        <dd>The axis roles of an anipoint, and the columns carrying them</dd>
       </dl></div><div class="section level2">
-      <h2 id="connections">Connections<a class="anchor" aria-label="anchor" href="#connections"></a></h2>
+      <h2 id="transforming-values">Transforming values<a class="anchor" aria-label="anchor" href="#transforming-values"></a></h2>
 
-      <div class="section-desc"><p>Manage connections between identity or temporal variables (e.g. skeleton edges between keypoints, or social-network edges between individuals). Stored as a named list of <code>from</code>/<code>to</code> tibbles in <code>metadata$connections</code>.</p></div>
+      <div class="section-desc"><p>Functions that change values and update the metadata to match.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -383,35 +314,125 @@
 
       <dl><dt>
 
-          <code><a href="set_connections.html">set_connections()</a></code>
+          <code><a href="convert_unit_space.html">convert_unit_space()</a></code>
 
         </dt>
-        <dd>Set the connections for a variable</dd>
+        <dd>Convert the spatial unit of an anipoint</dd>
 
         <dt>
 
-          <code><a href="get_connections.html">get_connections()</a></code>
+          <code><a href="convert_unit_time.html">convert_unit_time()</a></code>
 
         </dt>
-        <dd>Get connections from an aniframe</dd>
+        <dd>Convert the time unit of an anipoint or anievent</dd>
 
         <dt>
 
-          <code><a href="add_connections.html">add_connections()</a></code>
+          <code><a href="convert_unit_angle.html">convert_unit_angle()</a></code>
 
         </dt>
-        <dd>Add connections to an aniframe</dd>
+        <dd>Convert the angular unit of an anipoint</dd>
 
         <dt>
 
-          <code><a href="remove_connections.html">remove_connections()</a></code>
+          <code><a href="reflect_axis.html">reflect_axis()</a></code>
 
         </dt>
-        <dd>Remove connections from an aniframe</dd>
+        <dd>Turn an axis over</dd>
+      </dl></div><div class="section level2">
+      <h2 id="structures">Structures<a class="anchor" aria-label="anchor" href="#structures"></a></h2>
+
+      <div class="section-desc"><p>Points, the segments between them, and joints, over the levels of an identity or temporal variable. A frame can hold several named structures.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="anistructure.html">anistructure()</a></code>
+
+        </dt>
+        <dd>Create a structure: points, the segments between them, and joints</dd>
+
+        <dt>
+
+          <code><a href="example_structure.html">example_structure()</a></code>
+
+        </dt>
+        <dd>An example structure for the keypoints of <code><a href="../reference/example_anipoint.html">example_anipoint()</a></code></dd>
+
+        <dt>
+
+          <code><a href="validate_anistructure.html">validate_anistructure()</a></code>
+
+        </dt>
+        <dd>Check that a structure is internally consistent</dd>
+
+        <dt>
+
+          <code><a href="is_anistructure.html">is_anistructure()</a></code> <code><a href="is_anistructure.html">ensure_is_anistructure()</a></code>
+
+        </dt>
+        <dd>Test whether an object is an anistructure</dd>
+
+        <dt>
+
+          <code><a href="structures.html">set_structure()</a></code> <code><a href="structures.html">get_structure()</a></code> <code><a href="structures.html">remove_structure()</a></code>
+
+        </dt>
+        <dd>Attach, read and remove the structures of a frame</dd>
+      </dl></div><div class="section level2">
+      <h2 id="segments">Segments<a class="anchor" aria-label="anchor" href="#segments"></a></h2>
+
+      <div class="section-desc"><p>The same data re-expressed per segment: a length and a unit direction, converted from and back to an anipoint.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="as_anisegment.html">as_anisegment()</a></code>
+
+        </dt>
+        <dd>Convert an anipoint to segments: a length and a direction per segment</dd>
+
+        <dt>
+
+          <code><a href="is_anisegment.html">is_anisegment()</a></code> <code><a href="is_anisegment.html">ensure_is_anisegment()</a></code>
+
+        </dt>
+        <dd>Test whether an object is an anisegment</dd>
+      </dl></div><div class="section level2">
+      <h2 id="joints">Joints<a class="anchor" aria-label="anchor" href="#joints"></a></h2>
+
+      <div class="section-desc"><p>One angle per joint, computed from its two segments.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="as_anijoint.html">as_anijoint()</a></code>
+
+        </dt>
+        <dd>Convert segments to joints: one angle per joint</dd>
+
+        <dt>
+
+          <code><a href="is_anijoint.html">is_anijoint()</a></code> <code><a href="is_anijoint.html">ensure_is_anijoint()</a></code>
+
+        </dt>
+        <dd>Test whether an object is an anijoint</dd>
       </dl></div><div class="section level2">
       <h2 id="spatial-checks">Spatial checks<a class="anchor" aria-label="anchor" href="#spatial-checks"></a></h2>
 
-      <div class="section-desc"><p>These functions provide checks for your coordinate system. <code><a href="../reference/is_spatial.html">is_spatial()</a></code> and <code><a href="../reference/ensure_is_spatial.html">ensure_is_spatial()</a></code> check that the columns named in <code>variables_where</code> are present and numeric; the <code>is_cartesian*()</code> family reports which coordinate system the frame is in, which follows from the axis roles it declares.</p></div>
+      <div class="section-desc"><p>These functions provide checks for your coordinate system. <code><a href="../reference/is_spatial.html">is_spatial()</a></code> and <code><a href="../reference/ensure_is_spatial.html">ensure_is_spatial()</a></code> check that the declared position columns are present and numeric; the <code>is_cartesian*()</code> family reports which coordinate system the frame is in, which follows from the axis roles it declares.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -437,7 +458,7 @@
           <code><a href="is_cartesian.html">is_cartesian()</a></code>
 
         </dt>
-        <dd>Test whether an aniframe uses a Cartesian coordinate system</dd>
+        <dd>Test whether an anipoint uses a Cartesian coordinate system</dd>
 
         <dt>
 
@@ -465,21 +486,21 @@
           <code><a href="is_polar.html">is_polar()</a></code>
 
         </dt>
-        <dd>Test whether an aniframe uses a polar coordinate system</dd>
+        <dd>Test whether an anipoint uses a polar coordinate system</dd>
 
         <dt>
 
           <code><a href="is_cylindrical.html">is_cylindrical()</a></code>
 
         </dt>
-        <dd>Test whether an aniframe uses a cylindrical coordinate system</dd>
+        <dd>Test whether an anipoint uses a cylindrical coordinate system</dd>
 
         <dt>
 
           <code><a href="is_spherical.html">is_spherical()</a></code>
 
         </dt>
-        <dd>Test whether an aniframe uses a spherical coordinate system</dd>
+        <dd>Test whether an anipoint uses a spherical coordinate system</dd>
 
         <dt>
 
@@ -571,6 +592,13 @@
 
         </dt>
         <dd>Remove wrapping from a sequence of angles</dd>
+
+        <dt>
+
+          <code><a href="angle_between.html">angle_between()</a></code>
+
+        </dt>
+        <dd>The angle between two vectors</dd>
       </dl></div><div class="section level2">
 
       <h3 id="circular-statistics">Circular statistics<a class="anchor" aria-label="anchor" href="#circular-statistics"></a></h3>

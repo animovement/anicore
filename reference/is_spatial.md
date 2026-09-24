@@ -13,7 +13,7 @@ is_spatial(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 
@@ -33,12 +33,12 @@ both.
 ## See also
 
 [`ensure_is_spatial()`](https://animovement.dev/anicore/reference/ensure_is_spatial.md),
-[`validate_aniframe()`](https://animovement.dev/anicore/reference/validate_aniframe.md).
+[`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md).
 
 ## Examples
 
 ``` r
-af <- aniframe(time = 1:5, x = 1:5, y = 1:5)
+af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
 is_spatial(af)
 #> [1] TRUE
 

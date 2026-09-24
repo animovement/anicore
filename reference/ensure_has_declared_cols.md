@@ -1,9 +1,6 @@
 # Ensure declared columns are present
 
-Shared by construction
-([`ensure_has_aniframe_cols()`](https://animovement.dev/anicore/reference/ensure_has_aniframe_cols.md))
-and re-declaration, so a column that isn't there is reported the same
-way whichever route the caller took.
+Ensure declared columns are present
 
 ## Usage
 
@@ -23,7 +20,7 @@ ensure_has_declared_cols(data, cols, role)
 
 - role:
 
-  One of `"what"`, `"when"`, `"where"`.
+  One of `"what"`, `"when"`, `"where"`, `"event"`.
 
 ## Value
 

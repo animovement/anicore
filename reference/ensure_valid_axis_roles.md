@@ -1,8 +1,6 @@
 # Reject roles that no coordinate system defines
 
-Named by the offending role, at the point of declaration — as opposed to
-silently degrading the frame to `"unknown"` and failing later in
-whichever spatial function the user reaches for first.
+Reject roles that no coordinate system defines
 
 ## Usage
 

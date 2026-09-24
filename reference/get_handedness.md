@@ -2,9 +2,8 @@
 
 Three declared axis directions determine it, and are read in preference
 to anything recorded. A frame that states the convention without
-spelling the axes out — most 3D recordings — has it from the field
-[`set_handedness()`](https://animovement.dev/anicore/reference/set_handedness.md)
-writes.
+spelling the axes out — most 3D recordings — declares it with
+`set_metadata(data, handedness = "right")`.
 
 ## Usage
 
@@ -31,7 +30,7 @@ itself says.
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
 # Two axes are not enough
 af <- set_axis_directions(af, c(x = "right", y = "up"))

@@ -12,7 +12,7 @@ is_cartesian_1d(data, stop = FALSE)
 
 - data:
 
-  An aniframe.
+  An anipoint.
 
 - stop:
 
@@ -26,7 +26,7 @@ A logical value.
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_cartesian_1d(af)
 #> [1] FALSE
 ```

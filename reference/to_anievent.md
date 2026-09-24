@@ -5,7 +5,7 @@ long-format
 [`anievent()`](https://animovement.dev/anicore/reference/anievent.md).
 Works on a data frame (with bare-name selection of the event columns and
 explicit `time` / identity) or on an
-[`aniframe()`](https://animovement.dev/anicore/reference/aniframe.md)
+[`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md)
 (where everything is read from metadata).
 
 ## Usage
@@ -28,7 +28,7 @@ to_anievent(
   ...
 )
 
-# S3 method for class 'aniframe'
+# S3 method for class 'anipoint'
 to_anievent(
   data,
   variables_what = NULL,
@@ -43,7 +43,7 @@ to_anievent(
 - data:
 
   A data frame or an
-  [`aniframe()`](https://animovement.dev/anicore/reference/aniframe.md).
+  [`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md).
 
 - ...:
 
@@ -81,7 +81,7 @@ to_anievent(
 
 - metadata:
 
-  Optional list of metadata attached to the result. For an aniframe
+  Optional list of metadata attached to the result. For an anipoint
   input, fields like `unit_time` and `sampling_rate` are propagated
   automatically; `metadata` overrides those.
 

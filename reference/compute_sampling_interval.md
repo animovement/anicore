@@ -1,7 +1,6 @@
 # Derive the sampling interval from the index
 
-The median gap, which is unmoved by a few dropped frames in a way the
-mean is not.
+The median gap, robust to a few dropped frames.
 
 ## Usage
 
@@ -13,7 +12,7 @@ compute_sampling_interval(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 

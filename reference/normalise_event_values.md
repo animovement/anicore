@@ -1,8 +1,6 @@
 # Normalise an event-column vector to character labels
 
-Logical → column name on TRUE, `NA` on FALSE. Factor / character →
-character. Lets a single kernel handle both binary (logical) and
-multi-level (factor / character) inputs.
+Logical becomes the column name on TRUE, `NA` on FALSE.
 
 ## Usage
 

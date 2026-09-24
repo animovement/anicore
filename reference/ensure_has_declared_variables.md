@@ -12,7 +12,7 @@ ensure_has_declared_variables(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 

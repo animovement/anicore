@@ -1,8 +1,6 @@
 # Standardise column types for an anievent
 
-Coerces identity and temporal-grouping columns to factor/integer
-(mirroring the aniframe convention), `channel` to character, `label` to
-factor, and `start`/`stop` to numeric.
+Standardise column types for an anievent
 
 ## Usage
 
@@ -22,9 +20,7 @@ standardise_anievent_cols(data, variables_what, variables_when)
 
 - variables_when:
 
-  Temporal variable names — grouping columns (everything except
-  `start`/`stop`) are coerced like identity columns; `start` and `stop`
-  are forced numeric.
+  Temporal variable names, including `start`/`stop`.
 
 ## Value
 

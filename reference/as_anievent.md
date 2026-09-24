@@ -82,9 +82,9 @@ instead.
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 try(as_anievent(af))
 #> Error in as_anievent(af) : 
-#>   Cannot cast an <aniframe> directly to an <anievent>.
+#>   Cannot cast an <anipoint> directly to an <anievent>.
 #> ℹ Use `to_anievent()` to encode per-frame event columns into bouts.
 ```

@@ -8,7 +8,7 @@ library(anicore)
 ## At a glance
 
 An `anievent` is the sibling of
-[`aniframe`](https://animovement.dev/anicore/articles/aniframe-structure.md)
+[`anipoint`](https://animovement.dev/anicore/articles/aniframe-structure.md)
 for **behavioural events**: sleep bouts, vocalisations, manual scoring
 from BORIS, the output of segmentation models.
 
@@ -17,15 +17,15 @@ as a soft convention, mutually exclusive with other events on the same
 channel), has a **type** — either `"state"` (durative) or `"point"`
 (instant) — and carries a **label** identifying which event it is. Each
 event has a **start** and a **stop** time (identical for point events).
-Just like an `aniframe`, the event is *performed by something* (identity
-columns, declared via `variables_what`) at *some time*
-(temporal-grouping columns, declared via `variables_when`).
+Just like an `anipoint`, the event is *performed by something* (identity
+columns, the `what` keys) at *some time* (temporal-grouping columns, the
+`when` keys).
 
-The class is a true sibling — it does **not** inherit from `aniframe`,
-but it shares the metadata substrate, so
+Both classes inherit from the abstract `aniframe` parent, which carries
+the shared substrate — so
 [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md),
 [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md),
-and the rest of the metadata API work on both.
+the dplyr methods, and the rest of the family API work on both.
 
 ## Channels
 
@@ -91,7 +91,7 @@ travel via `variables_what`:
 | `modifiers` | list-column of `character` | optional | flat per-event modifier values |
 
 Identity columns are auto-detected from a known list (`model`,
-`individual`, `subject`, `track`, `keypoint`) — the same list `aniframe`
+`individual`, `subject`, `track`, `keypoint`) — the same list `anipoint`
 uses, so identity means the same thing on both sides — or you can supply
 any name via `variables_what`. An `anievent` with no identity column at
 all is fine for single-subject experiments.
@@ -108,9 +108,9 @@ Pass `type` explicitly to override this default.
 Behavioural coding often spans several clips or trials, each with its
 own time origin (`start = 0` means “the start of *this* clip”, not “the
 start of the experiment”). To carry that context, add an `observation`,
-`session`, or `trial` column — those three names are auto-detected into
-`variables_when` alongside `start` and `stop`, and the column is coerced
-to factor / integer the same way aniframe does it:
+`session`, or `trial` column — those three names are auto-detected as
+`when` keys, next to the `start`/`stop` interval, and the column is
+coerced to factor / integer the same way anipoint does it:
 
 ``` r
 
@@ -122,8 +122,8 @@ ae_multi <- anievent(
   start = c(3, 14, 1, 7),
   stop = c(9, 19, 5, 12)
 )
-get_metadata(ae_multi, "variables_when")
-#> [1] "observation" "start"       "stop"
+get_variables(ae_multi, "when")
+#> [1] "start"       "stop"        "observation"
 ae_multi
 #> # anievent:       4 × 7
 #> # Individuals:    1
@@ -147,13 +147,11 @@ observation-level offset table; the class itself just carries the key.
 
 `unit_time` is carried in the shared metadata substrate, so an
 `anievent` declares the unit of its `start`/`stop` values just like an
-`aniframe` declares the unit of its [index
+`anipoint` declares the unit of its [index
 column](https://animovement.dev/anicore/articles/aniframe-structure.html#the-index)
 (`"frame"`, `"ms"`, `"s"`, `"m"`, `"h"`, …).
-[`set_unit_time()`](https://animovement.dev/anicore/reference/set_unit_time.md)
-and
-[`set_sampling_rate()`](https://animovement.dev/anicore/reference/set_sampling_rate.md)
-dispatch on both classes — on an anievent they scale `start` and `stop`
+[`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md)
+works on both classes — on an anievent it scales `start` and `stop`
 instead of the index:
 
 ``` r
@@ -165,7 +163,9 @@ ae_frames <- anievent(
   start = c(30, 150),
   stop = c(60, 300)
 )
-ae_seconds <- set_sampling_rate(ae_frames, sampling_rate = 30)
+ae_seconds <- ae_frames |>
+  set_metadata(sampling_rate = 30) |>
+  convert_unit_time("s")
 ae_seconds
 #> # anievent:       2 × 6
 #> # Individuals:    1
@@ -194,18 +194,18 @@ row tells you everything the class needs.
 
 Type only becomes load-bearing at conversion / plotting / metric time:
 
-- when converting an `anievent` to a per-frame `aniframe` (so the
+- when converting an `anievent` to a per-frame `anipoint` (so the
   conversion knows whether to fill the whole interval or just a single
   frame),
 - when plotting (state → coloured band; point → marker),
 - when computing metrics that differ by type.
 
 Those operations live in companion packages (`animetric`, `anivis`) and
-will accept type declarations at call time. On the `aniframe` side the
+will accept type declarations at call time. On the `anipoint` side the
 distinction can be recorded explicitly with
-`set_variables_event(state = ..., point = ...)`, but the `anievent`
-class itself does not enforce it — an anievent has no `variables_event`
-of its own, since its events are already encoded in `channel` and
+`set_variables(event = list(state = ..., point = ...))`, but the
+`anievent` class itself does not enforce it — an anievent has no `event`
+role of its own, since its events are already encoded in `channel` and
 `label`.
 
 ## Modifiers
@@ -356,16 +356,16 @@ The channel name always comes from the column name. Use `state` vs
 `point` to pick how the column is interpreted — the value-shape (factor
 / character / logical) is handled internally.
 
-### From an `aniframe`
+### From an `anipoint`
 
-If you already have an `aniframe` with `variables_event` declared in
+If you already have an `anipoint` with an `event` role declared in
 metadata,
 [`to_anievent()`](https://animovement.dev/anicore/reference/to_anievent.md)
 reads everything from there:
 
 ``` r
 
-af <- aniframe(
+af <- anipoint(
   individual = rep(1L, 8),
   time = 1:8,
   x = 1:8,
@@ -375,7 +375,7 @@ af <- aniframe(
     levels = c("REM", "wake")
   )
 )
-af <- set_variables_event(af, state = "behaviour")
+af <- set_variables(af, event = list(state = "behaviour"))
 to_anievent(af)
 #> # anievent:       3 × 6
 #> # Individuals:    1
@@ -394,18 +394,18 @@ frame-aligned). If a `<col>_modifiers` list-column is present alongside
 an event column, its cells are gathered into the anievent’s `modifiers`
 column, one entry per emitted bout.
 
-The reverse direction (`anievent` → `aniframe`) is intentionally not
+The reverse direction (`anievent` → `anipoint`) is intentionally not
 provided yet — the anievent’s loose mutual-exclusion semantics don’t map
-onto an aniframe’s per-frame columns without a design decision about how
+onto an anipoint’s per-frame columns without a design decision about how
 to resolve overlap, and that design is still pending.
 
 ## Where things live in the ecosystem
 
 | Concern | Planned home | Status |
 |----|----|----|
-| The `anievent` class | `aniframe` | ✅ implemented |
-| Encoding per-frame data ([`to_anievent()`](https://animovement.dev/anicore/reference/to_anievent.md)) | `aniframe` | ✅ implemented |
-| Conversion to `aniframe` | `aniframe` | planned |
+| The `anievent` class | `anipoint` | ✅ implemented |
+| Encoding per-frame data ([`to_anievent()`](https://animovement.dev/anicore/reference/to_anievent.md)) | `anipoint` | ✅ implemented |
+| Conversion to `anipoint` | `anipoint` | planned |
 | Readers (BORIS, Solomon, …) | `aniread` | planned |
 | Bout-summary metrics | `animetric` | planned |
 | Plots (state band, point marker) | `anivis` | planned |

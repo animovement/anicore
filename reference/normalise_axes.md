@@ -1,8 +1,6 @@
 # Normalise a `variables_where` declaration into a role-to-column mapping
 
-An unnamed vector is the historical form, where the column name *is* the
-role; it is read that way, which is what keeps every existing frame and
-every reader's output working untouched.
+In an unnamed vector the column name is the role.
 
 ## Usage
 

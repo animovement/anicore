@@ -1,6 +1,6 @@
-# Test whether an aniframe uses a polar coordinate system
+# Test whether an anipoint uses a polar coordinate system
 
-Test whether an aniframe uses a polar coordinate system
+Test whether an anipoint uses a polar coordinate system
 
 ## Usage
 
@@ -12,7 +12,7 @@ is_polar(data)
 
 - data:
 
-  An aniframe.
+  An anipoint.
 
 ## Value
 
@@ -21,7 +21,7 @@ A logical value.
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_polar(af)
 #> [1] FALSE
 ```

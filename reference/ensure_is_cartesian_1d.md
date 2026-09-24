@@ -12,15 +12,15 @@ ensure_is_cartesian_1d(data)
 
 - data:
 
-  An aniframe.
+  An anipoint.
 
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 try(ensure_is_cartesian_1d(af))
 #> Error in ensure_coordinate_system(data, "cartesian_1d", "1D Cartesian") : 
-#>   This aniframe is not in a 1D Cartesian coordinate system.
+#>   This anipoint is not in a 1D Cartesian coordinate system.
 #> ℹ coordinate_system is "cartesian_2d".
 #> ℹ Convert the coordinates first; anispace has the transformations.
 ```

@@ -15,7 +15,7 @@ is_sampling_regular(data, tolerance = 1e-06)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 - tolerance:
 
@@ -36,7 +36,7 @@ is_sampling_regular(data, tolerance = 1e-06)
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 5, n_individuals = 2, n_keypoints = 1)
+af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 is_sampling_regular(af)
 #> [1] TRUE
 

@@ -37,7 +37,7 @@ The input `data`, invisibly.
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 try(validate_anievent(af))
 #> Error in ensure_is_anievent(data) : Data is not an anievent.
 ```

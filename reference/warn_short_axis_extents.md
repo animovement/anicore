@@ -13,7 +13,7 @@ warn_short_axis_extents(data, extents)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 - extents:
 

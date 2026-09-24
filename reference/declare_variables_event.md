@@ -12,11 +12,11 @@ declare_variables_event(data, state, point)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 - state, point:
 
-  Character vectors of column names, or `NULL`.
+  Character vectors of column names.
 
 ## Value
 

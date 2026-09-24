@@ -1,7 +1,6 @@
 # Which opposed pair each direction belongs to
 
-Two axes pointing along the same pair are parallel, which no frame can
-be.
+Which opposed pair each direction belongs to
 
 ## Usage
 

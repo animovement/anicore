@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>The aniframe data structure • anicore</title>
+<title>The anipoint data structure • anicore</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
@@ -14,7 +14,7 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="aniframe-structure_files/libs/quarto-html/popper.min.js"></script><script src="aniframe-structure_files/libs/quarto-html/tippy.umd.min.js"></script><link href="aniframe-structure_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="aniframe-structure_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="The aniframe data structure">
+<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="The anipoint data structure">
 <meta property="og:image" content="https://animovement.dev/anicore/logo.svg">
 </head>
 <body>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,9 +38,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/aniframe-structure.html">The aniframe data structure</a></li>
+<li><a class="dropdown-item" href="../articles/aniframe-structure.html">The anipoint data structure</a></li>
     <li><a class="dropdown-item" href="../articles/aniframe-metadata.html">Metadata on an aniframe</a></li>
-    <li><a class="dropdown-item" href="../articles/aniframe-connections.html">Connections</a></li>
+    <li><a class="dropdown-item" href="../articles/orientation.html">Orientation</a></li>
+    <li><a class="dropdown-item" href="../articles/structures.html">Structures</a></li>
     <li><a class="dropdown-item" href="../articles/anievent-structure.html">The anievent data structure</a></li>
   </ul>
 </li>
@@ -81,7 +82,7 @@
 </nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.svg" class="logo" alt=""><h1>The aniframe data structure</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>The anipoint data structure</h1>
 
 
 
@@ -99,17 +100,17 @@
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://animovement.dev/anicore/">anicore</a></span><span class="op">)</span></span></code></pre></div>
 </div>
-<section class="level2"><h2 id="what-is-an-aniframe">What is an <code>aniframe</code>?<a class="anchor" aria-label="anchor" href="#what-is-an-aniframe"></a>
+<section class="level2"><h2 id="what-is-an-anipoint">What is an <code>anipoint</code>?<a class="anchor" aria-label="anchor" href="#what-is-an-anipoint"></a>
 </h2>
-<p>The <em>aniframe</em> package defines <code>aniframe</code> — the foundational data structure of the <em>animovement</em> ecosystem. Every sister package (<em>aniread</em> for I/O, <em>animetric</em> for kinematics, …) is built around consuming and producing <code>aniframe</code> objects, so the shape that an <code>aniframe</code> takes is what holds the ecosystem together.</p>
+<p>The <em>anicore</em> package defines <code>anipoint</code> — the foundational data structure of the <em>animovement</em> ecosystem: one row per point per timepoint, with coordinate columns. Every sister package (<em>aniread</em> for I/O, <em>animetric</em> for kinematics, …) is built around consuming and producing <code>anipoint</code> objects, so the shape that an <code>anipoint</code> takes is what holds the ecosystem together. (<code>aniframe</code> names the abstract parent class that <code>anipoint</code> shares with <code>anievent</code> — the substrate of metadata, accessors and dplyr methods.)</p>
 <p>The shape itself follows the principles of <em>tidy movement data</em> (laid out in an upcoming paper). The short version: every row records one entity at one timepoint at one position, and the columns split into three semantic slots that answer <strong>what</strong> is moving, <strong>when</strong>, and <strong>where</strong>.</p>
-<p>This article covers the data shape. Companion articles cover the <a href="aniframe-metadata.html">metadata attribute</a> and the <a href="aniframe-connections.html">connections field</a> for skeletons and networks.</p>
+<p>This article covers the data shape. Companion articles cover the <a href="aniframe-metadata.html">metadata attribute</a> and the <a href="structures.html">structures</a> for skeletons and networks.</p>
 </section><section class="level2"><h2 id="anatomy-at-a-glance">Anatomy at a glance<a class="anchor" aria-label="anchor" href="#anatomy-at-a-glance"></a>
 </h2>
-<p>The cheapest way to see an <code>aniframe</code> is to print one.</p>
+<p>The cheapest way to see an <code>anipoint</code> is to print one.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_aniframe.html">example_aniframe</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_anipoint.html">example_anipoint</a></span><span class="op">(</span></span>
 <span>  n_obs <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  n_individuals <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  n_keypoints <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -120,18 +121,18 @@
 <span><span class="co">#&gt; # Keypoints:   head, neck, shoulder_right</span></span>
 <span><span class="co">#&gt; # Sessions:    1</span></span>
 <span><span class="co">#&gt; # Trials:      1</span></span>
-<span><span class="co">#&gt;    individual keypoint session trial  time       x       y confidence</span></span>
-<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1          1 head           1     1     1  1.98    0.535       0.876</span></span>
-<span><span class="co">#&gt;  2          1 head           1     1     2  0.0845 -0.805       0.847</span></span>
-<span><span class="co">#&gt;  3          1 head           1     1     3 -0.335   0.0369      0.807</span></span>
-<span><span class="co">#&gt;  4          1 head           1     1     4  0.488  -1.14        0.645</span></span>
-<span><span class="co">#&gt;  5          1 head           1     1     5  2.38   -0.289       0.878</span></span>
-<span><span class="co">#&gt;  6          1 neck           1     1     1 -0.621   0.359       0.738</span></span>
-<span><span class="co">#&gt;  7          1 neck           1     1     2 -2.21    0.481       0.744</span></span>
-<span><span class="co">#&gt;  8          1 neck           1     1     3 -0.403   0.740       0.459</span></span>
-<span><span class="co">#&gt;  9          1 neck           1     1     4 -0.695  -0.358       0.810</span></span>
-<span><span class="co">#&gt; 10          1 neck           1     1     5 -0.124  -0.350       0.819</span></span>
+<span><span class="co">#&gt;    individual keypoint session trial  time      x       y confidence</span></span>
+<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1          1 head           1     1     1  1.81  -1.67        0.739</span></span>
+<span><span class="co">#&gt;  2          1 head           1     1     2 -0.222  0.0721      0.290</span></span>
+<span><span class="co">#&gt;  3          1 head           1     1     3  0.607 -0.398       0.762</span></span>
+<span><span class="co">#&gt;  4          1 head           1     1     4 -0.734  0.298       0.748</span></span>
+<span><span class="co">#&gt;  5          1 head           1     1     5 -0.587  0.145       0.630</span></span>
+<span><span class="co">#&gt;  6          1 neck           1     1     1  0.169 -0.0706      0.855</span></span>
+<span><span class="co">#&gt;  7          1 neck           1     1     2  0.174  0.506       0.733</span></span>
+<span><span class="co">#&gt;  8          1 neck           1     1     3  0.146  0.479       0.569</span></span>
+<span><span class="co">#&gt;  9          1 neck           1     1     4  0.320 -0.486       0.498</span></span>
+<span><span class="co">#&gt; 10          1 neck           1     1     5 -1.13  -0.116       0.809</span></span>
 <span><span class="co">#&gt; # ℹ 20 more rows</span></span></code></pre></div>
 </div>
 <p>Two things to spot:</p>
@@ -139,11 +140,11 @@
 <li>The <strong>header rows</strong> prefixed with <code>#</code> come from the metadata attribute and summarise what the object contains — individuals, keypoints, recording duration when known, sampling rate, etc.</li>
 <li>The <strong>data columns</strong> form a tidy table where every row records one entity at one timepoint at one position.</li>
 </ol>
-<p><code>aniframe</code> inherits from <code>tbl_df</code> and <code>data.frame</code>, so dplyr verbs, ggplot2, and base subsetting all work on it directly.</p>
+<p><code>anipoint</code> inherits from <code>tbl_df</code> and <code>data.frame</code>, so dplyr verbs, ggplot2, and base subsetting all work on it directly.</p>
 <p>The rest of this article unpacks the columns.</p>
 </section><section class="level2"><h2 id="the-three-slots-what-when-where">The three slots: what / when / where<a class="anchor" aria-label="anchor" href="#the-three-slots-what-when-where"></a>
 </h2>
-<p>Every row of an <code>aniframe</code> answers three questions:</p>
+<p>Every row of an <code>anipoint</code> answers three questions:</p>
 <table class="table caption-top" style="width:100%;">
 <colgroup>
 <col style="width: 15%">
@@ -161,7 +162,7 @@
 <tr class="odd">
 <td>
 <strong>What</strong> is moving?</td>
-<td>Identity (<code>variables_what</code>)</td>
+<td>Identity (<code>what$keys</code>)</td>
 <td>An entity</td>
 <td>
 <code>individual</code>, <code>keypoint</code>
@@ -170,7 +171,7 @@
 <tr class="even">
 <td>
 <strong>When</strong>?</td>
-<td>Temporal context (<code>variables_when</code>)</td>
+<td>Temporal context (<code>when$keys</code>)</td>
 <td>A context — which session, which trial</td>
 <td>
 <code>session</code>, <code>trial</code>
@@ -179,7 +180,7 @@
 <tr class="odd">
 <td>
 <strong>Where</strong>?</td>
-<td>Spatial (<code>variables_where</code>)</td>
+<td>Spatial (<code>where$position</code>)</td>
 <td>A position</td>
 <td>
 <code>x</code>, <code>y</code>
@@ -187,24 +188,25 @@
 </tr>
 </tbody>
 </table>
-<p>“When” is really two questions, and only the first is answered here: which recording session this row belongs to, and where it sits inside it. The first is context the row shares with its neighbours, and it is what the frame groups by; the second is what tells the row apart from them, and it orders rather than groups. That second half is the <strong>index</strong>, declared on its own in <code>variables_index</code> and covered in <a href="#the-index">its own section</a> below.</p>
+<p>“When” is really two questions, and only the first is answered here: which recording session this row belongs to, and where it sits inside it. The first is context the row shares with its neighbours, and it is what the frame groups by; the second is what tells the row apart from them, and it orders rather than groups. That second half is the <strong>index</strong>, declared in its own slot (<code>when$index</code>) and covered in <a href="#the-index">its own section</a> below.</p>
 <p>The combination of all identity and temporal columns forms a composite key that uniquely identifies each row; the spatial columns are what that row <em>records</em> about that entity at that timepoint.</p>
-<p><code>aniframe</code> stores which columns play which role in the metadata, so downstream code can introspect:</p>
+<p><code>anipoint</code> stores which columns play which role in the metadata, so downstream code can introspect:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="va">md</span><span class="op">$</span><span class="va">variables_index</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_index.html">get_index</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "time"</span></span>
-<span><span class="va">md</span><span class="op">$</span><span class="va">variables_what</span></span>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"what"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "individual" "keypoint"</span></span>
-<span><span class="va">md</span><span class="op">$</span><span class="va">variables_when</span></span>
-<span><span class="co">#&gt; [1] "session" "trial"</span></span>
-<span><span class="va">md</span><span class="op">$</span><span class="va">variables_where</span></span>
-<span><span class="co">#&gt; [1] "x" "y"</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"when"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "time"    "session" "trial"</span></span>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"where"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "x" "y"</span></span>
+<span><span class="fu"><a href="../reference/get_keys.html">get_keys</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "individual" "keypoint"   "session"    "trial"</span></span></code></pre></div>
 </div>
 <section class="level3"><h3 id="customising-the-slots">Customising the slots<a class="anchor" aria-label="anchor" href="#customising-the-slots"></a>
 </h3>
-<p>Most readers populate these from the source data, but you can override them when constructing manually. By default, <code><a href="../reference/as_aniframe.html">as_aniframe()</a></code> recognises <code>c("model", "individual", "track", "keypoint")</code> as identity columns and <code>c("session", "trial")</code> as temporal context. Pass the slot arguments explicitly to use other names:</p>
+<p>Most readers populate these from the source data, but you can override them when constructing manually. By default, <code><a href="../reference/as_anipoint.html">as_anipoint()</a></code> recognises <code>c("model", "individual", "track", "keypoint")</code> as identity columns and <code>c("session", "trial")</code> as temporal context. Pass the slot arguments explicitly to use other names:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -215,7 +217,7 @@
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_aniframe.html">as_aniframe</a></span><span class="op">(</span></span>
+<span><span class="va">custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_anipoint.html">as_anipoint</a></span><span class="op">(</span></span>
 <span>  <span class="va">df</span>,</span>
 <span>  variables_what <span class="op">=</span> <span class="st">"track"</span>,</span>
 <span>  variables_when <span class="op">=</span> <span class="st">"trial"</span></span>
@@ -223,20 +225,20 @@
 <span><span class="va">custom</span></span>
 <span><span class="co">#&gt; # Tracks: A, B, C</span></span>
 <span><span class="co">#&gt; # Trials: 1, 2</span></span>
-<span><span class="co">#&gt;    track trial  time       x      y</span></span>
-<span><span class="co">#&gt;    &lt;fct&gt; &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 A         1     1 0.522   0.326 </span></span>
-<span><span class="co">#&gt;  2 A         1     1 0.239   0.627 </span></span>
-<span><span class="co">#&gt;  3 A         1     2 0.634   0.0937</span></span>
-<span><span class="co">#&gt;  4 A         1     2 0.307   0.588 </span></span>
-<span><span class="co">#&gt;  5 B         1     1 0.401   0.621 </span></span>
-<span><span class="co">#&gt;  6 B         1     2 0.00758 0.268 </span></span>
-<span><span class="co">#&gt;  7 B         2     1 0.690   0.805 </span></span>
-<span><span class="co">#&gt;  8 B         2     2 0.0665  0.239 </span></span>
-<span><span class="co">#&gt;  9 C         2     1 0.0153  0.477 </span></span>
-<span><span class="co">#&gt; 10 C         2     1 0.646   0.148 </span></span>
-<span><span class="co">#&gt; 11 C         2     2 0.337   0.924 </span></span>
-<span><span class="co">#&gt; 12 C         2     2 0.0284  0.764</span></span></code></pre></div>
+<span><span class="co">#&gt;    track trial  time     x      y</span></span>
+<span><span class="co">#&gt;    &lt;fct&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 A         1     1 0.552 0.221 </span></span>
+<span><span class="co">#&gt;  2 A         1     1 0.427 0.0422</span></span>
+<span><span class="co">#&gt;  3 A         1     2 0.447 0.879 </span></span>
+<span><span class="co">#&gt;  4 A         1     2 0.563 0.862 </span></span>
+<span><span class="co">#&gt;  5 B         1     1 0.562 0.146 </span></span>
+<span><span class="co">#&gt;  6 B         1     2 0.243 0.627 </span></span>
+<span><span class="co">#&gt;  7 B         2     1 0.591 0.874 </span></span>
+<span><span class="co">#&gt;  8 B         2     2 0.938 0.638 </span></span>
+<span><span class="co">#&gt;  9 C         2     1 0.219 0.204 </span></span>
+<span><span class="co">#&gt; 10 C         2     1 0.139 0.273 </span></span>
+<span><span class="co">#&gt; 11 C         2     2 0.266 0.401 </span></span>
+<span><span class="co">#&gt; 12 C         2     2 0.341 0.0669</span></span></code></pre></div>
 </div>
 </section></section><section class="level2"><h2 id="the-index">The index<a class="anchor" aria-label="anchor" href="#the-index"></a>
 </h2>
@@ -256,7 +258,7 @@
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_aniframe.html">as_aniframe</a></span><span class="op">(</span><span class="va">frames</span>, index <span class="op">=</span> <span class="st">"frame"</span><span class="op">)</span></span>
+<span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_anipoint.html">as_anipoint</a></span><span class="op">(</span><span class="va">frames</span>, index <span class="op">=</span> <span class="st">"frame"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_index.html">get_index</a></span><span class="op">(</span><span class="va">af</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "frame"</span></span></code></pre></div>
 </div>
@@ -270,7 +272,7 @@
 <p><strong>A frame has exactly one.</strong> The index is where a row sits within its context, so a second one would have nothing left to mean. Declaring more than one is an error rather than a silent pick between them:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_aniframe.html">as_aniframe</a></span><span class="op">(</span><span class="va">frames</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"frame"</span>, <span class="st">"individual"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_anipoint.html">as_anipoint</a></span><span class="op">(</span><span class="va">frames</span>, index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"frame"</span>, <span class="st">"individual"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in `ensure_index_name()`:</span></span>
 <span><span class="co">#&gt; ! `index` must be a single column name.</span></span>
 <span><span class="co">#&gt; ℹ A frame has exactly one index.</span></span></code></pre></div>
@@ -290,16 +292,16 @@
 <span></span>
 <span><span class="fu"><a href="../reference/get_index.html">get_index</a></span><span class="op">(</span><span class="va">timestamped</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "timestamp"</span></span>
-<span><span class="fu"><a href="../reference/variables.html">get_variables_when</a></span><span class="op">(</span><span class="va">timestamped</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">timestamped</span>, <span class="st">"when"</span>, <span class="st">"keys"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "session" "trial"</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_data.html" class="external-link">group_vars</a></span><span class="op">(</span><span class="va">timestamped</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "individual" "keypoint"   "session"    "trial"</span></span></code></pre></div>
 </div>
 <p><code>time</code> is still there as a column; it is simply no longer declared as anything.</p>
-<p>Downstream operations (smoothing, derivatives) assume the index is monotonically ordered within each entity, which is how <code><a href="../reference/as_aniframe.html">as_aniframe()</a></code> arranges the frame.</p>
+<p>Downstream operations (smoothing, derivatives) assume the index is monotonically ordered within each entity, which is how <code><a href="../reference/as_anipoint.html">as_anipoint()</a></code> arranges the frame.</p>
 </section><section class="level2"><h2 id="coordinate-systems">Coordinate systems<a class="anchor" aria-label="anchor" href="#coordinate-systems"></a>
 </h2>
-<p>The set of spatial columns determines the coordinate system. <code>aniframe</code> recognises four families:</p>
+<p>The set of spatial columns determines the coordinate system. <code>anipoint</code> recognises four families:</p>
 <table class="table caption-top">
 <thead><tr class="header">
 <th>System</th>
@@ -335,7 +337,7 @@
 <p>The number of Cartesian columns picks the dimensionality (<code>cartesian_1d</code>, <code>cartesian_2d</code>, <code>cartesian_3d</code>):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cart</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cart</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -346,7 +348,7 @@
 <p><code>rho</code> + <code>phi</code> indicates a polar-family system; the third column (if any) distinguishes the variant:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">pol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span>
 <span>  rho <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, phi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -354,7 +356,7 @@
 <span><span class="co">#&gt; [1] polar</span></span>
 <span><span class="co">#&gt; 7 Levels: unknown cartesian_1d cartesian_2d cartesian_3d polar ... spherical</span></span>
 <span></span>
-<span><span class="va">cyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
+<span><span class="va">cyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span>
 <span>  rho <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, phi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -362,7 +364,7 @@
 <span><span class="co">#&gt; [1] cylindrical</span></span>
 <span><span class="co">#&gt; 7 Levels: unknown cartesian_1d cartesian_2d cartesian_3d polar ... spherical</span></span>
 <span></span>
-<span><span class="va">sph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aniframe.html">aniframe</a></span><span class="op">(</span></span>
+<span><span class="va">sph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span>
 <span>  rho <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, phi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span><span class="op">)</span>, theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -378,13 +380,29 @@
 <span><span class="fu"><a href="../reference/is_cartesian_2d.html">is_cartesian_2d</a></span><span class="op">(</span><span class="va">cart</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
 </div>
+</section><section class="level2"><h2 id="orientation">Orientation<a class="anchor" aria-label="anchor" href="#orientation"></a>
+</h2>
+<p>Position says where an entity is; orientation says which way it faces. It is declared next to position, in the <code>where</code> role’s <code>orientation</code> slot: <code>yaw</code> for a 2D frame, a unit quaternion (<code>qw</code>, <code>qx</code>, <code>qy</code>, <code>qz</code>) for a 3D one.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/example_anipoint.html">example_anipoint</a></span><span class="op">(</span>n_keypoints <span class="op">=</span> <span class="fl">1</span>, n_individuals <span class="op">=</span> <span class="fl">1</span>, n_obs <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>heading <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/variables.html">set_variables</a></span><span class="op">(</span>where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>orientation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>yaw <span class="op">=</span> <span class="st">"heading"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">fly</span>, <span class="st">"where"</span>, <span class="st">"orientation"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       yaw </span></span>
+<span><span class="co">#&gt; "heading"</span></span></code></pre></div>
+</div>
+<p><a href="orientation.html">Orientation</a> covers the conventions, how orientation follows the frame’s axes, and why it is not the direction of travel.</p>
 </section><section class="level2"><h2 id="where-to-next">Where to next?<a class="anchor" aria-label="anchor" href="#where-to-next"></a>
 </h2>
 <ul>
 <li>
-<a href="aniframe-metadata.html">The metadata attribute</a> — units, axis directions, sampling rate, and the setters that keep them consistent with the data.</li>
+<a href="aniframe-metadata.html">The metadata attribute</a> — units, sampling rate, and the setters that keep them consistent with the data.</li>
 <li>
-<a href="aniframe-connections.html">Connections</a> — recording skeleton edges or other relationships between values of an identity / temporal variable.</li>
+<a href="orientation.html">Orientation</a> — which way the axes point, and which way an entity faces.</li>
+<li>
+<a href="structures.html">Structures</a> — skeletons, teams and other relationships between values of an identity variable.</li>
 </ul></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);

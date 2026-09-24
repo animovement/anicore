@@ -12,8 +12,7 @@ ensure_valid_axis_extents(extents)
 
 - extents:
 
-  Value supplied to
-  [`set_axis_extents()`](https://animovement.dev/anicore/reference/set_axis_extents.md).
+  A proposed `axis_extents` value.
 
 ## Value
 

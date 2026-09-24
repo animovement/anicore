@@ -1,11 +1,11 @@
 # Create an anievent data frame
 
 Creates a specialised data frame for behavioural events in long format:
-one row per bout (state event) or instant (point event). The class is a
-sibling of
-[`aniframe()`](https://animovement.dev/anicore/reference/aniframe.md) —
-it shares the metadata substrate but holds event-bout records rather
-than per-frame movement data.
+one row per bout (state event) or instant (point event). Like
+[`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md),
+the class inherits the shared `aniframe` substrate — metadata,
+accessors, dplyr methods — but holds event-bout records rather than
+per-frame movement data.
 
 ## Usage
 

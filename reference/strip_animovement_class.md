@@ -1,8 +1,7 @@
 # Strip a frame back to its dplyr classes
 
-The structural steps operate on a plain frame, so they neither dispatch
-back into the class-preserving methods nor trigger the `ungroup()` "use
-with care" warning when a declaration leaves nothing to group by.
+Avoids dispatching into class-preserving methods and the `ungroup()`
+"use with care" warning.
 
 ## Usage
 

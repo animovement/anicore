@@ -1,10 +1,8 @@
-# The axis roles of an aniframe, and the columns carrying them
+# The axis roles of an anipoint, and the columns carrying them
 
-Where
-[`get_variables_where()`](https://animovement.dev/anicore/reference/variables.md)
-gives the column names, this gives what each of them *means*. Index by
-role to write a transformation that does not care what the columns are
-called: `data[[get_axes(data)[["x"]]]]`.
+The `where$position` slot. Index by role to write a transformation that
+does not care what the columns are called:
+`data[[get_axes(data)[["x"]]]]`.
 
 ## Usage
 
@@ -16,7 +14,7 @@ get_axes(data)
 
 - data:
 
-  An aniframe object.
+  An anipoint object.
 
 ## Value
 
@@ -26,21 +24,19 @@ whose coordinate system is `"unknown"`.
 
 ## See also
 
-[`set_axes()`](https://animovement.dev/anicore/reference/set_axes.md) to
-change it,
-[`get_variables_where()`](https://animovement.dev/anicore/reference/variables.md)
-for the columns without their roles.
+[`set_variables()`](https://animovement.dev/anicore/reference/variables.md)
+to change it.
 
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 get_axes(af)
 #>   x   y 
 #> "x" "y" 
 
 df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
-renamed <- as_aniframe(df, variables_where = c(x = "u", y = "v"))
+renamed <- as_anipoint(df, variables_where = c(x = "u", y = "v"))
 get_axes(renamed)
 #>   x   y 
 #> "u" "v" 

@@ -35,7 +35,7 @@ are not both declared or do not span the view.
 ## Examples
 
 ``` r
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
 # An image-plane frame counts angles clockwise
 af <- set_axis_directions(af, c(x = "right", y = "down"))

@@ -1,11 +1,6 @@
-# The axes of a coordinate system that carry a length
+# The axes of a coordinate system that carry a length (#98)
 
-The complement of the angular axes that
-[`set_unit_angle()`](https://animovement.dev/anicore/reference/set_unit_angle.md)
-converts. A spatial unit applies to these and to nothing else: on a
-cylindrical frame `rho` and `z` are both lengths while `phi` is an
-angle, so converting by column name rather than by role leaves one of
-them behind (#98).
+The axes of a coordinate system that carry a length (#98)
 
 ## Usage
 

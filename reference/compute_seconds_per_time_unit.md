@@ -1,7 +1,6 @@
 # Multiplier from a metadata `unit_time` value to seconds
 
-Returns `NA_real_` when conversion is not possible (e.g. `"frame"`
-without a `sampling_rate`, or `"unknown"`).
+`NA_real_` when conversion is not possible.
 
 ## Usage
 
