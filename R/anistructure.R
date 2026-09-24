@@ -9,10 +9,16 @@
 #' * **segments** — directed links between two points, with an optional
 #'   expected `length`. Direction matters for joint angles: run limbs
 #'   proximal to distal, and paired segments (left to right) the same way.
-#' * **joints** — ordered pairs of segments `(a, b)`. `axis` names the axis
-#'   the angle is measured about (`"x"`, `"y"`, `"z"`, or a segment name);
-#'   `NA` gives the unsigned included angle. Limits are per degree of
-#'   freedom, in radians, with 0 when the two segments are aligned.
+#' * **joints** — one measured angle each, between an ordered pair of
+#'   segments `(a, b)`, with optional limits `min`, `max` and `rest` in
+#'   radians. The angle is 0 when the two segments point the same way. In
+#'   2D it is signed, turning from `a` to `b`. In 3D it is the included angle,
+#'   or, when `axis` is given (`"x"`, `"y"`, `"z"` or a segment name), the
+#'   signed angle about it. Several angles on the same pair of segments —
+#'   flexion and abduction, say — are several joints with different axes.
+#'
+#' Lengths and limits are recorded, not enforced: checks compare the data
+#' against them.
 #'
 #' A structure is a template: it records no data and no variable until it
 #' is attached to a frame with [set_structure()], so one structure can be
@@ -24,14 +30,10 @@
 #'   `segment` (defaults to `"from-to"`) and `length`; or a list of
 #'   `c(from, to)` pairs.
 #' @param joints A data frame with `a` and `b` (segment names), and
-#'   optionally `joint` (defaults to `"a-b"`), `axis`, and either `min`,
-#'   `max`, `rest` for a single degree of freedom or a `dof` list-column of
-#'   data frames with `dof`, `axis`, `min`, `max`, `rest`.
+#'   optionally `joint` (defaults to `"a-b"`), `axis`, `min`, `max` and
+#'   `rest`.
 #' @param root The point the structure hangs from when positions are
 #'   rebuilt from segments. `NA` if unset.
-#' @param twist How rotation about a segment's own axis is handled in 3D:
-#'   `"none"` (not represented), `"zero"` (the zero-twist convention, as for
-#'   chains) or `"frame"` (segments carry their own orientation).
 #' @param source,citation,license Provenance of the structure.
 #'
 #' @return An `anistructure`.
@@ -58,7 +60,6 @@ anistructure <- function(
   segments = NULL,
   joints = NULL,
   root = NA_character_,
-  twist = c("none", "zero", "frame"),
   source = NA_character_,
   citation = NA_character_,
   license = NA_character_
@@ -69,7 +70,6 @@ anistructure <- function(
     segments = segments,
     joints = as_structure_joints(joints),
     root = as.character(root),
-    twist = rlang::arg_match(twist),
     source = as.character(source),
     citation = as.character(citation),
     license = as.character(license)
@@ -84,7 +84,6 @@ new_anistructure <- function(
   segments = as_structure_segments(NULL),
   joints = as_structure_joints(NULL),
   root = NA_character_,
-  twist = "none",
   source = NA_character_,
   citation = NA_character_,
   license = NA_character_,
@@ -96,7 +95,6 @@ new_anistructure <- function(
       segments = segments,
       joints = joints,
       root = root,
-      twist = twist,
       source = source,
       citation = citation,
       license = license,
@@ -138,13 +136,7 @@ as_structure_segments <- function(segments) {
 #' @keywords internal
 as_structure_joints <- function(joints) {
   if (is.null(joints)) {
-    return(dplyr::tibble(
-      joint = character(),
-      a = character(),
-      b = character(),
-      axis = character(),
-      dof = list()
-    ))
+    joints <- data.frame(a = character(), b = character())
   }
   if (!is.data.frame(joints) || !all(c("a", "b") %in% names(joints))) {
     cli::cli_abort(
@@ -155,45 +147,10 @@ as_structure_joints <- function(joints) {
   column <- function(name, default) {
     if (name %in% names(joints)) joints[[name]] else rep(default, n)
   }
-  axis <- as.character(column("axis", NA_character_))
-
-  dof <- if ("dof" %in% names(joints)) {
-    lapply(joints$dof, as_structure_dof)
-  } else if (any(c("min", "max", "rest") %in% names(joints))) {
-    lapply(seq_len(n), function(i) {
-      as_structure_dof(data.frame(
-        dof = "angle",
-        axis = axis[[i]],
-        min = column("min", NA_real_)[[i]],
-        max = column("max", NA_real_)[[i]],
-        rest = column("rest", NA_real_)[[i]]
-      ))
-    })
-  } else {
-    rep(list(as_structure_dof(NULL)), n)
-  }
-
   dplyr::tibble(
     joint = as.character(column("joint", paste(joints$a, joints$b, sep = "-"))),
     a = as.character(joints$a),
     b = as.character(joints$b),
-    axis = axis,
-    dof = dof
-  )
-}
-
-
-#' @keywords internal
-as_structure_dof <- function(dof) {
-  if (is.null(dof)) {
-    dof <- data.frame(dof = character())
-  }
-  n <- nrow(dof)
-  column <- function(name, default) {
-    if (name %in% names(dof)) dof[[name]] else rep(default, n)
-  }
-  dplyr::tibble(
-    dof = as.character(column("dof", "angle")),
     axis = as.character(column("axis", NA_character_)),
     min = as.numeric(column("min", NA_real_)),
     max = as.numeric(column("max", NA_real_)),
@@ -251,8 +208,7 @@ validate_anistructure <- function(x) {
   if (length(same) > 0L) {
     cli::cli_abort("Joint{?s} {.val {same}} pair a segment with itself.")
   }
-  axes <- c(joints$axis, unlist(lapply(joints$dof, `[[`, "axis")))
-  axes <- axes[!is.na(axes)]
+  axes <- joints$axis[!is.na(joints$axis)]
   unknown <- setdiff(axes, c("x", "y", "z", segments$segment))
   if (length(unknown) > 0L) {
     cli::cli_abort(c(
@@ -260,21 +216,23 @@ validate_anistructure <- function(x) {
       "i" = "An axis is {.val {c('x', 'y', 'z')}} or a segment name."
     ))
   }
-  for (i in seq_len(nrow(joints))) {
-    dof <- joints$dof[[i]]
-    if (any(dof$min > dof$max, na.rm = TRUE)) {
-      cli::cli_abort(
-        "Joint {.val {joints$joint[[i]]}} has {.field min} above {.field max}."
-      )
-    }
-    outside <- !is.na(dof$rest) &
-      ((!is.na(dof$min) & dof$rest < dof$min) |
-        (!is.na(dof$max) & dof$rest > dof$max))
-    if (any(outside)) {
-      cli::cli_abort(
-        "Joint {.val {joints$joint[[i]]}} rests outside its limits."
-      )
-    }
+  inverted <- joints$joint[
+    !is.na(joints$min) & !is.na(joints$max) & joints$min > joints$max
+  ]
+  if (length(inverted) > 0L) {
+    cli::cli_abort(
+      "Joint{?s} {.val {inverted}} ha{?s/ve} {.field min} above {.field max}."
+    )
+  }
+  outside <- joints$joint[
+    !is.na(joints$rest) &
+      ((!is.na(joints$min) & joints$rest < joints$min) |
+        (!is.na(joints$max) & joints$rest > joints$max))
+  ]
+  if (length(outside) > 0L) {
+    cli::cli_abort(
+      "Joint{?s} {.val {outside}} rest{?s/} outside {?its/their} limits."
+    )
   }
 
   if (length(x$root) != 1L || (!is.na(x$root) && !x$root %in% points)) {
@@ -399,8 +357,7 @@ format.anistructure <- function(x, ...) {
   )
   details <- c(
     variable = x$variable,
-    root = x$root,
-    twist = if (!identical(x$twist, "none")) x$twist
+    root = x$root
   )
   details <- details[!is.na(details)]
   lines <- header
