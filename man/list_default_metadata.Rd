@@ -31,7 +31,9 @@ The categories:
 (derived from the index; read it with \code{\link[=get_sampling_interval]{get_sampling_interval()}}),
 \code{start_datetime}.
 \item \code{space} — \code{coordinate_system}, \code{reference_frame}, \code{handedness},
-\code{axis_directions}, \code{axis_extents}, \code{unit_space}, \code{unit_angle}. The
+\code{axis_directions}, \code{axis_extents}, \code{unit_space}, \code{unit_angle}, and
+\code{euler_sequence} / \code{euler_intrinsic}: the Euler convention the data's
+source uses, for showing and entering a quaternion orientation. The
 one category a class can lack: an \code{\link[=anievent]{anievent()}} has no spatial
 component, so its metadata simply has no \code{space} (#73).
 \item \code{variables} — which columns play which role, as a list of roles each

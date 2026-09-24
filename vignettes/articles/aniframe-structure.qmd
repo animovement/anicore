@@ -271,6 +271,13 @@ get_variables(fly, "where", "orientation")
 Declared orientation follows the frame: `reflect_axis()` reflects it with
 the positions, and `convert_unit_angle()` converts `yaw`.
 
+Orientation is stored as a quaternion because Euler angles break under
+ordinary operations: a mean or an interpolation across the ±π wrap, or
+near gimbal lock, gives the wrong rotation. For showing and entering
+orientation in the convention the data came in, a frame can record it,
+`set_metadata(x, euler_sequence = "ZYX", euler_intrinsic = TRUE)`, and
+anispace's Euler conversions use it.
+
 Orientation records measured or asserted state, such as a body axis from
 FicTrac, a rigid body from motion capture, or a fitted ellipse. The
 direction of travel is a different quantity, derived from displacement,

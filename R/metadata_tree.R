@@ -32,7 +32,9 @@ list_metadata_field_categories <- function() {
     axis_directions = "space",
     axis_extents = "space",
     unit_space = "space",
-    unit_angle = "space"
+    unit_angle = "space",
+    euler_sequence = "space",
+    euler_intrinsic = "space"
   )
 }
 
