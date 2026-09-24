@@ -97,6 +97,14 @@ reference:
       - is_anistructure
       - structures
 
+  - title: "Segments"
+    desc: >
+      The same data re-expressed per segment: a length and a unit direction,
+      converted from and back to an anipoint.
+    contents:
+      - as_anisegment
+      - is_anisegment
+
   - title: "Spatial checks"
     desc: |
       These functions provide checks for your coordinate system.

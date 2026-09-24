@@ -23,7 +23,7 @@ get_index <- function(data) {
       "i" = "Read them with {.code get_variables(data, \"when\", \"interval\")}."
     ))
   }
-  ensure_is_anipoint(data)
+  ensure_is_aniframe(data)
   resolve_index(get_metadata(data))
 }
 

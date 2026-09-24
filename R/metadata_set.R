@@ -9,10 +9,7 @@
 #' @keywords internal
 write_metadata <- function(data, metadata) {
   metadata <- migrate_metadata_layout(metadata, anievent = is_anievent(data))
-  ensure_valid_metadata(
-    metadata,
-    class = if (is_anievent(data)) "anievent" else "anipoint"
-  )
+  ensure_valid_metadata(metadata, class = frame_class(data))
   ensure_valid_variables_event(md_event(metadata))
   attach_metadata(data, metadata)
 }
@@ -227,7 +224,7 @@ check_orientation_fields <- function(data, md, user_md) {
     extents <- user_md$axis_extents
     extents <- stats::setNames(as.numeric(extents), names(extents))
     md <- md_field_set(md, "axis_extents", extents[!is.na(extents)])
-    if (has_metadata(data)) {
+    if (has_metadata(data) && is_anipoint(data)) {
       warn_short_axis_extents(data, md_field(md, "axis_extents"))
     }
   }

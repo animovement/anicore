@@ -10,7 +10,7 @@
 #' To declare a unit without changing values, use
 #' `set_metadata(data, unit_space = "mm")`.
 #'
-#' @param data An anipoint.
+#' @param data An anipoint, or an anisegment, whose `length` is rescaled.
 #' @param to_unit Target unit, one of the levels of `unit_space` in
 #'   [list_default_metadata()].
 #' @param calibration_factor Multiplier from the current unit to `to_unit`.
@@ -27,7 +27,9 @@
 #'
 #' @export
 convert_unit_space <- function(data, to_unit, calibration_factor = NULL) {
-  ensure_is_anipoint(data)
+  if (!is_anisegment(data)) {
+    ensure_is_anipoint(data)
+  }
 
   if (!to_unit %in% levels(list_default_metadata()[["unit_space"]])) {
     cli::cli_abort(
@@ -49,14 +51,16 @@ convert_unit_space <- function(data, to_unit, calibration_factor = NULL) {
     )
   }
 
-  # Select length axes by role, not name, so `rho` is converted too (#98).
-  axes <- get_axes(data)
-  space_cols <- unname(
-    axes[intersect(
+  space_cols <- if (is_anisegment(data)) {
+    get_variables(data, "where", "length")
+  } else {
+    # Select length axes by role, not name, so `rho` is converted too (#98).
+    axes <- get_axes(data)
+    unname(axes[intersect(
       get_system_axes(get_metadata(data, "coordinate_system")),
       names(axes)
-    )]
-  )
+    )])
+  }
 
   if (length(space_cols) == 0L) {
     cli::cli_warn(c(

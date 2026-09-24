@@ -35,6 +35,11 @@
 #'   systems stay well defined; an unrecognised role is rejected by name.
 #'   If `NULL` (the default), detected from the data.
 #'
+#' @param root For an [as_anisegment()] frame: an anipoint holding the root
+#'   point's trajectory, such as the frame the segments came from. The other
+#'   points are rebuilt by walking the structure's segments outward from it,
+#'   so edits to the segments (such as constant lengths) carry into the
+#'   positions.
 #' @return An anipoint object
 #' @examples
 #' df <- data.frame(
@@ -49,8 +54,12 @@ as_anipoint <- function(
   variables_what = NULL,
   variables_when = NULL,
   variables_where = NULL,
-  index = NULL
+  index = NULL,
+  root = NULL
 ) {
+  if (is_anisegment(data)) {
+    return(anisegment_to_anipoint(data, root))
+  }
   defaults <- list_default_metadata()
 
   if (!is.null(index)) {

@@ -4,7 +4,9 @@
 #'
 #' @return A list with `space` (logical) and `slots` (named list).
 #' @keywords internal
-list_metadata_schema <- function(class = c("anipoint", "anievent")) {
+list_metadata_schema <- function(
+  class = c("anipoint", "anisegment", "anievent")
+) {
   class <- rlang::arg_match(class)
   switch(
     class,
@@ -15,6 +17,14 @@ list_metadata_schema <- function(class = c("anipoint", "anievent")) {
         when = c("index", "keys"),
         where = c("position", "orientation"),
         event = c("state", "point")
+      )
+    ),
+    anisegment = list(
+      space = TRUE,
+      slots = list(
+        what = "keys",
+        when = c("index", "keys"),
+        where = c("length", "direction", "orientation")
       )
     ),
     anievent = list(

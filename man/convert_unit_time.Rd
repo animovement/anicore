@@ -3,12 +3,15 @@
 \name{convert_unit_time}
 \alias{convert_unit_time}
 \alias{convert_unit_time.anipoint}
+\alias{convert_unit_time.anisegment}
 \alias{convert_unit_time.anievent}
 \title{Convert the time unit of an anipoint or anievent}
 \usage{
 convert_unit_time(data, to_unit, calibration_factor = NULL)
 
 \method{convert_unit_time}{anipoint}(data, to_unit, calibration_factor = NULL)
+
+\method{convert_unit_time}{anisegment}(data, to_unit, calibration_factor = NULL)
 
 \method{convert_unit_time}{anievent}(data, to_unit, calibration_factor = NULL)
 }

@@ -93,6 +93,46 @@ get_structure(af, "defence")
 Membership is fixed for the frame: a player who changes role partway
 through needs a separate frame, or a column recording the role.
 
+## From points to segments
+
+`as_anisegment()` re-expresses an anipoint as the segments of one of its
+structures. Each row is one segment at one time: its `length`, and the
+unit vector from its `from` point to its `to` point (`ux`, `uy`, and
+`uz` in 3D). The structure's variable is replaced by a `segment` key.
+
+```{r}
+skeleton <- example_anipoint(n_obs = 3, n_individuals = 1) |>
+  set_structure(example_structure())
+
+seg <- as_anisegment(skeleton)
+seg
+get_variables(seg, "where")
+```
+
+Segment lengths should stay constant for a rigid body, so their spread is
+a first check on tracking quality:
+
+```{r}
+seg |>
+  dplyr::summarise(length_sd = sd(length), .groups = "drop") |>
+  head()
+```
+
+Editing the segments and rebuilding the positions carries the edit into
+every point but the root. Holding each segment at its median length makes
+the body rigid:
+
+```{r}
+rigid <- seg |>
+  dplyr::mutate(length = stats::median(length)) |>
+  as_anipoint(root = skeleton)
+rigid
+```
+
+The rebuild walks the segments outward from the structure's `root`, so it
+needs the root point's trajectory; `root` can be the frame the segments
+came from.
+
 ## Catching typos
 
 Points that don't appear in the data are kept with a warning, since

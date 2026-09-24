@@ -33,7 +33,13 @@ list_main_variable_slots <- function() {
 #'
 #' @keywords internal
 frame_class <- function(data) {
-  if (is_anievent(data)) "anievent" else "anipoint"
+  if (is_anievent(data)) {
+    "anievent"
+  } else if (is_anisegment(data)) {
+    "anisegment"
+  } else {
+    "anipoint"
+  }
 }
 
 
@@ -350,6 +356,12 @@ apply_variables <- function(data, variables, strict = TRUE) {
       as.character(variables$what$keys),
       c(variables$when$keys, variables$when$interval)
     ))
+  }
+
+  if (is_anisegment(data)) {
+    md <- get_metadata(data)
+    md$variables <- variables
+    return(restructure_anisegment(data, md))
   }
 
   index <- variables$when$index
