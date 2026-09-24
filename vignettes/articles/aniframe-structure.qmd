@@ -254,11 +254,8 @@ is_cartesian_2d(cart)
 
 Position says where an entity is; orientation says which way it faces.
 It is declared next to position, in the `where` role's `orientation`
-slot, with the same pattern: a closed set of roles mapped to columns of
-any name. A 2D frame uses `yaw`, measured from `x` toward `y` in
-`unit_angle`; a 3D frame uses a unit quaternion, `qw`, `qx`, `qy`, `qz`
-(Hamilton convention, scalar first), which has none of the gimbal lock or
-wraparound of Euler angles.
+slot: `yaw` for a 2D frame, a unit quaternion (`qw`, `qx`, `qy`, `qz`)
+for a 3D one.
 
 ```{r}
 fly <- example_anipoint(n_keypoints = 1, n_individuals = 1, n_obs = 3) |>
@@ -268,26 +265,14 @@ fly <- example_anipoint(n_keypoints = 1, n_individuals = 1, n_obs = 3) |>
 get_variables(fly, "where", "orientation")
 ```
 
-Declared orientation follows the frame: `reflect_axis()` reflects it with
-the positions, and `convert_unit_angle()` converts `yaw`.
-
-Orientation is stored as a quaternion because Euler angles break under
-ordinary operations: a mean or an interpolation across the ±π wrap, or
-near gimbal lock, gives the wrong rotation. For showing and entering
-orientation in the convention the data came in, a frame can record it,
-`set_metadata(x, euler_sequence = "ZYX", euler_intrinsic = TRUE)`, and
-anispace's Euler conversions use it.
-
-Orientation records measured or asserted state, such as a body axis from
-FicTrac, a rigid body from motion capture, or a fitted ellipse. The
-direction of travel is a different quantity, derived from displacement,
-and the two disagree exactly when it matters: side-slip, backing up,
-drift. Keep derived travel direction in an ordinary column.
+[Orientation](orientation.html) covers the conventions, how orientation
+follows the frame's axes, and why it is not the direction of travel.
 
 ## Where to next?
 
-- [The metadata attribute](aniframe-metadata.html) — units, axis
-  directions, sampling rate, and the setters that keep them consistent
-  with the data.
+- [The metadata attribute](aniframe-metadata.html) — units, sampling
+  rate, and the setters that keep them consistent with the data.
+- [Orientation](orientation.html) — which way the axes point, and which
+  way an entity faces.
 - [Structures](structures.html) — skeletons, teams and other
   relationships between values of an identity variable.

@@ -36,7 +36,8 @@ This article covers the metadata attribute and the functions that read
 and update it. For the data-column structure see
 [The aniframe data structure](aniframe-structure.html); for
 connections, which live in the `structure` category, see
-[Structures](structures.html).
+[Structures](structures.html); for axis directions and orientation, see
+[Orientation](orientation.html).
 
 ## The metadata attribute
 
@@ -62,7 +63,7 @@ question:
 |---------------|---------------------------------------------------------------------|
 | `recording`   | provenance: `source`, `source_version`, `source_format`, `filename` |
 | `time`        | `unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime` |
-| `space`       | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle` |
+| `space`       | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`, `euler_sequence`, `euler_intrinsic` |
 | `variables`   | which columns play which role: `what`, `when`, `where`, `event`, each a list of named slots |
 | `structure`   | relationships between levels of a variable — today's connections    |
 
@@ -178,72 +179,21 @@ data |>
 
 ## Which way the axes point
 
-For 2D image-derived data there's an annoying convention split: most
-image and video tooling counts y **downward** from the top of the frame,
-while plotting and most maths counts it **upward**. What differs is not
-where `(0, 0)` sits — it is a corner either way — but the direction y
-increases in, so that is what `anipoint` records.
-
-`axis_directions` maps each axis role to one of six words, in three
-opposed pairs, read from where the recording was made: `right`/`left`
-across the view, `up`/`down` within it, and `back`/`forward` toward and
-away from the viewer.
-
-`set_axis_directions()` only declares. To turn an axis over and keep
-the data describing the same scene, use `reflect_axis()`: an axis runs
-from zero to its `axis_extents` value, so the reflection is
-`extent - old`, and an axis with no declared extent is negated.
+`axis_directions` records which way each axis points, read from where
+the recording was made — `right`/`left`, `up`/`down`, `back`/`forward` —
+and `axis_extents` how far it runs. `set_axis_directions()` declares the
+directions; `reflect_axis()` turns an axis over and changes the data to
+match. The sense of rotation and the handedness are derived from them
+by `get_angle_direction()` and `get_handedness()`.
 
 ```{r}
-img <- anipoint(
-  individual = 1L, time = 1:4,
-  x = c(0, 10, 20, 30),
-  y = c(50, 100, 150, 200)
-) |>
-  set_metadata(axis_extents = c(y = 1080)) |>
-  set_axis_directions(c(x = "right", y = "down"))
-
-img$y
-img <- reflect_axis(img, "y")
-img$y # 1080 - original y
-get_axis_directions(img)
+data |>
+  set_axis_directions(c(x = "right", y = "down")) |>
+  get_angle_direction()
 ```
 
-### What follows from the directions
-
-Two things are read off them rather than recorded separately, so they
-cannot go on claiming a convention the axes no longer have.
-
-`get_angle_direction()` says which way angles run. `atan2(y, x)` counts
-counter-clockwise, so the same physical heading comes out mirrored
-between a y-down and a y-up frame — which is exactly the comparison that
-goes wrong silently without this.
-
-`get_handedness()` needs three axes. Two directions leave it open, so a
-frame with only `x` and `y` has none until it says which side it was
-observed from — and that is not a detail. A rodent filmed from above and
-the same rodent filmed from below through a glass floor give images whose
-`x` and `y` are declared identically, but whose rotations run opposite
-ways. The depth axis is the only thing that tells them apart.
-
-```{r}
-above <- set_axis_directions(img, c(z = "back"))
-below <- set_axis_directions(img, c(z = "forward"))
-
-c(above = get_angle_direction(above), below = get_angle_direction(below))
-c(above = get_handedness(above), below = get_handedness(below))
-```
-
-Since `det[x y z]` is `(x × y) · z`, a right-handed frame counts
-counter-clockwise about its own depth axis — always. The two answers are
-one fact seen twice.
-
-A frame can also state the convention without spelling the axes out,
-which is how most 3D recordings are described:
-
-```{r}
-set_metadata(img, handedness = "right") |> get_handedness()
-```
+[Orientation](orientation.html) sets out the model, including why the
+depth axis matters even for 2D data.
 
 ## Units
 
