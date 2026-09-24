@@ -40,12 +40,10 @@ holding named slots: \code{what$keys} (identity), \code{when$index} +
 index), \code{where$position} (the axis-role mapping; names are roles,
 values are columns), \code{event$state} + \code{event$point}. The frame groups
 by \code{c(what$keys, when$keys)} and nothing else. These slots are
-reached through the \verb{*_variables_*()} accessors, \code{\link[=get_index]{get_index()}} and
-\code{\link[=get_axes]{get_axes()}}, never by flat name — \code{keys} appears under two roles.
-\item \code{structure} — relationships between levels of a variable, keyed by
-that variable (typically \code{keypoint} for skeletons). Today this holds
-the connection tables managed via \code{\link[=set_connections]{set_connections()}}; it is where
-an \code{anistructure} will live.
+reached through \code{\link[=get_variables]{get_variables()}}, \code{\link[=get_index]{get_index()}} and \code{\link[=get_axes]{get_axes()}},
+never by flat name — \code{keys} appears under two roles.
+\item \code{structure} — named \code{\link[=anistructure]{anistructure()}}s, each relating the levels of
+one variable; see \code{\link[=set_structure]{set_structure()}}.
 \item \code{spec_version} — named list of semantic version strings, one per
 class, versioning the full data contract independently of the
 package version.

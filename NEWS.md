@@ -2,6 +2,8 @@
 
 ## Breaking changes
 
+* Structures replace connections (#154). An `anistructure()` holds points, the segments between them (with optional expected lengths) and joints, each one measured angle between a pair of segments with optional `min`/`max`/`rest` limits, plus a `root` and provenance fields. Lengths and limits are recorded, not enforced. A frame can carry several named structures, including several over the same variable — a `team`, `defence` and `left_flank` over `individual` alongside a `skeleton` over `keypoint` — through `set_structure()`, `get_structure()` and `remove_structure()`. `get_/set_/add_/remove_connections()` are removed; connection tables in existing objects become segments-only structures named after their variable.
+
 * The accessor API is rebuilt around one rule: `set_*` declares and never changes a value (#155).
 
   * `get_variables()`, `set_variables()`, `add_variables()` and `remove_variables()` replace the sixteen `*_variables_what/when/where/event()` functions. They take a role and slot — `get_variables(x, "when", "index")`, `set_variables(x, when = list(keys = "trial"))` — or a character vector for a role's main slot (`add_variables(x, what = "id")`). `get_variables(x, "when")` is now the union of the role's slots, index included; the grouping set is the new `get_keys()`. `set_axes()` is gone too: use `set_variables(x, where = c(x = "u", y = "v"))`.

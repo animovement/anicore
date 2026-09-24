@@ -64,9 +64,7 @@ ensure_valid_metadata <- function(metadata, class = "anipoint") {
 
   ensure_valid_spec_version(metadata[["spec_version"]])
   ensure_known_metadata_fields(metadata)
-  if (!is.list(metadata[["structure"]])) {
-    cli::cli_abort("The {.field structure} category must be a list.")
-  }
+  ensure_valid_structure_category(metadata[["structure"]])
   ensure_valid_metadata_types(metadata)
   ensure_valid_metadata_variables(metadata, schema$slots)
 }
@@ -292,6 +290,29 @@ ensure_valid_metadata_variables <- function(
   if (length(overlap) > 0L) {
     cli::cli_abort(
       "The index {.val {overlap}} cannot also be a {.field when} key."
+    )
+  }
+  invisible(TRUE)
+}
+
+
+#' @keywords internal
+ensure_valid_structure_category <- function(structures) {
+  if (!is.list(structures) || is_anistructure(structures)) {
+    cli::cli_abort(
+      "The {.field structure} category must be a named list of structures."
+    )
+  }
+  if (length(structures) == 0L) {
+    return(invisible(TRUE))
+  }
+  ensure_unique_names(
+    names(structures) %||% rep("", length(structures)),
+    "Structure"
+  )
+  if (!all(vapply(structures, is_anistructure, logical(1)))) {
+    cli::cli_abort(
+      "Every entry of the {.field structure} category must be an {.cls anistructure}."
     )
   }
   invisible(TRUE)

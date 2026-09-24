@@ -97,11 +97,7 @@ test_that("print returns input invisibly", {
 
 test_that("print renders the category tree with sections", {
   data <- example_anipoint()
-  data <- suppressWarnings(set_connections(
-    data,
-    list(c("head", "thorax"), c("thorax", "abdomen")),
-    variable = "keypoint"
-  ))
+  data <- set_structure(data, example_structure())
   out <- capture_md_print(get_metadata(data))
   text <- paste(out, collapse = "\n")
 
@@ -112,8 +108,7 @@ test_that("print renders the category tree with sections", {
   # variables print one line per role, slots inline
   expect_match(text, "keys:")
   expect_match(text, "index: time")
-  # structure prints one line per keyed variable
-  expect_match(text, "keypoint: 2 connections")
+  expect_match(text, "keypoint: <anistructure> 11 points", fixed = TRUE)
 })
 
 test_that("print renders an empty structure category as (empty)", {

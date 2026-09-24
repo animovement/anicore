@@ -152,7 +152,7 @@ print_metadata_variables <- function(variables) {
 }
 
 
-#' Render the structure category: one line per keyed variable
+#' Render the structure category: one line per structure
 #'
 #' @param structure The structure list.
 #' @keywords internal
@@ -161,15 +161,13 @@ print_metadata_structure <- function(structure) {
     cli::cli_verbatim("(empty)")
     return(invisible(structure))
   }
-  for (variable in names(structure)) {
-    entry <- structure[[variable]]
-    n <- if (is.data.frame(entry)) nrow(entry) else length(entry)
+  for (name in names(structure)) {
     cli::cli_verbatim(paste0(
-      variable,
+      name,
       ": ",
-      n,
-      " connection",
-      if (n == 1) "" else "s"
+      format(structure[[name]])[[1]],
+      " over ",
+      structure[[name]]$variable
     ))
   }
   invisible(structure)
