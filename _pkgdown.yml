@@ -16,6 +16,7 @@ articles:
     contents:
       - articles/aniframe-structure
       - articles/aniframe-metadata
+      - articles/orientation
       - articles/structures
       - articles/anievent-structure
 
