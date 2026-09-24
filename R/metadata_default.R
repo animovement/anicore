@@ -16,7 +16,9 @@
 #'   (derived from the index; read it with [get_sampling_interval()]),
 #'   `start_datetime`.
 #' * `space` — `coordinate_system`, `reference_frame`, `handedness`,
-#'   `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`. The
+#'   `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`, and
+#'   `euler_sequence` / `euler_intrinsic`: the Euler convention the data's
+#'   source uses, for showing and entering a quaternion orientation. The
 #'   one category a class can lack: an [anievent()] has no spatial
 #'   component, so its metadata simply has no `space` (#73).
 #' * `variables` — which columns play which role, as a list of roles each
@@ -99,7 +101,9 @@ list_default_metadata <- function(class = c("anipoint", "anievent")) {
       unit_angle = factor(
         "rad",
         levels = c("rad", "deg", "none")
-      )
+      ),
+      euler_sequence = NA_character_,
+      euler_intrinsic = NA
     ),
     variables = list(
       what = list(keys = c("individual", "keypoint")),

@@ -111,7 +111,7 @@ ensure_known_metadata_fields <- function(metadata) {
 
 # Added after the initial schema; tolerated as absent so old objects validate.
 list_optional_metadata_fields <- function() {
-  c("source_format", "sampling_interval")
+  c("source_format", "sampling_interval", "euler_sequence", "euler_intrinsic")
 }
 
 # Empty and all-NA collapse to character().

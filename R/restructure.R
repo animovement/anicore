@@ -47,6 +47,8 @@ restructure_anipoint <- function(
     ensure_valid_axis_roles(axes)
   }
   where_cols <- unname(axes)
+  orientation <- orientation %||% md$variables$where$orientation
+  ensure_has_declared_cols(bare, unname(orientation), "where")
 
   ensure_has_anipoint_cols(
     bare,
@@ -64,7 +66,7 @@ restructure_anipoint <- function(
   )
 
   standard_cols <- unique(
-    c(variables_what, variables_when, index, where_cols)
+    c(variables_what, variables_when, index, where_cols, unname(orientation))
   )
   if ("confidence" %in% names(bare)) {
     standard_cols <- c(standard_cols, "confidence")
@@ -99,9 +101,8 @@ restructure_anipoint <- function(
 
   md <- migrate_metadata_layout(md)
   where <- list(position = position)
-  orientation <- orientation %||% md$variables$where$orientation
   if (length(orientation) > 0L) {
-    ensure_has_declared_cols(bare, unname(orientation), "where")
+    ensure_valid_orientation(bare, orientation, coordinate_system)
     where$orientation <- orientation
   }
   md$variables <- list(

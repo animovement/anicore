@@ -34,6 +34,8 @@
 
 ## Added
 
+* Orientation can be declared alongside position (#46): `set_variables(x, where = list(orientation = c(yaw = "heading")))` for a 2D frame, or the roles `qw`, `qx`, `qy`, `qz` of a unit quaternion for a 3D one. The roles are checked against the frame's dimensionality, quaternions must have unit norm, `reflect_axis()` reflects orientation with the positions, and `convert_unit_angle()` converts `yaw`. A frame can also record the Euler convention of its source (`euler_sequence`, `euler_intrinsic`), so orientation can be shown and entered in that convention while it is stored as a quaternion.
+
 * `convert_inf_to_na()`, the sibling of `convert_nan_to_na()`, for sources that mark a missing observation with an infinity rather than a `NaN`. TRex is one — its own documentation masks `np.inf` out before plotting, and its `missing` flag is 1 in exactly those frames. Left in place an `Inf` propagates through arithmetic silently, so one untracked frame turns a mean or a speed into `Inf` rather than into a missing value (animovement/aniread#116).
 
 ## Added

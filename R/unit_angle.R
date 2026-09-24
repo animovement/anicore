@@ -2,8 +2,8 @@
 #'
 #' @description
 #' Converts angular columns between radians and degrees and records the new
-#' `unit_angle`. The spatial angular columns `phi` and `theta` are always
-#' converted; other angular columns, such as a heading, are named in `cols`.
+#' `unit_angle`. The spatial angular columns `phi` and `theta` and a declared
+#' `yaw` are always converted; other angular columns are named in `cols`.
 #'
 #' To declare a unit without changing values, use
 #' `set_metadata(data, unit_angle = "deg")`.
@@ -37,9 +37,10 @@ convert_unit_angle <- function(data, to_unit, cols = NULL) {
     }
   }
 
-  # Auto-include spatial angular columns whenever present (#21).
+  # Spatial angular columns and yaw are always converted (#21, #46).
   spatial_angular <- intersect(c("phi", "theta"), names(data))
-  cols_to_convert <- unique(c(spatial_angular, cols))
+  yaw <- get_variables(data, "where", "orientation")["yaw"]
+  cols_to_convert <- unique(c(spatial_angular, unname(yaw[!is.na(yaw)]), cols))
 
   current_unit_angle <- get_metadata(data, "unit_angle")
   if (identical(as.character(current_unit_angle), to_unit)) {

@@ -18,8 +18,8 @@ convert_unit_angle(data, to_unit, cols = NULL)
 }
 \description{
 Converts angular columns between radians and degrees and records the new
-\code{unit_angle}. The spatial angular columns \code{phi} and \code{theta} are always
-converted; other angular columns, such as a heading, are named in \code{cols}.
+\code{unit_angle}. The spatial angular columns \code{phi} and \code{theta} and a declared
+\code{yaw} are always converted; other angular columns are named in \code{cols}.
 
 To declare a unit without changing values, use
 \code{set_metadata(data, unit_angle = "deg")}.

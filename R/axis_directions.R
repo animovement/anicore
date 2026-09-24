@@ -178,6 +178,7 @@ reflect_axis <- function(data, axis) {
 
   handedness <- get_handedness(data)
   data <- reflect_axis_role(data, axis)
+  data <- reflect_orientation(data, axis)
 
   directions <- get_axis_directions(data)
   if (axis %in% names(directions)) {
