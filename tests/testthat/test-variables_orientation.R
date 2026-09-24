@@ -123,3 +123,28 @@ test_that("quaternions must have unit norm", {
   af <- dplyr::mutate(quat_frame(), w = 2)
   expect_error(as_anipoint(af), "unit norm")
 })
+
+test_that("the Euler convention is recorded together, validated and upper-cased", {
+  af <- set_metadata(
+    quat_frame(),
+    euler_sequence = "zyx",
+    euler_intrinsic = TRUE
+  )
+  expect_equal(get_metadata(af, "euler_sequence"), "ZYX")
+  expect_true(get_metadata(af, "euler_intrinsic"))
+  expect_error(
+    set_metadata(quat_frame(), euler_sequence = "ZYX"),
+    "set together"
+  )
+  expect_error(
+    set_metadata(quat_frame(), euler_sequence = "ZZX", euler_intrinsic = TRUE),
+    "three axes"
+  )
+  expect_error(
+    set_metadata(quat_frame(), euler_sequence = "AB", euler_intrinsic = FALSE),
+    "three axes"
+  )
+  cleared <- set_metadata(af, euler_sequence = NA, euler_intrinsic = NA)
+  expect_true(is.na(get_metadata(cleared, "euler_sequence")))
+  expect_true(is.na(get_metadata(quat_frame(), "euler_sequence")))
+})
