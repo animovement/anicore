@@ -9,7 +9,6 @@ anistructure(
   segments = NULL,
   joints = NULL,
   root = NA_character_,
-  twist = c("none", "zero", "frame"),
   source = NA_character_,
   citation = NA_character_,
   license = NA_character_
@@ -24,16 +23,11 @@ endpoints.}
 \code{c(from, to)} pairs.}
 
 \item{joints}{A data frame with \code{a} and \code{b} (segment names), and
-optionally \code{joint} (defaults to \code{"a-b"}), \code{axis}, and either \code{min},
-\code{max}, \code{rest} for a single degree of freedom or a \code{dof} list-column of
-data frames with \code{dof}, \code{axis}, \code{min}, \code{max}, \code{rest}.}
+optionally \code{joint} (defaults to \code{"a-b"}), \code{axis}, \code{min}, \code{max} and
+\code{rest}.}
 
 \item{root}{The point the structure hangs from when positions are
 rebuilt from segments. \code{NA} if unset.}
-
-\item{twist}{How rotation about a segment's own axis is handled in 3D:
-\code{"none"} (not represented), \code{"zero"} (the zero-twist convention, as for
-chains) or \code{"frame"} (segments carry their own orientation).}
 
 \item{source, citation, license}{Provenance of the structure.}
 }
@@ -49,11 +43,17 @@ It has three parts, each optional beyond the first:
 \item \strong{segments} — directed links between two points, with an optional
 expected \code{length}. Direction matters for joint angles: run limbs
 proximal to distal, and paired segments (left to right) the same way.
-\item \strong{joints} — ordered pairs of segments \verb{(a, b)}. \code{axis} names the axis
-the angle is measured about (\code{"x"}, \code{"y"}, \code{"z"}, or a segment name);
-\code{NA} gives the unsigned included angle. Limits are per degree of
-freedom, in radians, with 0 when the two segments are aligned.
+\item \strong{joints} — one measured angle each, between an ordered pair of
+segments \verb{(a, b)}, with optional limits \code{min}, \code{max} and \code{rest} in
+radians. The angle is 0 when the two segments point the same way. In
+2D it is signed, turning from \code{a} to \code{b}. In 3D it is the included angle,
+or, when \code{axis} is given (\code{"x"}, \code{"y"}, \code{"z"} or a segment name), the
+signed angle about it. Several angles on the same pair of segments —
+flexion and abduction, say — are several joints with different axes.
 }
+
+Lengths and limits are recorded, not enforced: checks compare the data
+against them.
 
 A structure is a template: it records no data and no variable until it
 is attached to a frame with \code{\link[=set_structure]{set_structure()}}, so one structure can be

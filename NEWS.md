@@ -2,7 +2,7 @@
 
 ## Breaking changes
 
-* Structures replace connections (#154). An `anistructure()` holds points, the segments between them (with optional expected lengths) and joints as pairs of segments with per-degree-of-freedom limits, plus a `root`, a 3D twist convention and provenance fields. A frame can carry several named structures, including several over the same variable — a `team`, `defence` and `left_flank` over `individual` alongside a `skeleton` over `keypoint` — through `set_structure()`, `get_structure()` and `remove_structure()`. `get_/set_/add_/remove_connections()` are removed; connection tables in existing objects become segments-only structures named after their variable.
+* Structures replace connections (#154). An `anistructure()` holds points, the segments between them (with optional expected lengths) and joints, each one measured angle between a pair of segments with optional `min`/`max`/`rest` limits, plus a `root` and provenance fields. Lengths and limits are recorded, not enforced. A frame can carry several named structures, including several over the same variable — a `team`, `defence` and `left_flank` over `individual` alongside a `skeleton` over `keypoint` — through `set_structure()`, `get_structure()` and `remove_structure()`. `get_/set_/add_/remove_connections()` are removed; connection tables in existing objects become segments-only structures named after their variable.
 
 * The accessor API is rebuilt around one rule: `set_*` declares and never changes a value (#155).
 

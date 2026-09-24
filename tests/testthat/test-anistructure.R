@@ -17,39 +17,34 @@ test_that("named from/to pairs are read by name", {
   expect_equal(c(s$segments$from, s$segments$to), c("a", "b"))
 })
 
-test_that("single-DoF limits fold into the dof list", {
+test_that("joint limits are plain columns, NA when not given", {
   s <- example_structure()
-  knee <- s$joints$dof[[which(s$joints$joint == "knee_right")]]
-  expect_equal(knee$dof, "angle")
+  knee <- s$joints[s$joints$joint == "knee_right", ]
   expect_equal(c(knee$min, knee$max), c(0, 2.5))
-})
-
-test_that("a dof list-column is kept per degree of freedom", {
-  s <- anistructure(
-    segments = list(c("a", "b"), c("b", "c")),
-    joints = dplyr::tibble(
-      a = "a-b",
-      b = "b-c",
-      dof = list(data.frame(
-        dof = c("flexion", "abduction"),
-        axis = c("x", "z"),
-        min = c(0, -0.5),
-        max = c(2, 0.5)
-      ))
-    )
-  )
-  expect_equal(s$joints$joint, "a-b-b-c")
-  expect_equal(s$joints$dof[[1]]$dof, c("flexion", "abduction"))
-  expect_true(all(is.na(s$joints$dof[[1]]$rest)))
-})
-
-test_that("joints without limits carry an empty dof table", {
-  s <- anistructure(
+  expect_true(is.na(knee$rest))
+  bare <- anistructure(
     segments = list(c("a", "b"), c("b", "c")),
     joints = data.frame(a = "a-b", b = "b-c", axis = "z")
   )
-  expect_equal(nrow(s$joints$dof[[1]]), 0L)
-  expect_equal(s$joints$axis, "z")
+  expect_equal(bare$joints$joint, "a-b-b-c")
+  expect_equal(bare$joints$axis, "z")
+  expect_true(all(is.na(unlist(bare$joints[c("min", "max", "rest")]))))
+})
+
+test_that("several angles on one segment pair are several joints", {
+  s <- anistructure(
+    segments = list(c("p", "hip"), c("hip", "knee")),
+    joints = data.frame(
+      joint = c("flexion", "abduction"),
+      a = "p-hip",
+      b = "hip-knee",
+      axis = c("x", "z"),
+      min = c(-0.5, -0.9),
+      max = c(2.1, 0.5)
+    )
+  )
+  expect_equal(nrow(s$joints), 2L)
+  expect_equal(s$joints$axis, c("x", "z"))
 })
 
 test_that("the validator names each inconsistency", {
@@ -129,10 +124,9 @@ test_that("is_anistructure() and its guard", {
 test_that("printing summarises the parts", {
   s <- example_structure()
   s$variable <- "keypoint"
-  s$twist <- "zero"
   out <- format(s)
   expect_match(out[[1]], "11 points, 10 segments, 3 joints")
-  expect_match(out[[2]], "variable: keypoint; root: abdomen; twist: zero")
+  expect_match(out[[2]], "variable: keypoint; root: abdomen")
   expect_output(
     print(anistructure(points = "a")),
     "1 point, 0 segments, 0 joints"
