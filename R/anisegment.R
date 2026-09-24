@@ -115,7 +115,7 @@ as_anisegment <- function(data, structure = NULL) {
   )
   md$structure[[name]] <- struct
 
-  restructure_anisegment(new_anisegment(out), md)
+  restructure_value_frame(new_anisegment(out), md)
 }
 
 
@@ -150,20 +150,20 @@ new_anisegment <- function(x) {
 }
 
 
-#' Order, group and declare an anisegment
+#' Order, group and declare a segment or joint frame
 #'
-#' @param data An anisegment.
+#' @param data An anisegment or anijoint.
 #' @param md Its complete metadata.
 #'
 #' @return `data`, restructured, with `md` attached.
 #' @keywords internal
-restructure_anisegment <- function(data, md) {
+restructure_value_frame <- function(data, md) {
   cls <- class(data)
   variables <- md$variables
   what <- as.character(variables$what$keys)
   when <- as.character(variables$when$keys)
   index <- variables$when$index
-  value_cols <- c(variables$where$length, unname(variables$where$direction))
+  value_cols <- unname(unlist(variables$where))
 
   bare <- strip_animovement_class(data)
   ensure_has_declared_cols(bare, c(what, when, index), "what")
@@ -199,11 +199,7 @@ anisegment_to_anipoint <- function(data, root) {
     ))
   }
   keys <- get_keys(data)
-  struct <- Filter(
-    function(s) !s$variable %in% keys,
-    get_structure(data)
-  )
-  struct <- struct[[1]]
+  struct <- source_structure(data)
   variable <- struct$variable
   if (is.na(struct$root)) {
     cli::cli_abort(c(
@@ -321,9 +317,8 @@ ensure_is_anisegment <- function(x) {
 tbl_sum.anisegment <- function(x, ...) {
   header <- NextMethod()
   names(header)[1] <- "anisegment"
-  structures <- Filter(
-    function(s) !s$variable %in% get_keys(x),
-    get_structure(x)
-  )
-  c(header, "Structure" = paste(names(structures), collapse = ", "))
+  structure_name <- names(get_structure(x))[
+    vapply(get_structure(x), identical, logical(1), source_structure(x))
+  ]
+  c(header, "Structure" = structure_name)
 }

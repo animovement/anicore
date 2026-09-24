@@ -2,45 +2,32 @@
 
 ## Breaking changes
 
-* Structures replace connections (#154). An `anistructure()` holds points, the segments between them (with optional expected lengths) and joints, each one measured angle between a pair of segments with optional `min`/`max`/`rest` limits, plus a `root` and provenance fields. Lengths and limits are recorded, not enforced. A frame can carry several named structures, including several over the same variable — a `team`, `defence` and `left_flank` over `individual` alongside a `skeleton` over `keypoint` — through `set_structure()`, `get_structure()` and `remove_structure()`. `get_/set_/add_/remove_connections()` are removed; connection tables in existing objects become segments-only structures named after their variable.
+* The position frame is now `anipoint`, and `aniframe` is the abstract parent of every frame class: `anipoint`, `anisegment`, `anijoint` and `anievent` (#154).
+  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace the `aniframe()` versions, which remain as soft-deprecated aliases for one release.
+  * `is_aniframe()` is now `TRUE` for any frame, including an anievent. Test the grain with `is_anipoint()` or `ensure_is_anipoint()`; functions that need coordinates now reject other grains.
+  * Re-cast objects saved with earlier versions with `as_anipoint()` or `as_anievent()`.
 
-* The accessor API is rebuilt around one rule: `set_*` declares and never changes a value (#155).
+* Metadata is grouped into categories — `recording`, `time`, `space`, `variables` and `structure` — and `spec_version` becomes 3.0.0 for anipoint frames and 1.0.0 for anievents (#118). Access stays flat: `get_metadata(x, "sampling_rate")`, `get_metadata(x)$sampling_rate` and `set_metadata(x, sampling_rate = 30)` work as before, and a category name returns the whole category. Reading `attr(x, "metadata")` directly no longer works. Objects in the old layout are migrated when read.
+  * An anievent has no `space` category: its spatial fields read `NULL`, and spatial fields passed to `as_anievent()` are dropped (#73).
+  * `get_metadata()` with several names returns a plain list, and setting a field to `NULL` errors (use `NA`).
 
-  * `get_variables()`, `set_variables()`, `add_variables()` and `remove_variables()` replace the sixteen `*_variables_what/when/where/event()` functions. They take a role and slot — `get_variables(x, "when", "index")`, `set_variables(x, when = list(keys = "trial"))` — or a character vector for a role's main slot (`add_variables(x, what = "id")`). `get_variables(x, "when")` is now the union of the role's slots, index included; the grouping set is the new `get_keys()`. `set_axes()` is gone too: use `set_variables(x, where = c(x = "u", y = "v"))`.
-  * `convert_unit_space()`, `convert_unit_time()` and `convert_unit_angle()` replace `set_unit_space()`, `set_unit_time()` and `set_unit_angle()`. Converting from `px`, `frame` or `unknown` without a `calibration_factor` now errors instead of relabelling the unit, except from `frame` with a declared `sampling_rate`. `convert_unit_time()` also handles `ns` and `us`.
-  * `set_axis_directions()` only records directions. The new `reflect_axis()` turns an axis over: it reflects the column, flips the declared direction and a known handedness.
-  * Removed in favour of `get_metadata()` / `set_metadata()`: `get_/set_unit_space()`, `get_/set_unit_time()`, `get_/set_unit_angle()`, `get_/set_sampling_rate()`, `get_/set_axis_extents()`, `set_handedness()` and `set_angle_direction()`. `set_sampling_rate()` used to convert frames to seconds as well; declare the rate, then call `convert_unit_time(x, "s")`. `set_metadata()` validates `axis_directions` and `axis_extents` and keeps `handedness` in step with three declared directions.
+* `set_*()` functions now only declare; operations that change values have their own verbs (#155).
+  * `get_variables()`, `set_variables()`, `add_variables()` and `remove_variables()` replace the sixteen `*_variables_*()` functions and `set_axes()`. They take a role and a slot, e.g. `set_variables(x, when = list(keys = "trial"))`. `get_variables(x, "when")` now includes the index; the grouping columns are `get_keys()`.
+  * `convert_unit_space()`, `convert_unit_time()` and `convert_unit_angle()` replace `set_unit_*()`. Converting from `px`, `frame` or `unknown` now needs a `calibration_factor`, or, from `frame`, a declared `sampling_rate`.
+  * `set_axis_directions()` only records directions; `reflect_axis()` turns an axis over and reflects the data.
+  * The unit and sampling-rate getters and setters, `get_/set_axis_extents()`, `set_handedness()` and `set_angle_direction()` are removed; use `get_metadata()` and `set_metadata()`. `set_sampling_rate()` also converted frames to seconds: use `set_metadata(x, sampling_rate = r) |> convert_unit_time("s")`.
 
-* The metadata list becomes a category tree (#118): `recording` (`source`, `source_version`, `source_format`, `filename`), `time` (`unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime`), `space` (`coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`), `variables`, and `structure` (which now holds what `connections` held), with `spec_version` at the top level. This is a `spec_version` major bump: `aniframe` moves to 3.0.0 and `anievent` to 1.0.0.
-
-  Access stays flat, so most code needs no change: `get_metadata(data, "sampling_rate")` finds the field wherever it lives, `set_metadata(data, sampling_rate = 30)` writes it there, and a category name returns the whole category (`get_metadata(data, "space")`). The object `get_metadata()` returns also resolves `$` and `[[` flat, so `get_metadata(data)$sampling_rate` keeps working over the nested storage. What breaks is anything reaching into the raw attribute — `attr(x, "metadata")$sampling_rate` — and the old flat names for the variable declaration: `get_metadata(x, "variables_what")` and friends are refused with a pointer to `get_variables_what()`, `get_index()`, `get_axes()` and `get_connections()`.
-
-  The variable roles become lists of named slots — `what$keys`, `when$index` + `when$keys`, `where$position` (the axis-role mapping, absorbing the separate `axes` field), `event$state` + `event$point` — and the frame groups by `c(what$keys, when$keys)`. An anievent's `start`/`stop` get the slot the flat vector could never express, `when$interval`, which is why `get_index()` had to refuse anievents by string comparison before.
-
-  An anievent's spatial "not applicable" is now spelled as an absent `space` category instead of five neutral values (#73): its spatial fields read as `NULL` (`NA` through `get_coordinate_system()`), and writing one errors. Spatial fields passed to `as_anievent()` are dropped silently, so readers written against the flat layout keep working.
-
-  Objects serialised with the flat layout are migrated to the tree, with `spec_version` bumped, whenever their metadata is read or written.
-
-  Assigning through the metadata object writes into the tree too, so `md$sampling_rate <- 30; set_metadata(x, metadata = md)` works; an unknown name errors. `names(get_metadata(x))` lists the categories, not the fields. `get_metadata()` with several names returns a plain named list. Setting a field to `NULL` errors; use `NA` for unknown.
-
-* The position-grain frame class is renamed from `aniframe` to `anipoint`, and `aniframe` becomes the abstract parent class shared by every animovement frame (#154). The class vectors are now `c("anipoint", "aniframe", ...)` and `c("anievent", "aniframe", ...)`, so the shared substrate — metadata accessors, dplyr methods, printing — is written once on the parent. The renamed structural-frame family (`anisegment`, `anijoint`) will join it as siblings of `anipoint`.
-
-  Concretely:
-
-  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace `aniframe()`, `as_aniframe()`, `example_aniframe()` and `validate_aniframe()`. The old names remain as soft-deprecated aliases, and will be removed after one release cycle.
-  * `is_aniframe()` now answers "is this any animovement frame?" — an anievent passes it too. Code that means the position grain should test with the new `is_anipoint()` / `ensure_is_anipoint()` instead.
-  * Functions that need coordinates (axes, units of space and angle, connections, orientation columns, the index, event declarations) now guard with `ensure_is_anipoint()`, so a wrong-grain input fails at the door rather than deep inside.
-  * Objects serialised before this release lack the new classes in their class vector; re-cast them with `as_anipoint()` (or `as_anievent()`), which repairs the class vector from the stored metadata.
+* Structures replace connections (#154). An `anistructure()` holds points, segments with optional expected lengths, and joints: angles between two segments, with optional limits. A frame can hold several named structures, including several over one variable, through `set_structure()`, `get_structure()` and `remove_structure()`. The `*_connections()` functions are removed; stored connection tables become structures.
 
 ## Added
 
-* A segment frame, `anisegment` (#154): `as_anisegment()` turns an anipoint into one row per segment of a structure, with its `length` and a unit direction (`ux`, `uy`, `uz`), a `segment` key in place of the structure's variable, and a `confidence` that is the lower of the two endpoints'. `as_anipoint(seg, root = )` rebuilds the positions from the root point's trajectory, so edits made in segment space, such as constant segment lengths, carry into the positions. Metadata, variables, structures, dplyr verbs, `convert_unit_space()` (which rescales `length`) and `convert_unit_time()` all work on it.
+* `as_anisegment()` gives one row per segment of a structure: its `length` and unit direction (#154). `as_anipoint(seg, root = )` rebuilds positions from segments, for example after holding lengths constant.
 
-* Orientation can be declared alongside position (#46): `set_variables(x, where = list(orientation = c(yaw = "heading")))` for a 2D frame, or the roles `qw`, `qx`, `qy`, `qz` of a unit quaternion for a 3D one. The roles are checked against the frame's dimensionality, quaternions must have unit norm, `reflect_axis()` reflects orientation with the positions, and `convert_unit_angle()` converts `yaw`. A frame can also record the Euler convention of its source (`euler_sequence`, `euler_intrinsic`), so orientation can be shown and entered in that convention while it is stored as a quaternion.
+* `as_anijoint()` gives one angle per joint of a structure (#154). `angle_between()` is the underlying computation.
+
+* Orientation can be declared alongside position: `yaw` in 2D, or a unit quaternion in 3D (#46). `reflect_axis()` and `convert_unit_angle()` handle it, and `euler_sequence` and `euler_intrinsic` record the Euler convention a source uses.
 
 * `convert_inf_to_na()`, the sibling of `convert_nan_to_na()`, for sources that mark a missing observation with an infinity rather than a `NaN`. TRex is one — its own documentation masks `np.inf` out before plotting, and its `missing` flag is 1 in exactly those frames. Left in place an `Inf` propagates through arithmetic silently, so one untracked frame turns a mean or a speed into `Inf` rather than into a missing value (animovement/aniread#116).
-
-## Added
 
 * A `source_format` metadata field, recording which export layout a file was read as (animovement/aniread#118). Tracking software changes its export layout between releases — FreeMoCap's tidy CSV gained a `reprojection_error` column at v1.8.0, and its wide per-model CSVs are a different layout again — so `source` alone does not say what was parsed. Readers set it to a short layout name such as `"by_frame_9col"`.
 
@@ -54,11 +41,9 @@
 
 ## Changed
 
-* `spec_version` moves to `aniframe = "2.1.0"` and `anievent = "0.4.0"`. Minor for both: each gains `source_format` as `NA`. Objects serialised before the field existed continue to validate.
+* The order of the identity keys (formerly `variables_what`) no longer asserts a hierarchy (#140, #141). It was documented as coarse to fine, which reads naturally for the names that nest — a subject has tracks, a track has keypoints — but identity variables need not nest at all. `sex`, `treatment` and `genotype` partition a population without containing one another, and there is no sense in which one is finer than the next.
 
-* The order of `variables_what` no longer asserts a hierarchy (#140, #141). It was documented as coarse to fine, which reads naturally for the names that nest — a subject has tracks, a track has keypoints — but identity variables need not nest at all. `sex`, `treatment` and `genotype` partition a population without containing one another, and there is no sense in which one is finer than the next.
-
-  The order is now documented as what auto-detection emits, not something a frame asserts. Nothing should read a position in `variables_what` as meaning a level; a function that needs to know which variable to act on asks for it — `animetric::add_centroid()` takes `across`, `anispace::translate_coords()` takes `level`.
+  The order is now documented as what auto-detection emits, not something a frame asserts. Nothing should read a position among the identity keys as meaning a level; a function that needs to know which variable to act on asks for it — `animetric::add_centroid()` takes `across`, `anispace::translate_coords()` takes `level`.
 
   No behaviour changes. Detection emits the same order, and the order still carries through to column order and grouping, which is presentation: grouping by `(a, b)` and `(b, a)` gives the same groups.
 

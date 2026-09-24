@@ -8,7 +8,7 @@
 #' To declare a unit without changing values, use
 #' `set_metadata(data, unit_angle = "deg")`.
 #'
-#' @param data An anipoint.
+#' @param data An anipoint, or an anijoint, whose `angle` is converted.
 #' @param to_unit `"rad"` or `"deg"`.
 #' @param cols Further numeric angular columns to convert.
 #'
@@ -20,7 +20,9 @@
 #'
 #' @export
 convert_unit_angle <- function(data, to_unit, cols = NULL) {
-  ensure_is_anipoint(data)
+  if (!is_anijoint(data)) {
+    ensure_is_anipoint(data)
+  }
 
   if (!to_unit %in% levels(list_default_metadata()[["unit_angle"]])) {
     cli::cli_abort(
@@ -38,9 +40,16 @@ convert_unit_angle <- function(data, to_unit, cols = NULL) {
   }
 
   # Spatial angular columns and yaw are always converted (#21, #46).
-  spatial_angular <- intersect(c("phi", "theta"), names(data))
-  yaw <- get_variables(data, "where", "orientation")["yaw"]
-  cols_to_convert <- unique(c(spatial_angular, unname(yaw[!is.na(yaw)]), cols))
+  cols_to_convert <- if (is_anijoint(data)) {
+    unique(c(get_variables(data, "where", "angle"), cols))
+  } else {
+    yaw <- get_variables(data, "where", "orientation")["yaw"]
+    unique(c(
+      intersect(c("phi", "theta"), names(data)),
+      unname(yaw[!is.na(yaw)]),
+      cols
+    ))
+  }
 
   current_unit_angle <- get_metadata(data, "unit_angle")
   if (identical(as.character(current_unit_angle), to_unit)) {
