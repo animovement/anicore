@@ -17,8 +17,10 @@ test_that("tbl_sum.anievent shows class name and identity row", {
 
   header <- pillar::tbl_sum(ae)
 
-  expect_true("anievent" %in% names(header))
-  expect_true("Individuals" %in% names(header))
+  expect_identical(names(header)[1], "anievent")
+  expect_match(header[[1]], "3 x")
+  expect_identical(sum(names(header) == "Individuals"), 1L)
+  expect_false(any(c("Starts", "Stops") %in% names(header)))
 })
 
 test_that("tbl_sum.anievent surfaces event channels from the channel column", {

@@ -3,17 +3,14 @@
 \name{set_sampling_rate}
 \alias{set_sampling_rate}
 \alias{set_sampling_rate.aniframe}
-\alias{set_sampling_rate.anievent}
-\title{Set the sampling rate of an aniframe or anievent}
+\title{Set the sampling rate of an anipoint or anievent}
 \usage{
 set_sampling_rate(data, sampling_rate)
 
 \method{set_sampling_rate}{aniframe}(data, sampling_rate)
-
-\method{set_sampling_rate}{anievent}(data, sampling_rate)
 }
 \arguments{
-\item{data}{An aniframe or anievent.}
+\item{data}{An anipoint or anievent.}
 
 \item{sampling_rate}{Numeric value in Hz (samples per second).}
 }
@@ -22,7 +19,7 @@ The input object with \code{sampling_rate} metadata updated and,
 where applicable, temporal columns converted to seconds.
 }
 \description{
-Sets the sampling rate (in Hz) on an \code{\link[=aniframe]{aniframe()}} or \code{\link[=anievent]{anievent()}} and,
+Sets the sampling rate (in Hz) on an \code{\link[=anipoint]{anipoint()}} or \code{\link[=anievent]{anievent()}} and,
 if the object's \code{unit_time} is currently \code{"frame"} or \code{"unknown"},
 converts the temporal columns from frames to seconds using
 \code{1 / sampling_rate}. If \code{unit_time} is already an SI unit, only the
@@ -30,7 +27,7 @@ metadata is updated.
 }
 \examples{
 \dontrun{
-# aniframe in frames -> seconds at 30 fps
+# anipoint in frames -> seconds at 30 fps
 data_s <- set_sampling_rate(data, sampling_rate = 30)
 
 # anievent: same call shape

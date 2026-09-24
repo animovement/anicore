@@ -15,7 +15,7 @@
 #'   axes are not both declared or do not span the view.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #'
 #' # An image-plane frame counts angles clockwise
 #' af <- set_axis_directions(af, c(x = "right", y = "down"))
@@ -24,7 +24,7 @@
 #' @seealso [get_axis_directions()], [get_handedness()]
 #' @export
 get_angle_direction <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   derive_angle_direction(get_axis_directions(data), get_handedness(data))
 }
 
@@ -43,7 +43,7 @@ get_angle_direction <- function(data) {
 #'   frame itself says.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #'
 #' # Two axes are not enough
 #' af <- set_axis_directions(af, c(x = "right", y = "up"))
@@ -52,7 +52,7 @@ get_angle_direction <- function(data) {
 #' @seealso [get_axis_directions()], [get_angle_direction()]
 #' @export
 get_handedness <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   md <- get_metadata(data)
 
   # Three directions say more than the field does, so they win. Nothing can
@@ -179,12 +179,12 @@ cross_product <- function(a, b) {
 #' not been asked: which side a recording was made from is a fact about the
 #' recording, and [get_handedness()] reports `"unknown"` until it is told.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param handedness Either `"right"` or `"left"`. Right-handed is the
 #'   convention across the suite and the default here; a frame is only
 #'   left-handed if it is told to be.
 #'
-#' @return The aniframe, with the axis directions that give this handedness
+#' @return The anipoint, with the axis directions that give this handedness
 #'   and the depth axis reflected if it had to turn over.
 #'
 #' @details
@@ -193,7 +193,7 @@ cross_product <- function(a, b) {
 #' [set_axis_directions()].
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' af <- set_axis_directions(af, c(x = "right", y = "up"))
 #'
 #' # z follows from the handedness, which defaults to right
@@ -203,7 +203,7 @@ cross_product <- function(a, b) {
 #' @seealso [get_handedness()], [set_axis_directions()]
 #' @export
 set_handedness <- function(data, handedness = "right") {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_is_one_of(handedness, c("right", "left"), "handedness")
 
   # Recorded whether or not the axes are spelled out, because a frame may
@@ -230,14 +230,14 @@ set_handedness <- function(data, handedness = "right") {
 #' reflects that column — the image-plane flip, stated as what it does to the
 #' angles rather than to a corner.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param angle_direction Either `"clockwise"` or `"counter_clockwise"`.
 #'
-#' @return The aniframe, with the axis directions that give this sense and the
+#' @return The anipoint, with the axis directions that give this sense and the
 #'   vertical axis reflected if it had to turn over.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' af <- set_axis_directions(af, c(x = "right"))
 #'
 #' # y follows from the sense of rotation
@@ -247,7 +247,7 @@ set_handedness <- function(data, handedness = "right") {
 #' @seealso [get_angle_direction()], [set_axis_directions()]
 #' @export
 set_angle_direction <- function(data, angle_direction) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_is_one_of(
     angle_direction,
     c("clockwise", "counter_clockwise"),
@@ -272,7 +272,7 @@ set_angle_direction <- function(data, angle_direction) {
 #' the axes already declared supply the rest of the answer, and when they
 #' supply all of it one axis has to turn over.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param wanted The value the derivation should give.
 #' @param derive The derivation to invert.
 #' @param roles The axis roles it reads.

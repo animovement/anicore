@@ -10,7 +10,7 @@
 # ---- Helpers -----------------------------------------------------------
 
 make_subclassed_af <- function(grouped = TRUE) {
-  af <- example_aniframe(n_obs = 4, n_individuals = 2, n_keypoints = 2)
+  af <- example_anipoint(n_obs = 4, n_individuals = 2, n_keypoints = 2)
   if (!grouped) {
     af <- suppressWarnings(dplyr::ungroup(af))
   }
@@ -128,7 +128,7 @@ test_that("metadata survives alongside a preserved subclass", {
 })
 
 test_that("a plain aniframe is unchanged by the preservation logic", {
-  af <- example_aniframe(n_obs = 4, n_individuals = 2, n_keypoints = 2)
+  af <- example_anipoint(n_obs = 4, n_individuals = 2, n_keypoints = 2)
 
   out <- dplyr::mutate(af, doubled = x * 2)
   expect_identical(class(out), class(af))

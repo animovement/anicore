@@ -7,12 +7,12 @@
 ensure_is_cartesian_1d(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \description{
 Internal guard for 1-D Cartesian checks
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 try(ensure_is_cartesian_1d(af))
 }

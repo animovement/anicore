@@ -1,5 +1,5 @@
 ---
-title: "The aniframe data structure"
+title: "The anipoint data structure"
 format:
   html:
     toc: true
@@ -18,13 +18,16 @@ knitr::opts_chunk$set(
 library(anicore)
 ```
 
-## What is an `aniframe`?
+## What is an `anipoint`?
 
-The _aniframe_ package defines `aniframe` — the foundational data
-structure of the _animovement_ ecosystem. Every sister package
+The _anicore_ package defines `anipoint` — the foundational data
+structure of the _animovement_ ecosystem: one row per point per
+timepoint, with coordinate columns. Every sister package
 (_aniread_ for I/O, _animetric_ for kinematics, …) is built around
-consuming and producing `aniframe` objects, so the shape that an
-`aniframe` takes is what holds the ecosystem together.
+consuming and producing `anipoint` objects, so the shape that an
+`anipoint` takes is what holds the ecosystem together. (`aniframe`
+names the abstract parent class that `anipoint` shares with
+`anievent` — the substrate of metadata, accessors and dplyr methods.)
 
 The shape itself follows the principles of *tidy movement data* (laid
 out in an upcoming paper). The short version: every row records one
@@ -39,10 +42,10 @@ networks.
 
 ## Anatomy at a glance
 
-The cheapest way to see an `aniframe` is to print one.
+The cheapest way to see an `anipoint` is to print one.
 
 ```{r}
-data <- example_aniframe(
+data <- example_anipoint(
   n_obs = 5,
   n_individuals = 2,
   n_keypoints = 3,
@@ -59,14 +62,14 @@ Two things to spot:
 2. The **data columns** form a tidy table where every row records one
    entity at one timepoint at one position.
 
-`aniframe` inherits from `tbl_df` and `data.frame`, so dplyr verbs,
+`anipoint` inherits from `tbl_df` and `data.frame`, so dplyr verbs,
 ggplot2, and base subsetting all work on it directly.
 
 The rest of this article unpacks the columns.
 
 ## The three slots: what / when / where
 
-Every row of an `aniframe` answers three questions:
+Every row of an `anipoint` answers three questions:
 
 | Question | Slot          | Resolves   | Default columns          |
 |----------|---------------|------------|--------------------------|
@@ -86,7 +89,7 @@ The combination of all identity and temporal columns forms a composite
 key that uniquely identifies each row; the spatial columns are what
 that row *records* about that entity at that timepoint.
 
-`aniframe` stores which columns play which role in the metadata, so
+`anipoint` stores which columns play which role in the metadata, so
 downstream code can introspect:
 
 ```{r}
@@ -100,7 +103,7 @@ md$variables_where
 ### Customising the slots
 
 Most readers populate these from the source data, but you can override
-them when constructing manually. By default, `as_aniframe()` recognises
+them when constructing manually. By default, `as_anipoint()` recognises
 `c("model", "individual", "track", "keypoint")` as identity columns and
 `c("session", "trial")` as temporal context. Pass the slot arguments
 explicitly to use other names:
@@ -114,7 +117,7 @@ df <- data.frame(
   y = runif(12)
 )
 
-custom <- as_aniframe(
+custom <- as_anipoint(
   df,
   variables_what = "track",
   variables_when = "trial"
@@ -142,7 +145,7 @@ frames <- data.frame(
   y = runif(6)
 )
 
-af <- as_aniframe(frames, index = "frame")
+af <- as_anipoint(frames, index = "frame")
 get_index(af)
 ```
 
@@ -159,7 +162,7 @@ context, so a second one would have nothing left to mean. Declaring more
 than one is an error rather than a silent pick between them:
 
 ```{r error=TRUE}
-as_aniframe(frames, index = c("frame", "individual"))
+as_anipoint(frames, index = c("frame", "individual"))
 ```
 
 **It is never a grouping variable.** The frame is grouped by identity
@@ -189,12 +192,12 @@ dplyr::group_vars(timestamped)
 anything.
 
 Downstream operations (smoothing, derivatives) assume the index is
-monotonically ordered within each entity, which is how `as_aniframe()`
+monotonically ordered within each entity, which is how `as_anipoint()`
 arranges the frame.
 
 ## Coordinate systems
 
-The set of spatial columns determines the coordinate system. `aniframe`
+The set of spatial columns determines the coordinate system. `anipoint`
 recognises four families:
 
 | System       | Columns                          |
@@ -208,7 +211,7 @@ The number of Cartesian columns picks the dimensionality
 (`cartesian_1d`, `cartesian_2d`, `cartesian_3d`):
 
 ```{r}
-cart <- aniframe(
+cart <- anipoint(
   individual = 1L, time = 1:3,
   x = c(0, 1, 2), y = c(0, 1, 4), z = c(0, 0, 1)
 )
@@ -219,19 +222,19 @@ get_metadata(cart, "coordinate_system")
 any) distinguishes the variant:
 
 ```{r}
-pol <- aniframe(
+pol <- anipoint(
   individual = 1L, time = 1:3,
   rho = c(1, 1, 1), phi = c(0, pi / 2, pi)
 )
 get_metadata(pol, "coordinate_system")
 
-cyl <- aniframe(
+cyl <- anipoint(
   individual = 1L, time = 1:3,
   rho = c(1, 1, 1), phi = c(0, pi / 2, pi), z = c(0, 1, 2)
 )
 get_metadata(cyl, "coordinate_system")
 
-sph <- aniframe(
+sph <- anipoint(
   individual = 1L, time = 1:3,
   rho = c(1, 1, 1), phi = c(0, pi / 2, pi), theta = c(0, pi / 4, pi / 2)
 )

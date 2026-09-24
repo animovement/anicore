@@ -14,7 +14,7 @@ neutralise_spatial_metadata(metadata)
 neutral values.
 }
 \description{
-An anievent shares the metadata substrate with \code{\link[=aniframe]{aniframe()}} but has no
+An anievent shares the metadata substrate with \code{\link[=anipoint]{anipoint()}} but has no
 spatial component: a stream of behavioural events has no axes, no
 reference frame and no angular unit. Inheriting the movement defaults
 made it claim otherwise — a BORIS export read into an anievent

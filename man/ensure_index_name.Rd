@@ -15,7 +15,7 @@ ensure_index_name(index, arg = "index")
 \code{TRUE}, invisibly.
 }
 \description{
-Split out from \code{\link[=ensure_valid_index]{ensure_valid_index()}} because \code{\link[=as_aniframe]{as_aniframe()}} needs it
+Split out from \code{\link[=ensure_valid_index]{ensure_valid_index()}} because \code{\link[=as_anipoint]{as_anipoint()}} needs it
 before the column is looked up, and under its own argument name.
 Unchecked, a two-column \code{index} falls through to \code{\link[=resolve_index]{resolve_index()}},
 which reads anything but a single name as "unset" and answers \code{"time"}.

@@ -56,7 +56,7 @@ get_variables <- function(data, role) {
 #' @return Named character vector, or a bare one when no roles are known.
 #' @keywords internal
 get_declared_where <- function(data) {
-  axes <- if (is_aniframe(data)) resolve_axes(get_metadata(data))
+  axes <- if (is_anipoint(data)) resolve_axes(get_metadata(data))
   if (length(axes) > 0L) {
     return(axes)
   }
@@ -77,7 +77,7 @@ get_declared_where <- function(data) {
 #' @return `data`, restructured and re-declared.
 #' @keywords internal
 declare_variables <- function(data, role, variables, strict = TRUE) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
   declared <- list(
@@ -124,7 +124,7 @@ ensure_variables_character <- function(variables) {
 
 #' Ensure declared columns are present
 #'
-#' Shared by construction ([ensure_has_aniframe_cols()]) and re-declaration,
+#' Shared by construction ([ensure_has_anipoint_cols()]) and re-declaration,
 #' so a column that isn't there is reported the same way whichever route
 #' the caller took.
 #'
@@ -165,7 +165,7 @@ ensure_has_declared_cols <- function(data, cols, role) {
 #' `variables_what`, `variables_when` and `variables_where` name the
 #' columns that carry, respectively, entity identity, temporal position
 #' and spatial position. They are the frame's structure rather than a
-#' description of it: [as_aniframe()] uses them to coerce column types,
+#' description of it: [as_anipoint()] uses them to coerce column types,
 #' order columns and rows, group the frame, and derive
 #' `coordinate_system`.
 #'
@@ -194,11 +194,11 @@ ensure_has_declared_cols <- function(data, cols, role) {
 #' @return For the setters, `data` restructured and re-declared. For the
 #'   getters, a character vector of column names.
 #'
-#' @seealso [validate_aniframe()], which reports a frame whose metadata
+#' @seealso [validate_anipoint()], which reports a frame whose metadata
 #'   has drifted out of sync by some other route.
 #'
 #' @examples
-#' af <- aniframe(time = 1:5, x = 1:5, y = 1:5)
+#' af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
 #'
 #' # Declaring an identity column groups the frame by it
 #' af |>
@@ -219,21 +219,21 @@ NULL
 #' @rdname variables
 #' @export
 get_variables_what <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   get_variables(data, "what")
 }
 
 #' @rdname variables
 #' @export
 get_variables_when <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   get_variables(data, "when")
 }
 
 #' @rdname variables
 #' @export
 get_variables_where <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   get_variables(data, "where")
 }
 
@@ -258,7 +258,7 @@ set_variables_where <- function(data, variables) {
 #' @rdname variables
 #' @export
 add_variables_what <- function(data, variables) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
   declare_variables(data, "what", union(get_variables(data, "what"), variables))
 }
@@ -266,7 +266,7 @@ add_variables_what <- function(data, variables) {
 #' @rdname variables
 #' @export
 add_variables_when <- function(data, variables) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
   # `variables_when` holds only the temporal context, so a new column
@@ -278,7 +278,7 @@ add_variables_when <- function(data, variables) {
 #' @rdname variables
 #' @export
 add_variables_where <- function(data, variables) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
   # `union()` drops names, so combining has to happen on the mapping: the
@@ -294,7 +294,7 @@ add_variables_where <- function(data, variables) {
 #' @rdname variables
 #' @export
 remove_variables_what <- function(data, variables) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
   declare_variables(
     data,
@@ -306,7 +306,7 @@ remove_variables_what <- function(data, variables) {
 #' @rdname variables
 #' @export
 remove_variables_when <- function(data, variables) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
   declare_variables(
     data,
@@ -318,7 +318,7 @@ remove_variables_when <- function(data, variables) {
 #' @rdname variables
 #' @export
 remove_variables_where <- function(data, variables) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   ensure_variables_character(variables)
 
   # By column, like the other `remove_` verbs; the roles of whatever is

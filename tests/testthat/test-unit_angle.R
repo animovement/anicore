@@ -4,7 +4,7 @@
 make_test_aniframe <- function(df, unit = "rad") {
   # Turn a plain data.frame into an aniframe and attach unit_angle metadata
   df %>%
-    as_aniframe() %>% # from your package
+    as_anipoint() %>% # from your package
     set_metadata(unit_angle = unit) # store the current angular unit
 }
 
@@ -81,7 +81,7 @@ test_that("no conversion occurs when target unit already set", {
   # Object should be identical (aside from possible class attributes)
   expect_identical(
     out,
-    as_aniframe(raw_df) |> set_metadata(unit_angle = "rad")
+    as_anipoint(raw_df) |> set_metadata(unit_angle = "rad")
   )
 })
 
@@ -126,7 +126,7 @@ test_that("set_unit_angle auto-converts phi for polar data (rad -> deg)", {
     rho = 1:3,
     phi = c(0, pi / 2, pi)
   )
-  anif <- as_aniframe(df) |> set_metadata(unit_angle = "rad")
+  anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
   out <- set_unit_angle(anif, to_unit = "deg")
 
@@ -142,7 +142,7 @@ test_that("set_unit_angle auto-converts phi and z-agnostic for cylindrical (rad 
     phi = c(0, pi / 4, pi / 2),
     z = c(10, 20, 30)
   )
-  anif <- as_aniframe(df) |> set_metadata(unit_angle = "rad")
+  anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
   out <- set_unit_angle(anif, to_unit = "deg")
 
@@ -157,7 +157,7 @@ test_that("set_unit_angle auto-converts phi and theta for spherical (rad -> deg)
     phi = c(0, pi / 2, pi),
     theta = c(0, pi / 4, pi / 2)
   )
-  anif <- as_aniframe(df) |> set_metadata(unit_angle = "rad")
+  anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
   out <- set_unit_angle(anif, to_unit = "deg")
 
@@ -172,7 +172,7 @@ test_that("set_unit_angle round-trips deg -> rad for spatial angular columns", {
     phi = c(0, pi / 2, pi),
     theta = c(0, pi / 4, pi / 2)
   )
-  anif <- as_aniframe(df) |> set_metadata(unit_angle = "rad")
+  anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
   out <- set_unit_angle(anif, to_unit = "deg") |>
     set_unit_angle(to_unit = "rad")
@@ -189,7 +189,7 @@ test_that("set_unit_angle combines spatial auto-detect with user cols", {
     phi = c(0, pi / 2, pi),
     heading = c(0, pi / 4, pi / 3)
   )
-  anif <- as_aniframe(df) |> set_metadata(unit_angle = "rad")
+  anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
   out <- set_unit_angle(anif, to_unit = "deg", cols = "heading")
 
@@ -199,7 +199,7 @@ test_that("set_unit_angle combines spatial auto-detect with user cols", {
 
 test_that("set_unit_angle is a no-op for non-angular spatial cols (cartesian)", {
   df <- data.frame(time = 1:3, x = 1:3, y = 1:3)
-  anif <- as_aniframe(df) |> set_metadata(unit_angle = "rad")
+  anif <- as_anipoint(df) |> set_metadata(unit_angle = "rad")
 
   out <- set_unit_angle(anif, to_unit = "deg")
 

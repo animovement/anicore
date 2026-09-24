@@ -1,7 +1,7 @@
-#' Set the spatial unit of an aniframe object
+#' Set the spatial unit of an anipoint object
 #'
 #' @description
-#' Converts the spatial coordinates of an aniframe object to a different unit
+#' Converts the spatial coordinates of an anipoint object to a different unit
 #' of measurement. The function handles both automatic unit conversion between
 #' standard units and custom calibration from pixel or arbitrary units.
 #'
@@ -11,7 +11,7 @@
 #' axes (`phi`, `theta`) are left alone; they are [set_unit_angle()]'s to
 #' convert.
 #'
-#' @param data An aniframe object containing spatial coordinate data.
+#' @param data An anipoint object containing spatial coordinate data.
 #' @param to_unit Character string specifying the target spatial unit. Must be
 #'   one of the permitted units defined in `list_default_metadata()$unit_space`.
 #' @param calibration_factor Numeric value for scaling spatial coordinates.
@@ -20,7 +20,7 @@
 #'   When converting from "px" or "unknown", you must provide a calibration factor
 #'   to define the relationship between the current units and the target unit.
 #'
-#' @return An aniframe object with spatial coordinates converted to the specified
+#' @return An anipoint object with spatial coordinates converted to the specified
 #'   unit and updated metadata reflecting the new unit_space.
 #'
 #' @details
@@ -47,7 +47,7 @@
 #'
 #' @export
 set_unit_space <- function(data, to_unit, calibration_factor = 1) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
 
   # Check that to_unit is permitted
   if (!to_unit %in% levels(list_default_metadata()[["unit_space"]])) {

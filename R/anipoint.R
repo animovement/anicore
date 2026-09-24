@@ -1,19 +1,19 @@
-#' Create an aniframe data frame
+#' Create an anipoint data frame
 #'
 #' Creates a specialized data frame for movement data with columns defining
 #' entity identity, timepoints, and spatial position.
 #'
 #' @param ... Name-value pairs to create columns in the data frame.
 #' @param metadata Optional list of metadata.
-#' @inheritParams as_aniframe
+#' @inheritParams as_anipoint
 #' @param .rows Number of rows (passed to tibble).
 #' @param .name_repair How to repair column names (passed to tibble).
 #'
-#' @return An aniframe object (tibble with aniframe class).
+#' @return An anipoint object (tibble with anipoint class).
 #' @export
 #'
 #' @examples
-#' aniframe(
+#' anipoint(
 #'   individual = rep(1:2, each = 25),
 #'   time = rep(1:10, 5),
 #'   x = rnorm(50),
@@ -21,7 +21,7 @@
 #' )
 #'
 #' # Custom variables
-#' aniframe(
+#' anipoint(
 #'   track = rep(1:3, each = 10),
 #'   trial = 1,
 #'   time = rep(1:10, 3),
@@ -32,14 +32,14 @@
 #' )
 #'
 #' # Indexed by a column that isn't called `time`
-#' aniframe(
+#' anipoint(
 #'   individual = 1L,
 #'   frame = 1:10,
 #'   x = rnorm(10),
 #'   y = rnorm(10),
 #'   index = "frame"
 #' )
-aniframe <- function(
+anipoint <- function(
   ...,
   metadata = list(),
   variables_what = NULL,
@@ -58,7 +58,7 @@ aniframe <- function(
     x <- dplyr::tibble(..., .rows = .rows, .name_repair = .name_repair)
   }
 
-  as_aniframe(
+  as_anipoint(
     x,
     metadata = metadata,
     variables_what = variables_what,

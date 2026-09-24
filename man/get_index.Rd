@@ -2,12 +2,12 @@
 % Please edit documentation in R/variables_index.R
 \name{get_index}
 \alias{get_index}
-\title{The column an aniframe is indexed by}
+\title{The column an anipoint is indexed by}
 \usage{
 get_index(data)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 }
 \value{
 Length-one character vector naming the index column.
@@ -26,7 +26,7 @@ declared temporal columns. Its \code{variables_index} is \code{NA}, and asking
 for it here is an error rather than a guess.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 get_index(af)
 
 }

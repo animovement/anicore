@@ -7,7 +7,7 @@
 warn_short_axis_extents(data, extents)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{extents}{Named numeric vector of extents.}
 }

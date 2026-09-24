@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Returns a list containing the default metadata fields and their initial
-#' values. The same metadata substrate is shared by both [aniframe()] and
+#' values. The same metadata substrate is shared by both [anipoint()] and
 #' [anievent()] objects; per-class data contracts are versioned via
 #' `spec_version`. Most fields are initialized as `NA` and should be set
 #' appropriately for your data.
@@ -43,7 +43,7 @@
 #'   with.
 #' * `variables_what`, `variables_when`, `variables_where`: The columns
 #'   that carry, respectively, entity identity, temporal context and
-#'   spatial position. These are the structural fields — [as_aniframe()]
+#'   spatial position. These are the structural fields — [as_anipoint()]
 #'   uses them to coerce column types, order columns and rows, group the
 #'   frame, and derive `coordinate_system`. The values here are a
 #'   placeholder skeleton for an object with no data attached; every

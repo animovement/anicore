@@ -11,7 +11,7 @@ Character vector of column names.
 }
 \description{
 The identity (\code{what}) columns auto-detection looks for, shared by
-\code{\link[=as_aniframe]{as_aniframe()}} and \code{\link[=as_anievent]{as_anievent()}}. Only the names present in the data
+\code{\link[=as_anipoint]{as_anipoint()}} and \code{\link[=as_anievent]{as_anievent()}}. Only the names present in the data
 are used, and any other column can be declared explicitly via
 \code{variables_what}.
 }

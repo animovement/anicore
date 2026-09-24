@@ -17,7 +17,7 @@ frame declares none.
 Get the direction each axis points
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_axis_directions(af, c(x = "right", y = "up"))
 get_axis_directions(af)
 

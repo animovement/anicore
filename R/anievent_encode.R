@@ -24,7 +24,7 @@ normalise_event_values <- function(x, col_name) {
 #'
 #' Returns the minimal subset of `candidate_cols` that the value of
 #' `event_col` varies across (given `time_col`). Used by
-#' `to_anievent.aniframe()` to drop redundant identity columns —
+#' `to_anievent.anipoint()` to drop redundant identity columns —
 #' e.g. a `behaviour` column that is constant across `keypoint`
 #' for each `(individual, time)` drops `keypoint` from the resulting
 #' anievent's grouping.

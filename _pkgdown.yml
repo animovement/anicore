@@ -20,17 +20,21 @@ articles:
       - articles/anievent-structure
 
 reference:
-  - title: "Creating and converting aniframe objects"
+  - title: "Creating and converting anipoint objects"
     desc: >
-      Functions that create an aniframe, coerce other objects to aniframe,
-      or provide example data.
+      Functions that create an anipoint (the position-grain frame), coerce
+      other objects to anipoint, or provide example data. `aniframe` is
+      the abstract parent class shared by anipoint and anievent.
     contents:
-      - as_aniframe
-      - aniframe
-      - example_aniframe
+      - as_anipoint
+      - anipoint
+      - example_anipoint
+      - is_anipoint
+      - ensure_is_anipoint
       - is_aniframe
       - ensure_is_aniframe
-      - validate_aniframe
+      - validate_anipoint
+      - anicore-deprecated
 
   - title: "Creating and converting anievent objects"
     desc: >

@@ -11,7 +11,7 @@
 # roles on every construction and re-declaration, so the predicates and
 # the metadata cannot disagree.
 
-#' The coordinate system an aniframe is in
+#' The coordinate system an anipoint is in
 #'
 #' Derived from the axis roles rather than declared: [set_axes()] says
 #' which column carries which role, and the system follows from the set of
@@ -19,33 +19,33 @@
 #' what the columns mean, or `anispace`'s `map_to_*()` functions to convert
 #' the coordinates themselves.
 #'
-#' @param data An aniframe or anievent object.
+#' @param data An anipoint or anievent object.
 #'
 #' @return Length-one character vector: one of `"cartesian_1d"`,
 #'   `"cartesian_2d"`, `"cartesian_3d"`, `"polar"`, `"cylindrical"`,
 #'   `"spherical"` or `"unknown"`.
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_coordinate_system(af)
 #'
 #' @seealso [get_axes()], [is_cartesian()], [is_polar()]
 #' @export
 get_coordinate_system <- function(data) {
-  ensure_is_aniframe_or_anievent(data)
+  ensure_is_aniframe(data)
   as.character(get_metadata(data, "coordinate_system"))
 }
 
 
-#' Test whether an aniframe uses a Cartesian coordinate system
+#' Test whether an anipoint uses a Cartesian coordinate system
 #'
 #' Returns `TRUE` if the data frame satisfies *any* of the 1-D, 2-D or 3-D
 #' Cartesian checks.
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian(af)
 #' @export
 is_cartesian <- function(data) {
@@ -57,9 +57,9 @@ is_cartesian <- function(data) {
 #'
 #' Stops with a clear error message if `data` is not Cartesian.
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' ensure_is_cartesian(af)
 #' @export
@@ -70,12 +70,12 @@ ensure_is_cartesian <- function(data) {
 
 #' Test for a 1-D Cartesian coordinate system
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @param stop Unused, and kept only so the signature does not change.
 #'   It has no effect.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_1d(af)
 #' @export
 is_cartesian_1d <- function(data, stop = FALSE) {
@@ -85,9 +85,9 @@ is_cartesian_1d <- function(data, stop = FALSE) {
 
 #' Internal guard for 1-D Cartesian checks
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(ensure_is_cartesian_1d(af))
 #' @export
 ensure_is_cartesian_1d <- function(data) {
@@ -97,10 +97,10 @@ ensure_is_cartesian_1d <- function(data) {
 
 #' Test for a 2-D Cartesian coordinate system
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_2d(af)
 #' @export
 is_cartesian_2d <- function(data) {
@@ -110,9 +110,9 @@ is_cartesian_2d <- function(data) {
 
 #' Internal guard for 2-D Cartesian checks
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' ensure_is_cartesian_2d(af)
 #' @export
 ensure_is_cartesian_2d <- function(data) {
@@ -122,10 +122,10 @@ ensure_is_cartesian_2d <- function(data) {
 
 #' Test for a 3-D Cartesian coordinate system
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_3d(af)
 #' @export
 is_cartesian_3d <- function(data) {
@@ -135,9 +135,9 @@ is_cartesian_3d <- function(data) {
 
 #' Internal guard for 3-D Cartesian checks
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(ensure_is_cartesian_3d(af))
 #' @export
 ensure_is_cartesian_3d <- function(data) {
@@ -145,12 +145,12 @@ ensure_is_cartesian_3d <- function(data) {
 }
 
 
-#' Test whether an aniframe uses a polar coordinate system
+#' Test whether an anipoint uses a polar coordinate system
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_polar(af)
 #' @export
 is_polar <- function(data) {
@@ -160,9 +160,9 @@ is_polar <- function(data) {
 
 #' Internal guard for polar checks
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' try(ensure_is_polar(af))
 #' @export
@@ -171,12 +171,12 @@ ensure_is_polar <- function(data) {
 }
 
 
-#' Test whether an aniframe uses a cylindrical coordinate system
+#' Test whether an anipoint uses a cylindrical coordinate system
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cylindrical(af)
 #' @export
 is_cylindrical <- function(data) {
@@ -186,9 +186,9 @@ is_cylindrical <- function(data) {
 
 #' Internal guard for cylindrical checks
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' try(ensure_is_cylindrical(af))
 #' @export
@@ -197,12 +197,12 @@ ensure_is_cylindrical <- function(data) {
 }
 
 
-#' Test whether an aniframe uses a spherical coordinate system
+#' Test whether an anipoint uses a spherical coordinate system
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @return A logical value.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_spherical(af)
 #' @export
 is_spherical <- function(data) {
@@ -212,9 +212,9 @@ is_spherical <- function(data) {
 
 #' Internal guard for spherical checks
 #'
-#' @param data An aniframe.
+#' @param data An anipoint.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
 #' try(ensure_is_spherical(af))
 #' @export
@@ -242,7 +242,7 @@ list_cartesian_systems <- function() {
 #' Reports what the frame *is* in, and points at the two ways out: saying
 #' what the columns mean, or converting the coordinates.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param permitted Coordinate systems that satisfy the caller.
 #' @param wanted Human-readable name of the required coordinate system.
 #'
@@ -261,7 +261,7 @@ ensure_coordinate_system <- function(data, permitted, wanted) {
   }
 
   cli::cli_abort(c(
-    "This aniframe is not in a {wanted} coordinate system.",
+    "This anipoint is not in a {wanted} coordinate system.",
     "i" = "{.field coordinate_system} is {.val {actual}}.",
     "i" = hint
   ))

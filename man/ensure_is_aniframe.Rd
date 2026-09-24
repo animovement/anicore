@@ -13,10 +13,12 @@ ensure_is_aniframe(x)
 Error if not an aniframe
 }
 \description{
-Ensure object is an aniframe
+Guard form of \code{\link[=is_aniframe]{is_aniframe()}}, passed by any animovement frame class.
+Functions that need coordinates should guard with
+\code{\link[=ensure_is_anipoint]{ensure_is_anipoint()}} instead.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 # Passes silently, and errors otherwise
 ensure_is_aniframe(af)
 

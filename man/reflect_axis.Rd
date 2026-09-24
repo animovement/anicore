@@ -7,7 +7,7 @@
 reflect_axis(data, axis, reference)
 }
 \arguments{
-\item{data}{A data frame (typically an aniframe) containing \code{axis}.}
+\item{data}{A data frame (typically an anipoint) containing \code{axis}.}
 
 \item{axis}{Name of the column to reflect.}
 

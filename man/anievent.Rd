@@ -37,9 +37,10 @@ An anievent object.
 }
 \description{
 Creates a specialised data frame for behavioural events in long format:
-one row per bout (state event) or instant (point event). The class is a
-sibling of \code{\link[=aniframe]{aniframe()}} — it shares the metadata substrate but holds
-event-bout records rather than per-frame movement data.
+one row per bout (state event) or instant (point event). Like
+\code{\link[=anipoint]{anipoint()}}, the class inherits the shared \code{aniframe} substrate —
+metadata, accessors, dplyr methods — but holds event-bout records
+rather than per-frame movement data.
 }
 \details{
 Mandatory columns: \code{channel}, \code{type}, \code{label}, \code{start}, \code{stop}. A

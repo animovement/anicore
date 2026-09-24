@@ -7,7 +7,7 @@
 reflect_axis_role(data, role)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{role}{An axis role.}
 }

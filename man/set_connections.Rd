@@ -7,7 +7,7 @@
 set_connections(data, connections, variable = "keypoint")
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{connections}{One of:
 \itemize{
@@ -21,7 +21,7 @@ or temporal (\code{variables_when}) variable the connections relate to.
 Defaults to \code{"keypoint"}.}
 }
 \value{
-The aniframe with updated \code{connections} metadata.
+The anipoint with updated \code{connections} metadata.
 }
 \description{
 \strong{[Experimental]}
@@ -39,7 +39,7 @@ be missing in this particular recording while being valid elsewhere.
 }
 \examples{
 \dontrun{
-data <- example_aniframe()
+data <- example_anipoint()
 
 # Implicit by position (element[1] = from, element[2] = to)
 data <- set_connections(

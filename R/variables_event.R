@@ -10,7 +10,7 @@
 
 #' Declare the event columns and validate them against the frame
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param state,point Character vectors of column names, or `NULL`.
 #'
 #' @return `data`, with the declaration recorded.
@@ -47,7 +47,7 @@ declare_variables_event <- function(data, state, point) {
 
 #' Ensure the object can carry an event declaration
 #'
-#' `variables_event` names per-frame columns, which only an aniframe
+#' `variables_event` names per-frame columns, which only an anipoint
 #' has. An anievent already *is* the encoded form — its events live in
 #' `channel` and `label` — so `to_anievent()` drops the field rather than
 #' inheriting it.
@@ -64,7 +64,7 @@ ensure_can_declare_events <- function(data) {
     ))
   }
 
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   invisible(TRUE)
 }
 
@@ -72,7 +72,7 @@ ensure_can_declare_events <- function(data) {
 #' Declare which columns carry per-frame event labels
 #'
 #' @description
-#' `variables_event` names the `aniframe` columns holding per-frame
+#' `variables_event` names the `anipoint` columns holding per-frame
 #' categorical event labels, split into two kinds:
 #'
 #' * **state** columns are interval-valued — a run of identical values is
@@ -99,10 +99,10 @@ ensure_can_declare_events <- function(data) {
 #'   `state` / `point` argument.
 #' * `get_variables_event()` reads the declaration back as a named list.
 #'
-#' Only an `aniframe` can carry this declaration: an `anievent` is
+#' Only an `anipoint` can carry this declaration: an `anievent` is
 #' already the encoded form, with its events in `channel` and `label`.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param state,point Character vectors of column names. `NULL` (the
 #'   default) leaves that side of the declaration as it was.
 #' @param variables Character vector of column names to undeclare.
@@ -115,7 +115,7 @@ ensure_can_declare_events <- function(data) {
 #'   [set_variables_what()] and friends for the other variable roles.
 #'
 #' @examples
-#' af <- aniframe(
+#' af <- anipoint(
 #'   time = 1:5,
 #'   x = 1:5,
 #'   y = 1:5,

@@ -2,12 +2,12 @@
 % Please edit documentation in R/unit_angle.R
 \name{set_unit_angle}
 \alias{set_unit_angle}
-\title{Set the angular unit of an aniframe object}
+\title{Set the angular unit of an anipoint object}
 \usage{
 set_unit_angle(data, to_unit, cols = NULL)
 }
 \arguments{
-\item{data}{An aniframe object containing angular data.}
+\item{data}{An anipoint object containing angular data.}
 
 \item{to_unit}{Character string specifying the target angular unit. Must
 be one of \code{c("rad", "deg")} (the levels of
@@ -20,11 +20,11 @@ angular columns (e.g. \code{"heading"}). All listed columns must be present
 and numeric.}
 }
 \value{
-An aniframe object with the relevant angular columns converted to
+An anipoint object with the relevant angular columns converted to
 the specified unit and \code{unit_angle} metadata updated accordingly.
 }
 \description{
-Converts angular columns in an aniframe between degrees (\code{"deg"}) and
+Converts angular columns in an anipoint between degrees (\code{"deg"}) and
 radians (\code{"rad"}), and updates the \code{unit_angle} metadata to match.
 
 Spatial angular columns (\code{phi}, \code{theta}) are converted automatically
@@ -42,7 +42,7 @@ metadata round-trip).
 \dontrun{
 # Polar data: phi is converted automatically
 df <- data.frame(time = 1:3, rho = 1:3, phi = c(0, pi / 2, pi))
-anif <- as_aniframe(df)
+anif <- as_anipoint(df)
 anif_deg <- set_unit_angle(anif, to_unit = "deg")
 
 # Custom angular columns alongside the spatial ones

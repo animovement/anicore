@@ -15,7 +15,7 @@ set_derived_orientation(
 )
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{wanted}{The value the derivation should give.}
 

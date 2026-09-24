@@ -1,6 +1,6 @@
-#' Validate an aniframe
+#' Validate an anipoint
 #'
-#' Re-checks, on demand, that an `aniframe`'s metadata still describes the
+#' Re-checks, on demand, that an `anipoint`'s metadata still describes the
 #' frame it is attached to. The two drift apart silently under ordinary
 #' dplyr work: [dplyr::select()] drops a column without touching the
 #' metadata that names it, and assignment can change a column's type. The
@@ -19,7 +19,7 @@
 #' * a declared `sampling_rate` agrees with the spacing of the index —
 #'   **warning** only (#114).
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return The input `data`, invisibly.
 #'
@@ -28,12 +28,12 @@
 #'   [validate_anievent()] for the `anievent` equivalent.
 #'
 #' @examples
-#' af <- aniframe(time = 1:5, x = 1:5, y = 1:5)
-#' validate_aniframe(af)
+#' af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
+#' validate_anipoint(af)
 #'
 #' @export
-validate_aniframe <- function(data) {
-  ensure_is_aniframe(data)
+validate_anipoint <- function(data) {
+  ensure_is_anipoint(data)
   # Before the generic check, which also names the index but reports it
   # less helpfully.
   ensure_has_index(data)
@@ -58,7 +58,7 @@ validate_aniframe <- function(data) {
 #' honest work — a frame read before its identity column is declared, say
 #' — and nothing in the class is broken by it (#49).
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return `TRUE`, invisibly.
 #' @keywords internal
@@ -95,7 +95,7 @@ warn_duplicate_observations <- function(data) {
 #' directly, so a frame serialised before the field existed reports the
 #' `time` column it was built with rather than nothing at all.
 #'
-#' @param md An aniframe metadata list.
+#' @param md An anipoint metadata list.
 #'
 #' @return Named list of character vectors, one per declaration field.
 #' @keywords internal
@@ -120,7 +120,7 @@ get_declared_variables <- function(md) {
 
 #' Ensure every declared variable names a column that exists
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return `TRUE`, invisibly.
 #' @keywords internal
@@ -149,7 +149,7 @@ ensure_has_declared_variables <- function(data) {
 #' Which column that is comes from the frame's own declaration; `time` is
 #' its default, not a requirement (#109).
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return `TRUE`, invisibly.
 #' @keywords internal
@@ -158,7 +158,7 @@ ensure_has_index <- function(data) {
   if (!index %in% names(data)) {
     cli::cli_abort(c(
       "Index column {.val {index}} is required but not found in data.",
-      "i" = "An aniframe is indexed by exactly one column."
+      "i" = "An anipoint is indexed by exactly one column."
     ))
   }
   if (!is.numeric(data[[index]])) {
@@ -174,7 +174,7 @@ ensure_has_index <- function(data) {
 #'
 #' The shared kernel behind [is_spatial()] and [ensure_is_spatial()].
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return Named list with the `declared` spatial variables and the
 #'   `missing` and `non_numeric` subsets of them.
@@ -206,14 +206,14 @@ find_spatial_problems <- function(data) {
 #' `is_cartesian_1d()` on the strength of `y` alone, while its
 #' `variables_where` still promises both.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return Logical scalar.
 #'
-#' @seealso [ensure_is_spatial()], [validate_aniframe()].
+#' @seealso [ensure_is_spatial()], [validate_anipoint()].
 #'
 #' @examples
-#' af <- aniframe(time = 1:5, x = 1:5, y = 1:5)
+#' af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
 #' is_spatial(af)
 #'
 #' # Dropping a declared column breaks the correspondence
@@ -235,19 +235,19 @@ is_spatial <- function(data) {
 #' the error points at the metadata mismatch rather than surfacing later
 #' and further away.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return The input `data`, invisibly.
 #'
-#' @seealso [is_spatial()], [validate_aniframe()].
+#' @seealso [is_spatial()], [validate_anipoint()].
 #'
 #' @examples
-#' af <- aniframe(time = 1:5, x = 1:5, y = 1:5)
+#' af <- anipoint(time = 1:5, x = 1:5, y = 1:5)
 #' ensure_is_spatial(af)
 #'
 #' @export
 ensure_is_spatial <- function(data) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   problems <- find_spatial_problems(data)
 
   if (length(problems$declared) == 0) {
@@ -286,10 +286,10 @@ ensure_is_spatial <- function(data) {
 #' [infer_coordinate_system()], but only at construction. Writing the
 #' source field on its own leaves the derived one stale.
 #'
-#' Called only from [validate_aniframe()], after [ensure_is_spatial()] has
+#' Called only from [validate_anipoint()], after [ensure_is_spatial()] has
 #' established that `variables_where` declares at least one column.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #'
 #' @return `TRUE`, invisibly.
 #' @keywords internal

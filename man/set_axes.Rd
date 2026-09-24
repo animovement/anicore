@@ -7,7 +7,7 @@
 set_axes(data, axes)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{axes}{Named character vector: names are axis roles, values are the
 columns carrying them. The roles must form a coordinate system, and
@@ -29,7 +29,7 @@ does nothing.
 }
 \examples{
 df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
-af <- as_aniframe(df, variables_where = c("u", "v"))
+af <- as_anipoint(df, variables_where = c("u", "v"))
 get_metadata(af, "coordinate_system")
 
 af <- set_axes(af, c(x = "u", y = "v"))

@@ -22,7 +22,7 @@ aligned columns, similar to \code{\link[=str]{str()}}.
 }
 \details{
 The S3 class is named \code{aniframe_metadata} for historical reasons,
-but the metadata substrate is shared by both \code{\link[=aniframe]{aniframe()}} and
+but the metadata substrate is shared by both \code{\link[=anipoint]{anipoint()}} and
 \code{\link[=anievent]{anievent()}} objects.
 }
 \keyword{internal}

@@ -12,14 +12,14 @@ flat_df <- function() {
 # ---- The rule ----------------------------------------------------------
 
 test_that("auto-detection guarantees at least one identity variable", {
-  af <- as_aniframe(flat_df())
+  af <- as_anipoint(flat_df())
 
   expect_gte(length(get_metadata(af, "variables_what")), 1)
   expect_true(all(get_metadata(af, "variables_what") %in% names(af)))
 })
 
 test_that("an identity column present in the data is used as-is", {
-  af <- as_aniframe(dplyr::mutate(flat_df(), track = 1L))
+  af <- as_anipoint(dplyr::mutate(flat_df(), track = 1L))
 
   expect_equal(get_metadata(af, "variables_what"), "track")
   expect_false("keypoint" %in% names(af))
@@ -33,7 +33,7 @@ test_that("every recognised identity column is picked up, in order", {
     individual = "a",
     track = 1L
   )
-  af <- as_aniframe(df)
+  af <- as_anipoint(df)
 
   expect_equal(
     get_metadata(af, "variables_what"),
@@ -47,7 +47,7 @@ test_that("every recognised identity column is picked up, in order", {
 })
 
 test_that("the injected identity is keypoint = centroid", {
-  af <- as_aniframe(flat_df())
+  af <- as_anipoint(flat_df())
 
   expect_equal(get_metadata(af, "variables_what"), "keypoint")
   expect_equal(as.character(unique(af$keypoint)), "centroid")
@@ -70,15 +70,15 @@ test_that("add_default_identity adds one when there is none", {
 # ---- The opt-out -------------------------------------------------------
 
 test_that("an explicit character(0) declares no identity variables", {
-  af <- as_aniframe(flat_df(), variables_what = character(0))
+  af <- as_anipoint(flat_df(), variables_what = character(0))
 
   expect_length(get_metadata(af, "variables_what"), 0)
   expect_false("keypoint" %in% names(af))
   expect_false(dplyr::is_grouped_df(af))
 })
 
-test_that("the opt-out survives the aniframe() constructor too", {
-  af <- aniframe(
+test_that("the opt-out survives the anipoint() constructor too", {
+  af <- anipoint(
     time = 1:5,
     x = as.numeric(1:5),
     y = as.numeric(1:5),
@@ -93,11 +93,11 @@ test_that("the opt-out survives the aniframe() constructor too", {
 
 test_that("declaring an identity column that isn't there errors", {
   expect_error(
-    as_aniframe(flat_df(), variables_what = "individual"),
+    as_anipoint(flat_df(), variables_what = "individual"),
     "Identity variable"
   )
   expect_error(
-    as_aniframe(flat_df(), variables_what = "individual"),
+    as_anipoint(flat_df(), variables_what = "individual"),
     "individual"
   )
 })
@@ -106,14 +106,14 @@ test_that("a partly-present declaration errors and names only the missing", {
   df <- dplyr::mutate(flat_df(), keypoint = "snout")
 
   expect_error(
-    as_aniframe(df, variables_what = c("nope", "keypoint")),
+    as_anipoint(df, variables_what = c("nope", "keypoint")),
     "nope"
   )
 })
 
 test_that("declared identity variables are all present in the metadata", {
   df <- dplyr::mutate(flat_df(), individual = "a", keypoint = "snout")
-  af <- as_aniframe(df, variables_what = c("individual", "keypoint"))
+  af <- as_anipoint(df, variables_what = c("individual", "keypoint"))
 
   expect_equal(get_metadata(af, "variables_what"), c("individual", "keypoint"))
   expect_true(all(get_metadata(af, "variables_what") %in% names(af)))
@@ -130,7 +130,7 @@ test_that("the recognised identity names are a single source of truth", {
 test_that("aniframe and anievent recognise the same identity names", {
   # `subject` is the behavioural-coding name for what tracking tools
   # call an `individual`; both classes accept both.
-  af <- as_aniframe(dplyr::mutate(flat_df(), subject = "a"))
+  af <- as_anipoint(dplyr::mutate(flat_df(), subject = "a"))
   expect_equal(get_metadata(af, "variables_what"), "subject")
   expect_false("keypoint" %in% names(af))
 

@@ -6,7 +6,7 @@
 
 spatial_af <- function(...) {
   cols <- list(...)
-  as_aniframe(
+  as_anipoint(
     data.frame(time = 1:3, individual = "a", cols),
     variables_where = names(cols)
   )
@@ -125,7 +125,7 @@ test_that("ensure_is_cartesian_3d() aborts when data isn't 3D Cartesian", {
 test_that("a renamed frame satisfies the predicate for its coordinate system", {
   # This is the point of axis roles: the frame is polar, so every spatial
   # function that gates on `ensure_is_polar()` must accept it.
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(time = 1:3, individual = "a", rr = c(1, 2, 3), aa = c(0, 1, 2)),
     variables_where = c(rho = "rr", phi = "aa")
   )
@@ -139,7 +139,7 @@ test_that("a renamed frame satisfies the predicate for its coordinate system", {
 test_that("an undeclared column does not decide the coordinate system", {
   # `rho` is dropped from the declaration but stays in the data. Matching
   # column names would still call this spherical.
-  af <- as_aniframe(
+  af <- as_anipoint(
     data.frame(
       time = 1:3,
       individual = "a",
@@ -158,12 +158,12 @@ test_that("an undeclared column does not decide the coordinate system", {
 })
 
 test_that("the guards report what the frame is in, and what to do", {
-  af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
   expect_error(ensure_is_polar(af), "cartesian_2d")
   expect_error(ensure_is_polar(af), "anispace")
 
-  unknown <- suppressWarnings(as_aniframe(
+  unknown <- suppressWarnings(as_anipoint(
     data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0)),
     variables_where = c("u", "v")
   ))
@@ -171,9 +171,9 @@ test_that("the guards report what the frame is in, and what to do", {
 })
 
 test_that("get_coordinate_system() reads the derived field", {
-  af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
   expect_equal(get_coordinate_system(af), "cartesian_2d")
   expect_type(get_coordinate_system(af), "character")
-  expect_error(get_coordinate_system(data.frame(x = 1)), "neither an aniframe")
+  expect_error(get_coordinate_system(data.frame(x = 1)), "not an aniframe")
 })

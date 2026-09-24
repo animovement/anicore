@@ -47,7 +47,7 @@ convert_inf_to_na <- function(data) {
 #' Identity variable names recognised across the animovement classes
 #'
 #' The identity (`what`) columns auto-detection looks for, shared by
-#' [as_aniframe()] and [as_anievent()]. Only the names present in the data
+#' [as_anipoint()] and [as_anievent()]. Only the names present in the data
 #' are used, and any other column can be declared explicitly via
 #' `variables_what`.
 #'

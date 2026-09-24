@@ -7,7 +7,7 @@
 is_cartesian_1d(data, stop = FALSE)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 
 \item{stop}{Unused, and kept only so the signature does not change.
 It has no effect.}
@@ -19,6 +19,6 @@ A logical value.
 Test for a 1-D Cartesian coordinate system
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_cartesian_1d(af)
 }

@@ -7,11 +7,7 @@
 resolve_unit_time_calibration(data, to_unit, calibration_factor)
 }
 \description{
-Shared between \code{set_unit_time.aniframe()} and
-\code{set_unit_time.anievent()}. Validates \code{to_unit}, reads the current
-\code{unit_time} from metadata, and returns the calibration factor to
-apply to the temporal columns. Emits an informational message and
-returns 1 (no-op on data values) when the source unit is \code{"frame"} /
-\code{"unknown"} and no calibration factor was supplied.
+Returns 1 (values unchanged) when converting from \code{"frame"} or
+\code{"unknown"} without a calibration factor.
 }
 \keyword{internal}

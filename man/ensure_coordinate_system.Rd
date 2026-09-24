@@ -7,7 +7,7 @@
 ensure_coordinate_system(data, permitted, wanted)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{permitted}{Coordinate systems that satisfy the caller.}
 

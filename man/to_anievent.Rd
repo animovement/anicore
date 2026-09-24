@@ -4,7 +4,7 @@
 \alias{to_anievent}
 \alias{to_anievent.anievent}
 \alias{to_anievent.data.frame}
-\alias{to_anievent.aniframe}
+\alias{to_anievent.anipoint}
 \title{Encode per-frame data into an anievent}
 \usage{
 to_anievent(data, ...)
@@ -22,7 +22,7 @@ to_anievent(data, ...)
   ...
 )
 
-\method{to_anievent}{aniframe}(
+\method{to_anievent}{anipoint}(
   data,
   variables_what = NULL,
   variables_when = NULL,
@@ -31,7 +31,7 @@ to_anievent(data, ...)
 )
 }
 \arguments{
-\item{data}{A data frame or an \code{\link[=aniframe]{aniframe()}}.}
+\item{data}{A data frame or an \code{\link[=anipoint]{anipoint()}}.}
 
 \item{...}{Passed to methods.}
 
@@ -58,7 +58,7 @@ grouping columns (e.g. \code{observation}, \code{session}, \code{trial}). Bare
 names (tidyselect). Like identity, these isolate bouts.}
 
 \item{metadata}{Optional list of metadata attached to the result.
-For an aniframe input, fields like \code{unit_time} and
+For an anipoint input, fields like \code{unit_time} and
 \code{sampling_rate} are propagated automatically; \code{metadata}
 overrides those.}
 }
@@ -69,7 +69,7 @@ An \code{\link[=anievent]{anievent()}}.
 Run-length-encodes per-frame state and point variables into the
 long-format \code{\link[=anievent]{anievent()}}. Works on a data frame (with bare-name
 selection of the event columns and explicit \code{time} / identity)
-or on an \code{\link[=aniframe]{aniframe()}} (where everything is read from metadata).
+or on an \code{\link[=anipoint]{anipoint()}} (where everything is read from metadata).
 }
 \details{
 Distinct from \code{\link[=as_anievent]{as_anievent()}}: that one is a strict cast — the

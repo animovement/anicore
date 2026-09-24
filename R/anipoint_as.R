@@ -1,13 +1,13 @@
-#' Convert a data frame to aniframe
+#' Convert a data frame to anipoint
 #'
 #' @param data A data frame with movement data.
-#' @param metadata A list of metadata to attach to the aniframe.
+#' @param metadata A list of metadata to attach to the anipoint.
 #' @param variables_what Character vector of identity columns that together
 #'   define a unique entity, and which the frame is grouped by. If `NULL`
 #'   (the default), detected from the data: whichever of `model`,
 #'   `individual`, `subject`, `track` and `keypoint` are present, in the
 #'   order [list_recognised_variables_what()] lists them. Order carries no
-#'   meaning of its own — see its documentation. An aniframe needs
+#'   meaning of its own — see its documentation. An anipoint needs
 #'   at least one identity variable, so if none of them is found, a
 #'   `keypoint` column is added with the value `"centroid"`. Pass
 #'   `character(0)` to declare no identity variables at all — a
@@ -35,15 +35,15 @@
 #'   systems stay well defined; an unrecognised role is rejected by name.
 #'   If `NULL` (the default), detected from the data.
 #'
-#' @return An aniframe object
+#' @return An anipoint object
 #' @examples
 #' df <- data.frame(
 #'   time = 1:3, individual = 'a', keypoint = 'centroid',
 #'   x = c(0, 1, 2), y = c(0, 1, 0)
 #' )
-#' as_aniframe(df)
+#' as_anipoint(df)
 #' @export
-as_aniframe <- function(
+as_anipoint <- function(
   data,
   metadata = list(),
   variables_what = NULL,
@@ -60,14 +60,14 @@ as_aniframe <- function(
     ensure_index_name(index)
   }
   index <- index %||%
-    (if (is_aniframe(data) || is_anievent(data)) {
+    (if (is_aniframe(data)) {
       resolve_index(get_metadata(data))
     } else {
       NULL
     }) %||%
     "time"
 
-  # A frame that already declares a role keeps it. Casting an aniframe
+  # A frame that already declares a role keeps it. Casting an anipoint
   # that has been given a custom identity -- `id`, say -- used to re-run
   # detection, find no recognised name, inject `keypoint = "centroid"`
   # and overwrite the declaration with it (#96). Declarations whose
@@ -122,7 +122,7 @@ as_aniframe <- function(
   # the rest: validate, standardise types, relocate, arrange, regroup,
   # and derive `coordinate_system`. Construction and re-declaration go
   # through the same code so they cannot drift apart (#82).
-  data <- new_aniframe(data)
+  data <- new_anipoint(data)
   data <- set_metadata(data, metadata = metadata)
 
   # `index` is a declaration, so `set_metadata()` refuses it — it goes on
@@ -131,7 +131,7 @@ as_aniframe <- function(
   md[["variables_index"]] <- index
   data <- attach_metadata(data, md)
 
-  data <- restructure_aniframe(
+  data <- restructure_anipoint(
     data,
     variables_what,
     variables_when,
@@ -144,7 +144,7 @@ as_aniframe <- function(
 
 #' Add a default identity variable when the data has none
 #'
-#' An aniframe needs **at least one identity (`what`) variable** — the
+#' An anipoint needs **at least one identity (`what`) variable** — the
 #' columns that together say which entity a row belongs to, and which the
 #' frame is grouped by. When auto-detection finds none of the recognised
 #' names in the data, one is added so that rule holds.
@@ -212,7 +212,7 @@ detect_variables_where <- function(data) {
 
 #' A role the data already declares, when its columns are still there
 #'
-#' Casting an object that is already an aniframe should not re-derive
+#' Casting an object that is already an anipoint should not re-derive
 #' what it has been told. It does fall back to detection when the
 #' declared columns are gone, so a cast still repairs a frame whose
 #' metadata has drifted rather than erroring on it.

@@ -7,7 +7,7 @@
 warn_sampling_rate_mismatch(data)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 }
 \value{
 \code{TRUE}, invisibly.

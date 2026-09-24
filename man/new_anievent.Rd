@@ -13,6 +13,8 @@ new_anievent(x)
 An anievent object.
 }
 \description{
-Create a new anievent object (internal constructor)
+Lays down the class vector \code{c("anievent", "aniframe", ...)}: an
+anievent inherits the shared substrate (metadata accessors, dplyr
+methods, printing) from the abstract \code{aniframe} parent.
 }
 \keyword{internal}

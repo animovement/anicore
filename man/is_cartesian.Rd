@@ -2,12 +2,12 @@
 % Please edit documentation in R/coordinate_system.R
 \name{is_cartesian}
 \alias{is_cartesian}
-\title{Test whether an aniframe uses a Cartesian coordinate system}
+\title{Test whether an anipoint uses a Cartesian coordinate system}
 \usage{
 is_cartesian(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \value{
 A logical value.
@@ -17,6 +17,6 @@ Returns \code{TRUE} if the data frame satisfies \emph{any} of the 1-D, 2-D or 3-
 Cartesian checks.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_cartesian(af)
 }

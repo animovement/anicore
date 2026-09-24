@@ -16,7 +16,7 @@ test_that("list_default_metadata() includes source_format as NA character", {
 })
 
 test_that("source_format round-trips through set_metadata()", {
-  data <- example_aniframe() |>
+  data <- example_anipoint() |>
     set_metadata(source = "freemocap", source_format = "by_frame_9col")
 
   expect_equal(get_metadata(data)$source_format, "by_frame_9col")
@@ -24,7 +24,7 @@ test_that("source_format round-trips through set_metadata()", {
 })
 
 test_that("source_format is independent of source_version", {
-  data <- example_aniframe() |>
+  data <- example_anipoint() |>
     set_metadata(source_format = "by_frame_8col")
 
   expect_equal(get_metadata(data)$source_format, "by_frame_8col")

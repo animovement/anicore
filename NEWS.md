@@ -1,5 +1,16 @@
 # anicore (development version)
 
+## Breaking changes
+
+* The position-grain frame class is renamed from `aniframe` to `anipoint`, and `aniframe` becomes the abstract parent class shared by every animovement frame (#154). The class vectors are now `c("anipoint", "aniframe", ...)` and `c("anievent", "aniframe", ...)`, so the shared substrate — metadata accessors, dplyr methods, printing — is written once on the parent. The renamed structural-frame family (`anisegment`, `anijoint`) will join it as siblings of `anipoint`.
+
+  Concretely:
+
+  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace `aniframe()`, `as_aniframe()`, `example_aniframe()` and `validate_aniframe()`. The old names remain as soft-deprecated aliases, and will be removed after one release cycle.
+  * `is_aniframe()` now answers "is this any animovement frame?" — an anievent passes it too. Code that means the position grain should test with the new `is_anipoint()` / `ensure_is_anipoint()` instead.
+  * Functions that need coordinates (axes, units of space and angle, connections, orientation columns, the index, event declarations) now guard with `ensure_is_anipoint()`, so a wrong-grain input fails at the door rather than deep inside.
+  * Objects serialised before this release lack the new classes in their class vector; re-cast them with `as_anipoint()` (or `as_anievent()`), which repairs the class vector from the stored metadata.
+
 ## Added
 
 * `convert_inf_to_na()`, the sibling of `convert_nan_to_na()`, for sources that mark a missing observation with an infinity rather than a `NaN`. TRex is one — its own documentation masks `np.inf` out before plotting, and its `missing` flag is 1 in exactly those frames. Left in place an `Inf` propagates through arithmetic silently, so one untracked frame turns a mean or a speed into `Inf` rather than into a missing value (animovement/aniread#116).

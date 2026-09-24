@@ -3,7 +3,7 @@
 #' Run-length-encodes per-frame state and point variables into the
 #' long-format [anievent()]. Works on a data frame (with bare-name
 #' selection of the event columns and explicit `time` / identity)
-#' or on an [aniframe()] (where everything is read from metadata).
+#' or on an [anipoint()] (where everything is read from metadata).
 #'
 #' Distinct from [as_anievent()]: that one is a strict cast — the
 #' input must already be in canonical anievent shape (one row per
@@ -11,7 +11,7 @@
 #' `to_anievent()` is the encoding verb that *produces* that shape
 #' from per-frame data.
 #'
-#' @param data A data frame or an [aniframe()].
+#' @param data A data frame or an [anipoint()].
 #' @param time For data-frame input, the column holding per-frame
 #'   times. Bare name (tidyselect). Required.
 #' @param state For data-frame input, columns to run-length-encode
@@ -30,7 +30,7 @@
 #'   grouping columns (e.g. `observation`, `session`, `trial`). Bare
 #'   names (tidyselect). Like identity, these isolate bouts.
 #' @param metadata Optional list of metadata attached to the result.
-#'   For an aniframe input, fields like `unit_time` and
+#'   For an anipoint input, fields like `unit_time` and
 #'   `sampling_rate` are propagated automatically; `metadata`
 #'   overrides those.
 #' @param ... Passed to methods.
@@ -112,7 +112,7 @@ to_anievent.data.frame <- function(
 
 #' @rdname to_anievent
 #' @export
-to_anievent.aniframe <- function(
+to_anievent.anipoint <- function(
   data,
   variables_what = NULL,
   variables_when = NULL,
@@ -123,7 +123,7 @@ to_anievent.aniframe <- function(
   ve <- md$variables_event
   if (is.null(ve) || (length(ve$state) == 0 && length(ve$point) == 0)) {
     cli::cli_abort(c(
-      "The {.cls aniframe} has no event columns declared.",
+      "The {.cls anipoint} has no event columns declared.",
       "i" = "Populate {.field variables_event$state} and/or {.field variables_event$point} in metadata before conversion."
     ))
   }

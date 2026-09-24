@@ -1,12 +1,13 @@
-# Methods for aniframe class to preserve class through dplyr operations.
-# Shares the capture / `NextMethod()` / re-attach pattern with
-# `anievent_methods.R` via `preserve_animovement_class()`.
+# Methods for the aniframe family to preserve class through dplyr
+# operations. `aniframe` is the abstract parent of every animovement
+# frame class, so one method set serves anipoint, anievent and any
+# downstream subclass.
 #
 # Each method captures the incoming class vector *before* dispatch and
 # hands it back to `preserve_animovement_class()`, which restores it. That
-# is what carries downstream subclasses (animetric's `aniframe_kin` and
-# friends) through a pipeline — rebuilding a fixed `aniframe` here would
-# drop them (#81).
+# is what carries subclasses (anipoint, anievent, animetric's
+# `aniframe_kin` and friends) through a pipeline — rebuilding a fixed
+# `aniframe` here would drop them (#81).
 
 # ---- dplyr verb methods ----
 
@@ -19,7 +20,7 @@
 #' @export
 ungroup.aniframe <- function(x, ...) {
   cli::cli_warn(
-    "Ungrouping an aniframe data frame makes errors more likely. Proceed with care."
+    "Ungrouping an {class(x)[[1]]} data frame makes errors more likely. Proceed with care."
   )
   cls <- class(x)
   md <- get_metadata(x)

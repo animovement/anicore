@@ -27,7 +27,7 @@
 #'
 #' @return An anievent object.
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(as_anievent(af))
 #' @export
 as_anievent <- function(
@@ -47,6 +47,14 @@ as_anievent.anievent <- function(
   variables_what = NULL,
   variables_when = NULL
 ) {
+  # Repair objects serialised before the aniframe superclass existed.
+  if (!inherits(data, "aniframe")) {
+    class(data) <- append(
+      class(data),
+      "aniframe",
+      after = match("anievent", class(data))
+    )
+  }
   data
 }
 
@@ -59,7 +67,7 @@ as_anievent.aniframe <- function(
   variables_when = NULL
 ) {
   cli::cli_abort(c(
-    "Cannot cast an {.cls aniframe} directly to an {.cls anievent}.",
+    "Cannot cast an {.cls {class(data)[[1]]}} directly to an {.cls anievent}.",
     "i" = "Use {.fn to_anievent} to encode per-frame event columns into bouts."
   ))
 }
@@ -202,7 +210,7 @@ standardise_anievent_cols <- function(data, variables_what, variables_when) {
 
 #' Fill the spatial metadata fields with their "not applicable" values
 #'
-#' An anievent shares the metadata substrate with [aniframe()] but has no
+#' An anievent shares the metadata substrate with [anipoint()] but has no
 #' spatial component: a stream of behavioural events has no axes, no
 #' reference frame and no angular unit. Inheriting the movement defaults
 #' made it claim otherwise — a BORIS export read into an anievent

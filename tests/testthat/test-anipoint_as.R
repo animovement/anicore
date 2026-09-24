@@ -1,4 +1,4 @@
-# Test outline for as_aniframe():
+# Test outline for as_anipoint():
 #
 # Validation and minimal requirements:
 #   - errors when no temporal variables found
@@ -40,7 +40,7 @@
 #   - spherical data (rho, phi, theta) is detected as spherical
 #   - polar data (rho, phi) is detected as polar
 
-test_that("as_aniframe detects cylindrical data (rho, phi, z), not cartesian_1d", {
+test_that("as_anipoint detects cylindrical data (rho, phi, z), not cartesian_1d", {
   # Regression test for #44: previously the cartesian-first detection saw
   # the `z` column and returned c("z"), giving coordinate_system = cartesian_1d.
   df <- data.frame(
@@ -51,7 +51,7 @@ test_that("as_aniframe detects cylindrical data (rho, phi, z), not cartesian_1d"
     z = 1:5
   )
 
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
 
   expect_equal(
     as.character(get_metadata(data, "coordinate_system")),
@@ -63,7 +63,7 @@ test_that("as_aniframe detects cylindrical data (rho, phi, z), not cartesian_1d"
   )
 })
 
-test_that("as_aniframe orders cylindrical spatial columns as rho, phi, z (#43)", {
+test_that("as_anipoint orders cylindrical spatial columns as rho, phi, z (#43)", {
   # Regression test for #43: previously z appeared before rho and phi
   # because rho/phi were pushed to "other cols" when only z was detected
   # as a where-variable.
@@ -75,7 +75,7 @@ test_that("as_aniframe orders cylindrical spatial columns as rho, phi, z (#43)",
     z = 1:3
   )
 
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
 
   spatial_idx <- match(c("rho", "phi", "z"), names(data))
   expect_equal(spatial_idx, sort(spatial_idx))
@@ -85,7 +85,7 @@ test_that("as_aniframe orders cylindrical spatial columns as rho, phi, z (#43)",
   )
 })
 
-test_that("as_aniframe detects spherical data (rho, phi, theta)", {
+test_that("as_anipoint detects spherical data (rho, phi, theta)", {
   df <- data.frame(
     individual = 1L,
     time = 1:5,
@@ -94,7 +94,7 @@ test_that("as_aniframe detects spherical data (rho, phi, theta)", {
     theta = seq(0, pi, length.out = 5)
   )
 
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
 
   expect_equal(
     as.character(get_metadata(data, "coordinate_system")),
@@ -106,7 +106,7 @@ test_that("as_aniframe detects spherical data (rho, phi, theta)", {
   )
 })
 
-test_that("as_aniframe detects polar data (rho, phi)", {
+test_that("as_anipoint detects polar data (rho, phi)", {
   df <- data.frame(
     individual = 1L,
     time = 1:5,
@@ -114,7 +114,7 @@ test_that("as_aniframe detects polar data (rho, phi)", {
     phi = seq(0, pi, length.out = 5)
   )
 
-  data <- as_aniframe(df)
+  data <- as_anipoint(df)
 
   expect_equal(
     as.character(get_metadata(data, "coordinate_system")),
@@ -126,7 +126,7 @@ test_that("as_aniframe detects polar data (rho, phi)", {
   )
 })
 
-test_that("as_aniframe does not invent axis extents", {
+test_that("as_anipoint does not invent axis extents", {
   # `y_height` used to fall back to `max(y)`, which is the highest tracked
   # point rather than the frame height. An extent that was guessed reflects
   # around the wrong place, so a frame now has none until one is declared.
@@ -137,10 +137,10 @@ test_that("as_aniframe does not invent axis extents", {
     y = c(10, 50, 200, 1000)
   )
 
-  expect_length(get_axis_extents(as_aniframe(df)), 0)
+  expect_length(get_axis_extents(as_anipoint(df)), 0)
 })
 
-test_that("as_aniframe keeps axis extents the caller supplies", {
+test_that("as_anipoint keeps axis extents the caller supplies", {
   df <- data.frame(
     individual = 1L,
     time = 1:3,
@@ -148,12 +148,12 @@ test_that("as_aniframe keeps axis extents the caller supplies", {
     y = c(10, 50, 200)
   )
 
-  data <- as_aniframe(df, metadata = list(axis_extents = c(y = 1080)))
+  data <- as_anipoint(df, metadata = list(axis_extents = c(y = 1080)))
 
   expect_equal(get_axis_extents(data), c(y = 1080))
 })
 
-test_that("as_aniframe errors when time column missing", {
+test_that("as_anipoint errors when time column missing", {
   df <- data.frame(
     frame = 1:5,
     x = 1:5,
@@ -161,12 +161,12 @@ test_that("as_aniframe errors when time column missing", {
   )
 
   expect_error(
-    as_aniframe(df),
+    as_anipoint(df),
     "time.*is required"
   )
 })
 
-test_that("as_aniframe errors when other temporal variables missing", {
+test_that("as_anipoint errors when other temporal variables missing", {
   df <- data.frame(
     time = 1:5,
     x = 1:5,
@@ -174,12 +174,12 @@ test_that("as_aniframe errors when other temporal variables missing", {
   )
 
   expect_error(
-    as_aniframe(df, variables_when = c("trial", "time")),
+    as_anipoint(df, variables_when = c("trial", "time")),
     "Temporal variable.*not found.*trial"
   )
 })
 
-test_that("as_aniframe works with additional temporal variables", {
+test_that("as_anipoint works with additional temporal variables", {
   df <- data.frame(
     trial = c(1L, 1L, 2L, 2L, 2L),
     time = c(1, 2, 1, 2, 3),
@@ -187,39 +187,39 @@ test_that("as_aniframe works with additional temporal variables", {
     y = 1:5
   )
 
-  result <- as_aniframe(df, variables_when = c("trial", "time"))
+  result <- as_anipoint(df, variables_when = c("trial", "time"))
 
   expect_s3_class(result, "aniframe")
   expect_true("trial" %in% dplyr::group_vars(result))
   expect_false("time" %in% dplyr::group_vars(result))
 })
 
-test_that("as_aniframe works with minimal required columns", {
+test_that("as_anipoint works with minimal required columns", {
   df <- data.frame(
     time = 1:5,
     x = 1:5,
     y = 1:5
   )
 
-  result <- as_aniframe(df)
+  result <- as_anipoint(df)
 
   expect_s3_class(result, "aniframe")
   expect_equal(names(result), c("keypoint", "time", "x", "y"))
 })
 
-test_that("as_aniframe works with custom spatial variables", {
+test_that("as_anipoint works with custom spatial variables", {
   df <- data.frame(
     time = 1:5,
     z = 1:5
   )
 
-  result <- as_aniframe(df, variables_where = "z")
+  result <- as_anipoint(df, variables_where = "z")
 
   expect_s3_class(result, "aniframe")
   expect_equal(names(result), c("keypoint", "time", "z"))
 })
 
-test_that("as_aniframe converts character identity variables to factor", {
+test_that("as_anipoint converts character identity variables to factor", {
   df <- data.frame(
     individual = c("A", "A", "B", "B", "A"),
     time = 1:5,
@@ -227,13 +227,13 @@ test_that("as_aniframe converts character identity variables to factor", {
     y = 1:5
   )
 
-  result <- as_aniframe(df, variables_what = "individual")
+  result <- as_anipoint(df, variables_what = "individual")
 
   expect_s3_class(result$individual, "factor")
   expect_equal(levels(result$individual), c("A", "B"))
 })
 
-test_that("as_aniframe converts character temporal variables to factor", {
+test_that("as_anipoint converts character temporal variables to factor", {
   df <- data.frame(
     trial = c("trial1", "trial1", "trial2", "trial2", "trial1"),
     time = 1:5,
@@ -241,12 +241,12 @@ test_that("as_aniframe converts character temporal variables to factor", {
     y = 1:5
   )
 
-  result <- as_aniframe(df, variables_when = c("trial", "time"))
+  result <- as_anipoint(df, variables_when = c("trial", "time"))
 
   expect_s3_class(result$trial, "factor")
 })
 
-test_that("as_aniframe keeps integer temporal variables as integer", {
+test_that("as_anipoint keeps integer temporal variables as integer", {
   df <- data.frame(
     trial = c(1L, 1L, 2L, 2L, 3L),
     time = 1:5,
@@ -254,24 +254,24 @@ test_that("as_aniframe keeps integer temporal variables as integer", {
     y = 1:5
   )
 
-  result <- as_aniframe(df, variables_when = c("trial", "time"))
+  result <- as_anipoint(df, variables_when = c("trial", "time"))
 
   expect_type(result$trial, "integer")
 })
 
-test_that("as_aniframe converts spatial variables to numeric", {
+test_that("as_anipoint converts spatial variables to numeric", {
   df <- data.frame(
     time = 1:5,
     x = c("1", "2", "3", "4", "5"),
     y = 1:5
   )
 
-  result <- as_aniframe(df)
+  result <- as_anipoint(df)
 
   expect_type(result$x, "double")
 })
 
-test_that("as_aniframe relocates columns to standard order", {
+test_that("as_anipoint relocates columns to standard order", {
   df <- data.frame(
     confidence = rep(0.9, 5),
     x = 1:5,
@@ -280,13 +280,13 @@ test_that("as_aniframe relocates columns to standard order", {
     individual = "A"
   )
 
-  result <- as_aniframe(df, variables_what = "individual")
+  result <- as_anipoint(df, variables_what = "individual")
 
   expect_equal(names(result)[1:4], c("individual", "time", "x", "y"))
   expect_true("confidence" %in% names(result))
 })
 
-test_that("as_aniframe preserves non-standard columns", {
+test_that("as_anipoint preserves non-standard columns", {
   df <- data.frame(
     time = 1:5,
     x = 1:5,
@@ -294,13 +294,13 @@ test_that("as_aniframe preserves non-standard columns", {
     custom_col = letters[1:5]
   )
 
-  result <- as_aniframe(df)
+  result <- as_anipoint(df)
 
   expect_true("custom_col" %in% names(result))
   expect_equal(result$custom_col, letters[1:5])
 })
 
-test_that("as_aniframe groups by identity and temporal context", {
+test_that("as_anipoint groups by identity and temporal context", {
   df <- data.frame(
     individual = c("A", "A", "A", "B", "B", "B"),
     trial = c(1L, 1L, 1L, 2L, 2L, 2L),
@@ -309,7 +309,7 @@ test_that("as_aniframe groups by identity and temporal context", {
     y = 1:6
   )
 
-  result <- as_aniframe(
+  result <- as_anipoint(
     df,
     variables_what = "individual",
     variables_when = c("trial", "time")
@@ -322,7 +322,7 @@ test_that("as_aniframe groups by identity and temporal context", {
   expect_false("time" %in% group_vars)
 })
 
-test_that("as_aniframe arranges by identity then temporal", {
+test_that("as_anipoint arranges by identity then temporal", {
   df <- data.frame(
     individual = c("B", "A", "B", "A", "B", "A"),
     time = c(3, 1, 2, 3, 1, 2),
@@ -330,14 +330,14 @@ test_that("as_aniframe arranges by identity then temporal", {
     y = 1:6
   )
 
-  result <- as_aniframe(df, variables_what = "individual")
+  result <- as_anipoint(df, variables_what = "individual")
 
   # Should be arranged by individual, then by time within individual
   expect_equal(as.character(result$individual), c("A", "A", "A", "B", "B", "B"))
   expect_equal(result$time, c(1, 2, 3, 1, 2, 3))
 })
 
-test_that("as_aniframe attaches metadata", {
+test_that("as_anipoint attaches metadata", {
   df <- data.frame(
     time = 1:5,
     x = 1:5,
@@ -345,14 +345,14 @@ test_that("as_aniframe attaches metadata", {
   )
 
   md <- list(sampling_rate = 30, source = "test")
-  result <- as_aniframe(df, metadata = md)
+  result <- as_anipoint(df, metadata = md)
 
   result_md <- get_metadata(result)
   expect_equal(result_md$sampling_rate, 30)
   expect_equal(result_md$source, "test")
 })
 
-test_that("as_aniframe stores variables in metadata", {
+test_that("as_anipoint stores variables in metadata", {
   df <- data.frame(
     individual = "A",
     trial = 1L,
@@ -361,7 +361,7 @@ test_that("as_aniframe stores variables in metadata", {
     y = 1:5
   )
 
-  result <- as_aniframe(
+  result <- as_anipoint(
     df,
     variables_what = "individual",
     variables_when = c("trial", "time"),
@@ -374,7 +374,7 @@ test_that("as_aniframe stores variables in metadata", {
   expect_equal(result_md$variables_where, c("x", "y"))
 })
 
-test_that("as_aniframe respects custom variables_what", {
+test_that("as_anipoint respects custom variables_what", {
   df <- data.frame(
     track = c(1, 1, 2, 2, 3, 3),
     time = rep(1:2, 3),
@@ -382,13 +382,13 @@ test_that("as_aniframe respects custom variables_what", {
     y = 1:6
   )
 
-  result <- as_aniframe(df, variables_what = "track")
+  result <- as_anipoint(df, variables_what = "track")
 
   expect_equal(names(result)[1], "track")
   expect_true("track" %in% dplyr::group_vars(result))
 })
 
-test_that("as_aniframe respects custom variables_when with time", {
+test_that("as_anipoint respects custom variables_when with time", {
   df <- data.frame(
     session = c(1L, 1L, 2L, 2L),
     time = 1:4,
@@ -396,13 +396,13 @@ test_that("as_aniframe respects custom variables_when with time", {
     y = 1:4
   )
 
-  result <- as_aniframe(df, variables_when = c("session", "time"))
+  result <- as_anipoint(df, variables_when = c("session", "time"))
 
   expect_s3_class(result, "aniframe")
   expect_equal(get_metadata(result)$variables_when, "session")
 })
 
-test_that("as_aniframe auto-detects observation as a temporal grouping column", {
+test_that("as_anipoint auto-detects observation as a temporal grouping column", {
   df <- data.frame(
     individual = 1L,
     observation = c("clip_a", "clip_a", "clip_b", "clip_b"),
@@ -411,7 +411,7 @@ test_that("as_aniframe auto-detects observation as a temporal grouping column", 
     y = 1:4
   )
 
-  result <- as_aniframe(df)
+  result <- as_anipoint(df)
 
   expect_equal(
     get_metadata(result, "variables_when"),
@@ -421,14 +421,14 @@ test_that("as_aniframe auto-detects observation as a temporal grouping column", 
 
 # TODO: We need to handle the coordinate system before including this test
 
-# test_that("as_aniframe respects custom variables_where", {
+# test_that("as_anipoint respects custom variables_where", {
 #   df <- data.frame(
 #     time = 1:5,
 #     lon = 1:5,
 #     lat = 1:5
 #   )
 
-#   result <- as_aniframe(df, variables_where = c("lon", "lat"))
+#   result <- as_anipoint(df, variables_where = c("lon", "lat"))
 
 #   expect_s3_class(result, "aniframe")
 #   expect_true(all(c("lon", "lat") %in% names(result)))
@@ -436,7 +436,7 @@ test_that("as_aniframe auto-detects observation as a temporal grouping column", 
 #   expect_type(result$lat, "double")
 # })
 
-test_that("as_aniframe works with full tidy movement data", {
+test_that("as_anipoint works with full tidy movement data", {
   df <- data.frame(
     individual = c("A", "A", "B", "B", "A", "A", "B", "B"),
     keypoint = rep(c("head", "tail"), 4),
@@ -448,7 +448,7 @@ test_that("as_aniframe works with full tidy movement data", {
     confidence = rep(0.95, 8)
   )
 
-  result <- as_aniframe(
+  result <- as_anipoint(
     df,
     variables_what = c("individual", "keypoint"),
     variables_when = c("session", "trial", "time"),
@@ -478,14 +478,14 @@ test_that("as_aniframe works with full tidy movement data", {
   expect_false("time" %in% group_vars)
 })
 
-test_that("as_aniframe infers coordinate system from spatial variables", {
+test_that("as_anipoint infers coordinate system from spatial variables", {
   df_2d <- data.frame(time = 1:5, x = 1:5, y = 1:5)
   df_3d <- data.frame(time = 1:5, x = 1:5, y = 1:5, z = 1:5)
   df_polar <- data.frame(time = 1:5, rho = 1:5, phi = 1:5)
 
-  result_2d <- as_aniframe(df_2d)
-  result_3d <- as_aniframe(df_3d, variables_where = c("x", "y", "z"))
-  result_polar <- as_aniframe(df_polar, variables_where = c("rho", "phi"))
+  result_2d <- as_anipoint(df_2d)
+  result_3d <- as_anipoint(df_3d, variables_where = c("x", "y", "z"))
+  result_polar <- as_anipoint(df_polar, variables_where = c("rho", "phi"))
 
   expect_equal(
     as.character(get_metadata(result_2d)$coordinate_system),
@@ -501,7 +501,7 @@ test_that("as_aniframe infers coordinate system from spatial variables", {
   )
 })
 
-# test_that("as_aniframe warns for unknown coordinate system", {
+# test_that("as_anipoint warns for unknown coordinate system", {
 #   df <- data.frame(
 #     time = 1:5,
 #     lon = 1:5,
@@ -509,36 +509,36 @@ test_that("as_aniframe infers coordinate system from spatial variables", {
 #   )
 
 #   expect_warning(
-#     as_aniframe(df, variables_where = c("lon", "lat")),
+#     as_anipoint(df, variables_where = c("lon", "lat")),
 #     "Could not infer coordinate system"
 #   )
 # })
 
-test_that("as_aniframe errors when no spatial variables found", {
+test_that("as_anipoint errors when no spatial variables found", {
   df <- data.frame(
     time = 1:5,
     value = 1:5
   )
 
   expect_error(
-    as_aniframe(df),
+    as_anipoint(df),
     "No spatial variables found"
   )
 })
 
-test_that("as_aniframe errors when specified spatial variables missing", {
+test_that("as_anipoint errors when specified spatial variables missing", {
   df <- data.frame(
     time = 1:5,
     x = 1:5
   )
 
   expect_error(
-    as_aniframe(df, variables_where = c("x", "y", "z")),
+    as_anipoint(df, variables_where = c("x", "y", "z")),
     "Missing spatial variable"
   )
 })
 
-test_that("as_aniframe warns for unknown coordinate system", {
+test_that("as_anipoint warns for unknown coordinate system", {
   df <- data.frame(
     time = 1:5,
     lon = 1:5,
@@ -546,19 +546,19 @@ test_that("as_aniframe warns for unknown coordinate system", {
   )
 
   expect_warning(
-    as_aniframe(df, variables_where = c("lon", "lat")),
+    as_anipoint(df, variables_where = c("lon", "lat")),
     "Could not infer coordinate system"
   )
 })
 
-test_that("as_aniframe detects polar coordinates", {
+test_that("as_anipoint detects polar coordinates", {
   df <- data.frame(
     time = 1:5,
     rho = 1:5,
     phi = seq(0, pi, length.out = 5)
   )
 
-  result <- as_aniframe(df)
+  result <- as_anipoint(df)
 
   expect_s3_class(result, "aniframe")
   expect_equal(
@@ -585,27 +585,27 @@ test_that("casting an aniframe keeps a custom identity declaration", {
   # `id` is not a recognised identity name, so re-detection found none,
   # injected `keypoint = "centroid"` and overwrote the declaration with
   # it — silently regrouping the frame on a constant column.
-  af <- aniframe(keypoint = "centroid", time = 1:4, x = 1:4, y = 1:4) |>
+  af <- anipoint(keypoint = "centroid", time = 1:4, x = 1:4, y = 1:4) |>
     dplyr::mutate(id = "a") |>
     add_variables_what("id") |>
     remove_variables_what("keypoint") |>
     dplyr::select(-keypoint)
 
-  out <- as_aniframe(af)
+  out <- as_anipoint(af)
 
   expect_equal(get_variables_what(out), "id")
   expect_false("keypoint" %in% names(out))
 })
 
 test_that("casting keeps a declared opt-out rather than injecting an identity", {
-  af <- aniframe(
+  af <- anipoint(
     time = 1:4,
     x = 1:4,
     y = 1:4,
     variables_what = character(0)
   )
 
-  out <- as_aniframe(af)
+  out <- as_anipoint(af)
 
   expect_length(get_variables_what(out), 0)
   expect_false("keypoint" %in% names(out))
@@ -614,10 +614,10 @@ test_that("casting keeps a declared opt-out rather than injecting an identity", 
 test_that("a declaration whose columns are gone falls back to detection", {
   # A cast should still repair a frame whose metadata has drifted, rather
   # than erroring on columns that are no longer there.
-  af <- aniframe(individual = "a", time = 1:4, x = 1:4, y = 1:4, z = 1:4)
+  af <- anipoint(individual = "a", time = 1:4, x = 1:4, y = 1:4, z = 1:4)
   drifted <- dplyr::select(af, -z)
 
-  out <- as_aniframe(drifted)
+  out <- as_anipoint(drifted)
 
   expect_equal(get_variables_where(out), c("x", "y"))
   expect_equal(
@@ -627,16 +627,16 @@ test_that("a declaration whose columns are gone falls back to detection", {
 })
 
 test_that("explicit arguments still win over what the frame declares", {
-  af <- aniframe(individual = "a", time = 1:4, x = 1:4, y = 1:4)
+  af <- anipoint(individual = "a", time = 1:4, x = 1:4, y = 1:4)
   af <- dplyr::mutate(af, track = 1L)
 
-  out <- as_aniframe(af, variables_what = "track")
+  out <- as_anipoint(af, variables_what = "track")
 
   expect_equal(get_variables_what(out), "track")
 })
 
 test_that("the unit setters leave the declarations alone", {
-  af <- aniframe(keypoint = "centroid", time = 1:4, x = 1:4, y = 1:4) |>
+  af <- anipoint(keypoint = "centroid", time = 1:4, x = 1:4, y = 1:4) |>
     dplyr::mutate(id = "a") |>
     add_variables_what("id") |>
     remove_variables_what("keypoint") |>

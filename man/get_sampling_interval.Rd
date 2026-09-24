@@ -7,7 +7,7 @@
 get_sampling_interval(data)
 }
 \arguments{
-\item{data}{An aniframe object.
+\item{data}{An anipoint object.
 
 Refreshed whenever the frame is re-declared, so like
 \code{coordinate_system} it can lag raw dplyr edits. \code{\link[=is_sampling_regular]{is_sampling_regular()}}
@@ -27,7 +27,7 @@ each group, so pooling them would measure the restarts rather than the
 sampling.
 }
 \examples{
-af <- example_aniframe(n_obs = 5, n_individuals = 2, n_keypoints = 1)
+af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)
 get_sampling_interval(af)
 
 }

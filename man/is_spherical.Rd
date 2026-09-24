@@ -2,20 +2,20 @@
 % Please edit documentation in R/coordinate_system.R
 \name{is_spherical}
 \alias{is_spherical}
-\title{Test whether an aniframe uses a spherical coordinate system}
+\title{Test whether an anipoint uses a spherical coordinate system}
 \usage{
 is_spherical(data)
 }
 \arguments{
-\item{data}{An aniframe.}
+\item{data}{An anipoint.}
 }
 \value{
 A logical value.
 }
 \description{
-Test whether an aniframe uses a spherical coordinate system
+Test whether an anipoint uses a spherical coordinate system
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 is_spherical(af)
 }

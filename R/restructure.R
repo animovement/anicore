@@ -11,7 +11,7 @@
 #' Restructure a frame to match a declaration
 #'
 #' Dispatches to the per-class restructure. The two classes share the
-#' metadata substrate but not their layout: an aniframe is grouped and
+#' metadata substrate but not their layout: an anipoint is grouped and
 #' ordered by identity then time, an anievent is ordered by identity then
 #' bout start and is never grouped.
 #'
@@ -32,13 +32,13 @@ restructure_frame <- function(
     if (length(variables_where) > 0) {
       cli::cli_abort(c(
         "An {.cls anievent} has no spatial variables.",
-        "i" = "{.field variables_where} is always empty on an anievent; spatial position lives on the {.cls aniframe} it was encoded from."
+        "i" = "{.field variables_where} is always empty on an anievent; spatial position lives on the {.cls anipoint} it was encoded from."
       ))
     }
     return(restructure_anievent(data, variables_what, variables_when))
   }
 
-  restructure_aniframe(
+  restructure_anipoint(
     data,
     variables_what,
     variables_when,
@@ -65,20 +65,20 @@ strip_animovement_class <- function(data) {
 }
 
 
-#' Restructure an aniframe
+#' Restructure an anipoint
 #'
-#' The tail of [as_aniframe()], factored out so that construction and
+#' The tail of [as_anipoint()], factored out so that construction and
 #' re-declaration cannot drift apart: validate the declared columns
 #' exist, standardise their types, relocate, arrange, regroup, and
 #' refresh the derived `coordinate_system`.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param variables_what,variables_when,variables_where The declaration
 #'   to apply.
 #'
 #' @return `data`, restructured, with the declaration recorded.
 #' @keywords internal
-restructure_aniframe <- function(
+restructure_anipoint <- function(
   data,
   variables_what,
   variables_when,
@@ -107,14 +107,14 @@ restructure_aniframe <- function(
   }
   where_cols <- unname(axes)
 
-  ensure_has_aniframe_cols(
+  ensure_has_anipoint_cols(
     bare,
     variables_what,
     variables_when,
     where_cols,
     index
   )
-  bare <- standardise_aniframe_cols(
+  bare <- standardise_anipoint_cols(
     bare,
     variables_what,
     variables_when,
@@ -173,7 +173,7 @@ restructure_aniframe <- function(
 
 #' Restructure an anievent
 #'
-#' The anievent counterpart to [restructure_aniframe()]: validate,
+#' The anievent counterpart to [restructure_anipoint()]: validate,
 #' standardise types, relocate, and order by identity then bout start.
 #' An anievent is not grouped.
 #'
@@ -213,7 +213,7 @@ restructure_anievent <- function(data, variables_what, variables_when) {
   md$variables_what <- variables_what
   md$variables_when <- variables_when
   # An anievent carries no spatial variables — position lives on the
-  # aniframe it was encoded from.
+  # anipoint it was encoded from.
   md$variables_where <- character()
   md$axes <- stats::setNames(character(), character())
   # No index, so nothing to measure a sampling interval from.
@@ -244,7 +244,7 @@ regroup_frame <- function(data, grouping_vars) {
 }
 
 
-#' Validate required columns for aniframe
+#' Validate required columns for anipoint
 #'
 #' @param data Data frame to validate.
 #' @param variables_what Identity variables.
@@ -252,7 +252,7 @@ regroup_frame <- function(data, grouping_vars) {
 #' @param variables_where Spatial variables.
 #'
 #' @keywords internal
-ensure_has_aniframe_cols <- function(
+ensure_has_anipoint_cols <- function(
   data,
   variables_what,
   variables_when,
@@ -269,7 +269,7 @@ ensure_has_aniframe_cols <- function(
     cli::cli_abort(
       c(
         "Index column {.val {index}} is required but not found in data.",
-        "i" = "An aniframe is indexed by exactly one column.",
+        "i" = "An anipoint is indexed by exactly one column.",
         "i" = "Declare a different one with {.arg index}, or {.fn set_index}."
       )
     )
@@ -282,7 +282,7 @@ ensure_has_aniframe_cols <- function(
 }
 
 
-#' Standardize column types for aniframe
+#' Standardize column types for anipoint
 #'
 #' Converts character identity and temporal variables to factors.
 #' Converts numeric identity and temporal variables (except the index) to
@@ -298,7 +298,7 @@ ensure_has_aniframe_cols <- function(
 #'
 #' @return Data frame with standardised column types.
 #' @keywords internal
-standardise_aniframe_cols <- function(
+standardise_anipoint_cols <- function(
   data,
   variables_what,
   variables_when,

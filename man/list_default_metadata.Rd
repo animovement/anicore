@@ -44,7 +44,7 @@ existed, where it reads back as \code{"time"} — the value they were built
 with.
 \item \code{variables_what}, \code{variables_when}, \code{variables_where}: The columns
 that carry, respectively, entity identity, temporal context and
-spatial position. These are the structural fields — \code{\link[=as_aniframe]{as_aniframe()}}
+spatial position. These are the structural fields — \code{\link[=as_anipoint]{as_anipoint()}}
 uses them to coerce column types, order columns and rows, group the
 frame, and derive \code{coordinate_system}. The values here are a
 placeholder skeleton for an object with no data attached; every
@@ -115,7 +115,7 @@ tolerated by the metadata validator; new objects always get it.
 }
 \description{
 Returns a list containing the default metadata fields and their initial
-values. The same metadata substrate is shared by both \code{\link[=aniframe]{aniframe()}} and
+values. The same metadata substrate is shared by both \code{\link[=anipoint]{anipoint()}} and
 \code{\link[=anievent]{anievent()}} objects; per-class data contracts are versioned via
 \code{spec_version}. Most fields are initialized as \code{NA} and should be set
 appropriately for your data.

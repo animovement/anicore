@@ -4,7 +4,7 @@
 # a later restructure (#118) does not reach them.
 
 test_that("every field with a setter has a getter that reads it back", {
-  af <- example_aniframe(n_obs = 4, n_individuals = 1, n_keypoints = 1)
+  af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1)
 
   expect_equal(get_sampling_rate(af), get_metadata(af, "sampling_rate"))
   expect_equal(get_axis_directions(af), get_metadata(af, "axis_directions"))
@@ -15,7 +15,7 @@ test_that("every field with a setter has a getter that reads it back", {
 })
 
 test_that("the getters see what their setters wrote", {
-  af <- example_aniframe(n_obs = 4, n_individuals = 1, n_keypoints = 1)
+  af <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1)
 
   expect_equal(get_sampling_rate(set_sampling_rate(af, 30)), 30)
   expect_equal(get_axis_extents(set_axis_extents(af, c(y = 1080))), c(y = 1080))
@@ -36,7 +36,7 @@ test_that("the getters see what their setters wrote", {
 test_that("the factor-backed getters return a bare character", {
   # Downstream almost always wraps these in as.character(); doing it here
   # means they no longer have to.
-  af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 
   for (value in list(
     get_unit_space(af),
@@ -53,14 +53,14 @@ test_that("the factor-backed getters return a bare character", {
 test_that("the getters reject a plain data frame", {
   df <- data.frame(x = 1)
 
-  expect_error(get_sampling_rate(df), "neither an aniframe")
-  expect_error(get_unit_space(df), "neither an aniframe")
-  expect_error(get_axis_extents(df), "neither an aniframe")
-  expect_error(get_handedness(df), "neither an aniframe")
+  expect_error(get_sampling_rate(df), "not an aniframe")
+  expect_error(get_unit_space(df), "not an aniframe")
+  expect_error(get_axis_extents(df), "not an aniframe")
+  expect_error(get_handedness(df), "not an aniframe")
 })
 
 test_that("they work on an anievent too, where the field applies", {
-  ae <- example_aniframe(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
+  ae <- example_anipoint(n_obs = 4, n_individuals = 1, n_keypoints = 1) |>
     dplyr::mutate(b = factor(rep(c("r", "w"), each = 2))) |>
     set_variables_event(state = "b") |>
     to_anievent()

@@ -2,18 +2,18 @@
 % Please edit documentation in R/unit_time.R
 \name{set_unit_time}
 \alias{set_unit_time}
-\alias{set_unit_time.aniframe}
+\alias{set_unit_time.anipoint}
 \alias{set_unit_time.anievent}
-\title{Set the temporal unit of an aniframe or anievent}
+\title{Set the temporal unit of an anipoint or anievent}
 \usage{
 set_unit_time(data, to_unit, calibration_factor = 1)
 
-\method{set_unit_time}{aniframe}(data, to_unit, calibration_factor = 1)
+\method{set_unit_time}{anipoint}(data, to_unit, calibration_factor = 1)
 
 \method{set_unit_time}{anievent}(data, to_unit, calibration_factor = 1)
 }
 \arguments{
-\item{data}{An \code{\link[=aniframe]{aniframe()}} or \code{\link[=anievent]{anievent()}} object.}
+\item{data}{An \code{\link[=anipoint]{anipoint()}} or \code{\link[=anievent]{anievent()}} object.}
 
 \item{to_unit}{Character string specifying the target time unit. Must be
 one of the permitted units defined in \code{list_default_metadata()$unit_time}
@@ -31,13 +31,13 @@ The input object with temporal columns converted to \code{to_unit}
 and \code{unit_time} metadata updated accordingly.
 }
 \description{
-Converts the temporal columns of an \code{aniframe} (its index column) or
+Converts the temporal columns of an \code{anipoint} (its index column) or
 \code{anievent} (the \code{start} and \code{stop} columns) to a different unit of
 measurement. Handles automatic conversion between standard SI time
 units and custom calibration from frame or arbitrary units.
 }
 \details{
-For an \code{aniframe} the column \code{\link[=get_index]{get_index()}} names is multiplied by the
+For an \code{anipoint} the column \code{\link[=get_index]{get_index()}} names is multiplied by the
 calibration factor; for an \code{anievent} both \code{start} and \code{stop} are. In
 either case:
 \itemize{
@@ -52,10 +52,10 @@ data values are left unchanged (the metadata still flips to \code{to_unit});
 }
 \examples{
 \dontrun{
-# aniframe: convert milliseconds to seconds (automatic)
+# anipoint: convert milliseconds to seconds (automatic)
 data_s <- set_unit_time(data, to_unit = "s")
 
-# aniframe: convert frames to seconds at 30 fps
+# anipoint: convert frames to seconds at 30 fps
 data_s <- set_unit_time(data, to_unit = "s", calibration_factor = 1 / 30)
 
 # anievent: same call shape; mutates start/stop instead of the index

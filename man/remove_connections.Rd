@@ -2,12 +2,12 @@
 % Please edit documentation in R/connections.R
 \name{remove_connections}
 \alias{remove_connections}
-\title{Remove connections from an aniframe}
+\title{Remove connections from an anipoint}
 \usage{
 remove_connections(data, from, to, variable = "keypoint")
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 
 \item{from}{Character vector of source endpoints to remove.}
 
@@ -18,7 +18,7 @@ length as \code{from}.}
 \code{"keypoint"}.}
 }
 \value{
-The aniframe with matching connections removed.
+The anipoint with matching connections removed.
 }
 \description{
 \strong{[Experimental]}
@@ -30,7 +30,7 @@ gone.
 }
 \examples{
 \dontrun{
-data <- example_aniframe() |>
+data <- example_anipoint() |>
   add_connections(from = c("head", "neck"), to = c("neck", "shoulder_right"))
 data <- remove_connections(data, from = "head", to = "neck")
 }

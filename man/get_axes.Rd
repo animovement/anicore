@@ -2,12 +2,12 @@
 % Please edit documentation in R/axes.R
 \name{get_axes}
 \alias{get_axes}
-\title{The axis roles of an aniframe, and the columns carrying them}
+\title{The axis roles of an anipoint, and the columns carrying them}
 \usage{
 get_axes(data)
 }
 \arguments{
-\item{data}{An aniframe object.}
+\item{data}{An anipoint object.}
 }
 \value{
 Named character vector: names are axis roles (\code{x}, \code{y}, \code{z},
@@ -21,11 +21,11 @@ not care what the columns are called:
 \code{data[[get_axes(data)[["x"]]]]}.
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 get_axes(af)
 
 df <- data.frame(time = 1:3, individual = "a", u = c(1, 2, 3), v = c(0, 1, 0))
-renamed <- as_aniframe(df, variables_where = c(x = "u", y = "v"))
+renamed <- as_anipoint(df, variables_where = c(x = "u", y = "v"))
 get_axes(renamed)
 get_metadata(renamed, "coordinate_system")
 

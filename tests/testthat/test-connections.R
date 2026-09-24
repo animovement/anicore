@@ -55,7 +55,7 @@
 # ------------------------------------------------------------------
 
 mini_aniframe <- function() {
-  example_aniframe(n_obs = 3, n_individuals = 2, n_keypoints = 5)
+  example_anipoint(n_obs = 3, n_individuals = 2, n_keypoints = 5)
 }
 
 # ------------------------------------------------------------------
@@ -163,7 +163,7 @@ test_that("set_connections errors on unknown variable", {
 })
 
 test_that("set_connections accepts variables_when entries (e.g. session)", {
-  data <- example_aniframe(n_obs = 3, n_sessions = 2)
+  data <- example_anipoint(n_obs = 3, n_sessions = 2)
   expect_no_error(
     set_connections(data, list(c("1", "2")), variable = "session")
   )
@@ -329,11 +329,11 @@ test_that("add_connections errors when from or to is empty", {
 test_that("set_connections doesn't warn when variable is in metadata but absent from data", {
   # Declaring a column that isn't in the data is rejected at
   # construction (#77), but metadata can still drift out of sync with
-  # the frame afterwards — the divergence `validate_aniframe()` reports.
+  # the frame afterwards — the divergence `validate_anipoint()` reports.
   # Given such an object, the endpoint check has nothing to check
   # against, so it should early-return rather than warn about every
   # value.
-  data <- as_aniframe(
+  data <- as_anipoint(
     data.frame(individual = 1L, time = 1:3, x = 1:3, y = 1:3)
   )
   drifted <- get_metadata(data)

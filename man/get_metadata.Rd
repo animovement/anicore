@@ -20,7 +20,7 @@ The metadata associated with the object.
 Get metadata
 }
 \examples{
-af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 names(get_metadata(af))
 
 # A single field can be pulled out by name

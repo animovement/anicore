@@ -9,7 +9,7 @@
 #' supplied so downstream consumers can interpret the table as either
 #' directed or undirected.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param connections One of:
 #'   * a 2-column data.frame with columns `from` and `to`,
 #'   * a list of length-2 character vectors (each `c(from, to)`),
@@ -18,7 +18,7 @@
 #'   or temporal (`variables_when`) variable the connections relate to.
 #'   Defaults to `"keypoint"`.
 #'
-#' @return The aniframe with updated `connections` metadata.
+#' @return The anipoint with updated `connections` metadata.
 #'
 #' @details
 #' If any `from`/`to` value isn't found in the corresponding column of `data`,
@@ -29,7 +29,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' data <- example_aniframe()
+#' data <- example_anipoint()
 #'
 #' # Implicit by position (element[1] = from, element[2] = to)
 #' data <- set_connections(
@@ -64,7 +64,7 @@
 #'
 #' @export
 set_connections <- function(data, connections, variable = "keypoint") {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_known_connection_variable(data, variable)
 
   current <- get_connections(data)
@@ -80,16 +80,16 @@ set_connections <- function(data, connections, variable = "keypoint") {
   set_metadata(data, connections = current)
 }
 
-#' Get connections from an aniframe
+#' Get connections from an anipoint
 #'
 #' @description
 #' **\[Experimental\]**
 #'
-#' Read the connections currently stored on an aniframe. Returns the full
+#' Read the connections currently stored on an anipoint. Returns the full
 #' named list of `from`/`to` tibbles by default, or a single tibble when
 #' `variable` is supplied.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param variable Optional character scalar. When `NULL` (default), returns
 #'   the full named list of connection tables (one per variable). When a
 #'   variable name, returns just that variable's `from`/`to` tibble (an empty
@@ -101,11 +101,11 @@ set_connections <- function(data, connections, variable = "keypoint") {
 #' @seealso [set_connections()], [add_connections()], [remove_connections()]
 #'
 #' @examples
-#' af <- example_aniframe(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+#' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' get_connections(af)
 #' @export
 get_connections <- function(data, variable = NULL) {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   current <- get_metadata(data, "connections")
   if (is.null(current)) {
     current <- list()
@@ -122,7 +122,7 @@ get_connections <- function(data, variable = NULL) {
   conn
 }
 
-#' Add connections to an aniframe
+#' Add connections to an anipoint
 #'
 #' @description
 #' **\[Experimental\]**
@@ -131,7 +131,7 @@ get_connections <- function(data, variable = NULL) {
 #' variable. `from` and `to` may be either single strings or character vectors
 #' of equal length (one connection per element).
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param from Character vector of source endpoints.
 #' @param to Character vector of target endpoints. Must be the same length
 #'   as `from`.
@@ -139,7 +139,7 @@ get_connections <- function(data, variable = NULL) {
 #'   relate to (must be in `variables_what` or `variables_when`). Defaults
 #'   to `"keypoint"`.
 #'
-#' @return The aniframe with the new connections appended.
+#' @return The anipoint with the new connections appended.
 #'
 #' @details
 #' No deduplication is performed — duplicates of an existing pair will appear
@@ -150,7 +150,7 @@ get_connections <- function(data, variable = NULL) {
 #'
 #' @examples
 #' \dontrun{
-#' data <- example_aniframe()
+#' data <- example_anipoint()
 #' data <- add_connections(data, from = "head", to = "neck")
 #' data <- add_connections(
 #'   data,
@@ -161,7 +161,7 @@ get_connections <- function(data, variable = NULL) {
 #'
 #' @export
 add_connections <- function(data, from, to, variable = "keypoint") {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_known_connection_variable(data, variable)
 
   pairs <- coerce_from_to_to_df(from, to)
@@ -177,7 +177,7 @@ add_connections <- function(data, from, to, variable = "keypoint") {
   set_metadata(data, connections = current)
 }
 
-#' Remove connections from an aniframe
+#' Remove connections from an anipoint
 #'
 #' @description
 #' **\[Experimental\]**
@@ -188,27 +188,27 @@ add_connections <- function(data, from, to, variable = "keypoint") {
 #' to = "a")`. Call twice with swapped arguments if you want both directions
 #' gone.
 #'
-#' @param data An aniframe object.
+#' @param data An anipoint object.
 #' @param from Character vector of source endpoints to remove.
 #' @param to Character vector of target endpoints to remove. Must be the same
 #'   length as `from`.
 #' @param variable Character scalar. Name of the variable. Defaults to
 #'   `"keypoint"`.
 #'
-#' @return The aniframe with matching connections removed.
+#' @return The anipoint with matching connections removed.
 #'
 #' @seealso [set_connections()], [get_connections()], [add_connections()]
 #'
 #' @examples
 #' \dontrun{
-#' data <- example_aniframe() |>
+#' data <- example_anipoint() |>
 #'   add_connections(from = c("head", "neck"), to = c("neck", "shoulder_right"))
 #' data <- remove_connections(data, from = "head", to = "neck")
 #' }
 #'
 #' @export
 remove_connections <- function(data, from, to, variable = "keypoint") {
-  ensure_is_aniframe(data)
+  ensure_is_anipoint(data)
   ensure_known_connection_variable(data, variable)
 
   to_remove <- coerce_from_to_to_df(from, to)
