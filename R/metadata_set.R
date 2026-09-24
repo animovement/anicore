@@ -219,6 +219,9 @@ set_metadata <- function(data, ..., metadata = NULL) {
 #' @return `md`.
 #' @keywords internal
 check_orientation_fields <- function(data, md, user_md) {
+  if (any(c("euler_sequence", "euler_intrinsic") %in% names(user_md))) {
+    md <- check_euler_convention(md)
+  }
   if ("axis_extents" %in% names(user_md)) {
     ensure_valid_axis_extents(user_md$axis_extents)
     extents <- user_md$axis_extents
@@ -244,4 +247,40 @@ check_orientation_fields <- function(data, md, user_md) {
     }
   }
   md
+}
+
+
+#' Validate a recorded Euler convention
+#'
+#' The sequence and whether it is intrinsic are only meaningful together, so
+#' both are set or neither.
+#'
+#' @param md The metadata about to be written.
+#'
+#' @return `md`, with the sequence in upper case.
+#' @keywords internal
+check_euler_convention <- function(md) {
+  sequence <- md_field(md, "euler_sequence")
+  intrinsic <- md_field(md, "euler_intrinsic")
+  if (is.na(sequence) && is.na(intrinsic)) {
+    return(md)
+  }
+  if (is.na(sequence) || is.na(intrinsic)) {
+    cli::cli_abort(c(
+      "{.field euler_sequence} and {.field euler_intrinsic} are set together.",
+      "i" = "For example {.code set_metadata(x, euler_sequence = \"ZYX\", euler_intrinsic = TRUE)}."
+    ))
+  }
+  axes <- strsplit(toupper(sequence), "")[[1]]
+  if (
+    length(axes) != 3L ||
+      !all(axes %in% c("X", "Y", "Z")) ||
+      axes[[1]] == axes[[2]] ||
+      axes[[2]] == axes[[3]]
+  ) {
+    cli::cli_abort(
+      "{.field euler_sequence} must be three axes with no axis repeated consecutively, such as {.val ZYX}, not {.val {sequence}}."
+    )
+  }
+  md_field_set(md, "euler_sequence", paste(axes, collapse = ""))
 }
