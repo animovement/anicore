@@ -314,12 +314,12 @@ and `transform_euler_to_quaternion()` read them.
 
 ## Heading is not direction of travel
 
-Orientation records measured state: FicTrac’s ball rotation, a TRex
-posture angle, a rigid body from motion capture. The direction of travel
-is a different quantity, derived from successive positions, and the two
-disagree exactly when it is interesting — side-slip, backing up, drift.
-Keep derived travel direction in an ordinary column, not in
-`where$orientation`.
+Orientation records measured state: FicTrac’s heading (integrated from
+the ball’s rotation), a TRex posture angle, a rigid body from motion
+capture. The direction of travel is a different quantity, derived from
+successive positions, and the two disagree exactly when it is
+interesting — side-slip, backing up, drift. Keep derived travel
+direction in an ordinary column, not in `where$orientation`.
 
 Nor is every angle a tracker reports a `yaw`. Blob and mask trackers
 such as Bonsai and Octron give the angle of an ellipse’s long axis,

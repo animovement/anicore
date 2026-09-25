@@ -324,7 +324,7 @@
 <p>The two are set together. anispace’s <code>transform_quaternion_to_euler()</code> and <code>transform_euler_to_quaternion()</code> read them.</p>
 </section></section><section class="level2"><h2 id="heading-is-not-direction-of-travel">Heading is not direction of travel<a class="anchor" aria-label="anchor" href="#heading-is-not-direction-of-travel"></a>
 </h2>
-<p>Orientation records measured state: FicTrac’s ball rotation, a TRex posture angle, a rigid body from motion capture. The direction of travel is a different quantity, derived from successive positions, and the two disagree exactly when it is interesting — side-slip, backing up, drift. Keep derived travel direction in an ordinary column, not in <code>where$orientation</code>.</p>
+<p>Orientation records measured state: FicTrac’s heading (integrated from the ball’s rotation), a TRex posture angle, a rigid body from motion capture. The direction of travel is a different quantity, derived from successive positions, and the two disagree exactly when it is interesting — side-slip, backing up, drift. Keep derived travel direction in an ordinary column, not in <code>where$orientation</code>.</p>
 <p>Nor is every angle a tracker reports a <code>yaw</code>. Blob and mask trackers such as Bonsai and Octron give the angle of an ellipse’s long axis, which has no front: θ and θ + π are the same. Declared as <code>yaw</code>, a mean, a difference or a reflection would mix front and back, so these stay as undeclared columns for now (see <a href="https://github.com/animovement/anicore/issues/165" class="external-link">#165</a>).</p>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
