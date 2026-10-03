@@ -1,5 +1,7 @@
 # Convert segments to joints: one angle per joint
 
+**\[experimental\]**
+
 Computes the angle of each joint of a structure from the directions of
 its two segments `a` and `b`, with
 [`angle_between()`](https://animovement.dev/anicore/reference/angle_between.md):

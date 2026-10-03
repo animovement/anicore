@@ -208,6 +208,25 @@
   still carries through to column order and grouping, which is
   presentation: grouping by `(a, b)` and `(b, a)` gives the same groups.
 
+- Help pages now show each function’s lifecycle stage
+  (animovement/.github#46); a function without a badge is stable. The
+  structure family is marked experimental, since its design is still
+  being worked out
+  ([\#154](https://github.com/animovement/anicore/issues/154),
+  [\#162](https://github.com/animovement/anicore/issues/162)):
+  [`anistructure()`](https://animovement.dev/anicore/reference/anistructure.md),
+  [`validate_anistructure()`](https://animovement.dev/anicore/reference/validate_anistructure.md),
+  [`set_structure()`](https://animovement.dev/anicore/reference/structures.md),
+  [`get_structure()`](https://animovement.dev/anicore/reference/structures.md),
+  [`remove_structure()`](https://animovement.dev/anicore/reference/structures.md),
+  [`as_anisegment()`](https://animovement.dev/anicore/reference/as_anisegment.md)
+  and
+  [`as_anijoint()`](https://animovement.dev/anicore/reference/as_anijoint.md),
+  together with the `anisegment` and `anijoint` classes they return, and
+  the `root` argument of
+  [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md).
+  Experimental functions may change without a deprecation cycle.
+
 ## anicore 0.8.0 (2026-08-28)
 
 ### Changed

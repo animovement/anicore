@@ -1,6 +1,6 @@
 # Check that a structure is internally consistent
 
-Check that a structure is internally consistent
+**\[experimental\]**
 
 ## Usage
 

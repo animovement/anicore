@@ -1,5 +1,7 @@
 # Create a structure: points, the segments between them, and joints
 
+**\[experimental\]**
+
 An `anistructure` describes how the levels of one identity or temporal
 variable relate: the keypoints of a skeleton, or the players of a team.
 It has three parts, each optional beyond the first:

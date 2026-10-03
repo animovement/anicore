@@ -114,7 +114,8 @@ identity or temporal variable. A frame can hold several named
 structures.
 
 - [`anistructure()`](https://animovement.dev/anicore/reference/anistructure.md)
-  : Create a structure: points, the segments between them, and joints
+  **\[experimental\]** : Create a structure: points, the segments
+  between them, and joints
 
 - [`example_structure()`](https://animovement.dev/anicore/reference/example_structure.md)
   :
@@ -123,7 +124,7 @@ structures.
   [`example_anipoint()`](https://animovement.dev/anicore/reference/example_anipoint.md)
 
 - [`validate_anistructure()`](https://animovement.dev/anicore/reference/validate_anistructure.md)
-  : Check that a structure is internally consistent
+  **\[experimental\]** : Check that a structure is internally consistent
 
 - [`is_anistructure()`](https://animovement.dev/anicore/reference/is_anistructure.md)
   [`ensure_is_anistructure()`](https://animovement.dev/anicore/reference/is_anistructure.md)
@@ -132,7 +133,8 @@ structures.
 - [`set_structure()`](https://animovement.dev/anicore/reference/structures.md)
   [`get_structure()`](https://animovement.dev/anicore/reference/structures.md)
   [`remove_structure()`](https://animovement.dev/anicore/reference/structures.md)
-  : Attach, read and remove the structures of a frame
+  **\[experimental\]** : Attach, read and remove the structures of a
+  frame
 
 ## Segments
 
@@ -140,8 +142,8 @@ The same data re-expressed per segment: a length and a unit direction,
 converted from and back to an anipoint.
 
 - [`as_anisegment()`](https://animovement.dev/anicore/reference/as_anisegment.md)
-  : Convert an anipoint to segments: a length and a direction per
-  segment
+  **\[experimental\]** : Convert an anipoint to segments: a length and a
+  direction per segment
 - [`is_anisegment()`](https://animovement.dev/anicore/reference/is_anisegment.md)
   [`ensure_is_anisegment()`](https://animovement.dev/anicore/reference/is_anisegment.md)
   : Test whether an object is an anisegment
@@ -151,7 +153,7 @@ converted from and back to an anipoint.
 One angle per joint, computed from its two segments.
 
 - [`as_anijoint()`](https://animovement.dev/anicore/reference/as_anijoint.md)
-  : Convert segments to joints: one angle per joint
+  **\[experimental\]** : Convert segments to joints: one angle per joint
 - [`is_anijoint()`](https://animovement.dev/anicore/reference/is_anijoint.md)
   [`ensure_is_anijoint()`](https://animovement.dev/anicore/reference/is_anijoint.md)
   : Test whether an object is an anijoint

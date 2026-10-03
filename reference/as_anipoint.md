@@ -71,7 +71,7 @@ as_anipoint(
 
 - root:
 
-  For an
+  **\[experimental\]** For an
   [`as_anisegment()`](https://animovement.dev/anicore/reference/as_anisegment.md)
   frame: an anipoint holding the root point's trajectory, such as the
   frame the segments came from. The other points are rebuilt by walking

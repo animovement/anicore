@@ -1,5 +1,7 @@
 # Attach, read and remove the structures of a frame
 
+**\[experimental\]**
+
 A frame can carry any number of named
 [`anistructure()`](https://animovement.dev/anicore/reference/anistructure.md)s,
 each spanning the levels of one identity or temporal variable. Several
