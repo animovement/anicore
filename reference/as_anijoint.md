@@ -59,15 +59,15 @@ as_anijoint(af)
 #> # anijoint:  9 × 7
 #> # Groups:    individual, joint, session, trial [3]
 #> # Structure: keypoint
-#>   individual joint      session trial  time  angle confidence
-#>        <int> <fct>        <int> <int> <int>  <dbl>      <dbl>
-#> 1          1 neck             1     1     1  2.77       0.568
-#> 2          1 neck             1     1     2  1.78       0.466
-#> 3          1 neck             1     1     3 -0.373      0.823
-#> 4          1 knee_right       1     1     1  2.35       0.500
-#> 5          1 knee_right       1     1     2 -1.22       0.547
-#> 6          1 knee_right       1     1     3 -3.02       0.427
-#> 7          1 knee_left        1     1     1 -1.89       0.749
-#> 8          1 knee_left        1     1     2 -1.44       0.541
-#> 9          1 knee_left        1     1     3  2.93       0.614
+#>   individual joint      session trial  time angle confidence
+#>        <int> <fct>        <int> <int> <int> <dbl>      <dbl>
+#> 1          1 neck             1     1     1 -2.99      0.379
+#> 2          1 neck             1     1     2  1.59      0.568
+#> 3          1 neck             1     1     3  2.51      0.547
+#> 4          1 knee_right       1     1     1 -1.45      0.427
+#> 5          1 knee_right       1     1     2 -2.15      0.843
+#> 6          1 knee_right       1     1     3  2.26      0.549
+#> 7          1 knee_left        1     1     1 -2.58      0.614
+#> 8          1 knee_left        1     1     2  1.10      0.783
+#> 9          1 knee_left        1     1     3 -3.13      0.586
 ```

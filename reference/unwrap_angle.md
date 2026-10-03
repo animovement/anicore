@@ -25,6 +25,7 @@ discontinuities.
 ## See also
 
 Other angle utilities:
+[`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md),
 [`deg_to_rad()`](https://animovement.dev/anicore/reference/deg_to_rad.md),
 [`rad_to_deg()`](https://animovement.dev/anicore/reference/rad_to_deg.md),
 [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)

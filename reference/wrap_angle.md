@@ -40,6 +40,7 @@ A numeric vector the same length as `x`, wrapped to the chosen range.
 ## See also
 
 Other angle utilities:
+[`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md),
 [`deg_to_rad()`](https://animovement.dev/anicore/reference/deg_to_rad.md),
 [`rad_to_deg()`](https://animovement.dev/anicore/reference/rad_to_deg.md),
 [`unwrap_angle()`](https://animovement.dev/anicore/reference/unwrap_angle.md)

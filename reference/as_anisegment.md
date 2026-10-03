@@ -53,18 +53,18 @@ seg
 #> # anisegment: 30 × 9
 #> # Groups:     individual, segment, session, trial [10]
 #> # Structure:  keypoint
-#>    individual segment       session trial  time length     ux      uy confidence
-#>         <int> <fct>           <int> <int> <int>  <dbl>  <dbl>   <dbl>      <dbl>
-#>  1          1 spine               1     1     1  3.79  -0.770 -0.638       0.555
-#>  2          1 spine               1     1     2  2.34  -0.970 -0.242       0.550
-#>  3          1 spine               1     1     3  2.20  -0.903 -0.429       0.463
-#>  4          1 head                1     1     1  2.89   0.534  0.846       0.555
-#>  5          1 head                1     1     2  0.583  0.974  0.228       0.550
-#>  6          1 head                1     1     3  2.08  -0.176  0.984       0.473
-#>  7          1 shoulder_rig…       1     1     1  1.60   0.993  0.114       0.555
-#>  8          1 shoulder_rig…       1     1     2  1.46   0.827  0.563       0.550
-#>  9          1 shoulder_rig…       1     1     3  1.63   0.599  0.801       0.473
-#> 10          1 shoulder_left       1     1     1  0.839  0.997 -0.0811      0.555
+#>    individual segment        session trial  time length     ux     uy confidence
+#>         <int> <fct>            <int> <int> <int>  <dbl>  <dbl>  <dbl>      <dbl>
+#>  1          1 spine                1     1     1  1.65   0.357 -0.934      0.703
+#>  2          1 spine                1     1     2  2.19   0.463  0.887      0.497
+#>  3          1 spine                1     1     3  2.46   0.546  0.838      0.698
+#>  4          1 head                 1     1     1  1.59  -0.105  0.994      0.745
+#>  5          1 head                 1     1     2  3.24  -0.642 -0.767      0.497
+#>  6          1 head                 1     1     3  1.62  -0.715 -0.699      0.698
+#>  7          1 shoulder_right       1     1     1  1.47   0.568  0.823      0.862
+#>  8          1 shoulder_right       1     1     2  2.96  -0.476 -0.879      0.463
+#>  9          1 shoulder_right       1     1     3  0.434 -0.828 -0.561      0.698
+#> 10          1 shoulder_left        1     1     1  0.627  0.151  0.989      0.751
 #> # ℹ 20 more rows
 
 # Hold each segment's length constant, then rebuild the positions

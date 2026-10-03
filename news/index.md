@@ -93,6 +93,21 @@
 
 ### Added
 
+- [`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
+  and
+  [`angle_from_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
+  convert angle values between radians and a frame’s declared
+  `unit_angle`, for functions that compute angles in radians and return
+  them in the frame’s unit
+  ([\#170](https://github.com/animovement/anicore/issues/170)). The
+  frame’s unit, or a unit string read once for use inside `mutate()`,
+  says which. A frame that declares no angular unit (`"none"`, or an
+  anievent) is read as radians.
+  [`as_anijoint()`](https://animovement.dev/anicore/reference/as_anijoint.md)
+  and
+  [`reflect_axis()`](https://animovement.dev/anicore/reference/reflect_axis.md)
+  use them in place of their own copies of the check.
+
 - [`as_anisegment()`](https://animovement.dev/anicore/reference/as_anisegment.md)
   gives one row per segment of a structure: its `length` and unit
   direction

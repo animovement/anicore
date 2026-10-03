@@ -21,6 +21,7 @@ Numeric vector of angles expressed in radians.
 ## See also
 
 Other angle utilities:
+[`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md),
 [`rad_to_deg()`](https://animovement.dev/anicore/reference/rad_to_deg.md),
 [`unwrap_angle()`](https://animovement.dev/anicore/reference/unwrap_angle.md),
 [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)

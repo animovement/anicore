@@ -14,6 +14,7 @@
 <url><loc>https://animovement.dev/anicore/news/index.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/add_default_identity.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/angle_between.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/angle_to_rad.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/anicore-deprecated.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/anicore.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/anievent.html</loc></url>
@@ -186,6 +187,7 @@
 <url><loc>https://animovement.dev/anicore/reference/resolve_axis_extents.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/resolve_index.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/resolve_segment_structure.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/resolve_unit_angle.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/resolve_unit_time_calibration.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/restructure_anievent.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/restructure_anipoint.html</loc></url>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +87,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="added-development-version">Added<a class="anchor" aria-label="anchor" href="#added-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/as_anisegment.html">as_anisegment()</a></code> gives one row per segment of a structure: its <code>length</code> and unit direction (<a href="https://github.com/animovement/anicore/issues/154" class="external-link">#154</a>). <code>as_anipoint(seg, root = )</code> rebuilds positions from segments, for example after holding lengths constant.</p></li>
+<ul><li><p><code><a href="../reference/angle_to_rad.html">angle_to_rad()</a></code> and <code><a href="../reference/angle_to_rad.html">angle_from_rad()</a></code> convert angle values between radians and a frame’s declared <code>unit_angle</code>, for functions that compute angles in radians and return them in the frame’s unit (<a href="https://github.com/animovement/anicore/issues/170" class="external-link">#170</a>). The frame’s unit, or a unit string read once for use inside <code>mutate()</code>, says which. A frame that declares no angular unit (<code>"none"</code>, or an anievent) is read as radians. <code><a href="../reference/as_anijoint.html">as_anijoint()</a></code> and <code><a href="../reference/reflect_axis.html">reflect_axis()</a></code> use them in place of their own copies of the check.</p></li>
+<li><p><code><a href="../reference/as_anisegment.html">as_anisegment()</a></code> gives one row per segment of a structure: its <code>length</code> and unit direction (<a href="https://github.com/animovement/anicore/issues/154" class="external-link">#154</a>). <code>as_anipoint(seg, root = )</code> rebuilds positions from segments, for example after holding lengths constant.</p></li>
 <li><p><code><a href="../reference/as_anijoint.html">as_anijoint()</a></code> gives one angle per joint of a structure (<a href="https://github.com/animovement/anicore/issues/154" class="external-link">#154</a>). <code><a href="../reference/angle_between.html">angle_between()</a></code> is the underlying computation.</p></li>
 <li><p>Orientation can be declared alongside position: <code>yaw</code> in 2D, or a unit quaternion in 3D (<a href="https://github.com/animovement/anicore/issues/46" class="external-link">#46</a>). <code><a href="../reference/reflect_axis.html">reflect_axis()</a></code> and <code><a href="../reference/convert_unit_angle.html">convert_unit_angle()</a></code> handle it, and <code>euler_sequence</code> and <code>euler_intrinsic</code> record the Euler convention a source uses.</p></li>
 <li><p><code><a href="../reference/convert_inf_to_na.html">convert_inf_to_na()</a></code>, the sibling of <code><a href="../reference/convert_nan_to_na.html">convert_nan_to_na()</a></code>, for sources that mark a missing observation with an infinity rather than a <code>NaN</code>. TRex is one — its own documentation masks <code>np.inf</code> out before plotting, and its <code>missing</code> flag is 1 in exactly those frames. Left in place an <code>Inf</code> propagates through arithmetic silently, so one untracked frame turns a mean or a speed into <code>Inf</code> rather than into a missing value (animovement/aniread#116).</p></li>

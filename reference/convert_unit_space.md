@@ -48,9 +48,9 @@ convert_unit_space(af_mm, "cm")
 #> # Keypoints:   centroid
 #> # Sessions:    1
 #> # Trials:      1
-#>   individual keypoint session trial  time       x        y confidence
-#>        <int> <fct>      <int> <int> <int>   <dbl>    <dbl>      <dbl>
-#> 1          1 centroid       1     1     1 -0.0317 -0.0236       0.243
-#> 2          1 centroid       1     1     2  0.0408 -0.0263       0.862
-#> 3          1 centroid       1     1     3  0.0151 -0.00476      0.724
+#>   individual keypoint session trial  time        x        y confidence
+#>        <int> <fct>      <int> <int> <int>    <dbl>    <dbl>      <dbl>
+#> 1          1 centroid       1     1     1 -0.00476  0.0584       0.638
+#> 2          1 centroid       1     1     2 -0.125   -0.00685      0.347
+#> 3          1 centroid       1     1     3  0.00834 -0.0257       0.534
 ```

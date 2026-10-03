@@ -212,6 +212,9 @@ the wrong answer, since the mean of 350 and 10 degrees is 0, not 180.
   : Convert radians to degrees
 - [`deg_to_rad()`](https://animovement.dev/anicore/reference/deg_to_rad.md)
   : Convert degrees to radians
+- [`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
+  [`angle_from_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
+  : Convert angles between radians and a frame's angular unit
 - [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
   : Constrain angles to a standard range
 - [`unwrap_angle()`](https://animovement.dev/anicore/reference/unwrap_angle.md)

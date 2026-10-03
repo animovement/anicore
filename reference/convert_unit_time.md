@@ -59,9 +59,9 @@ convert_unit_time(af, "s")
 #> # Trials:        1
 #> # Sampling rate: 30 Hz
 #> # Time:          00:00:00.033 to 00:00:00.100
-#>   individual keypoint session trial   time      x      y confidence
-#>        <int> <fct>      <int> <int>  <dbl>  <dbl>  <dbl>      <dbl>
-#> 1          1 centroid       1     1 0.0333 -2.50  -0.515      0.347
-#> 2          1 centroid       1     1 0.0667  0.167  1.52       0.534
-#> 3          1 centroid       1     1 0.1     0.350 -0.328      0.741
+#>   individual keypoint session trial   time       x      y confidence
+#>        <int> <fct>      <int> <int>  <dbl>   <dbl>  <dbl>      <dbl>
+#> 1          1 centroid       1     1 0.0333  1.52   -0.561      0.815
+#> 2          1 centroid       1     1 0.0667 -0.328   0.188      0.842
+#> 3          1 centroid       1     1 0.1    -0.0537  0.749      0.736
 ```
