@@ -14,6 +14,20 @@ validate_anistructure(x)
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+Checks the rules a structure has to satisfy:
+\itemize{
+\item points are unique and not \code{NA};
+\item every segment joins two known, different points, and any expected
+\code{length} is positive;
+\item every joint pairs two different, defined segments, about an \code{axis} that is
+\code{"x"}, \code{"y"}, \code{"z"} or a segment name;
+\item a joint's \code{min} is not above its \code{max}, and its \code{rest} lies between them;
+\item \code{root} is one of the points, or \code{NA}.
+}
+
+\code{\link[=anistructure]{anistructure()}} and \code{\link[=set_structure]{set_structure()}} call it, so a structure built there is
+already valid; call it yourself after editing a structure's parts by hand.
 }
 \examples{
 validate_anistructure(example_structure())

@@ -166,6 +166,18 @@ as_structure_joints <- function(joints) {
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
+#' Checks the rules a structure has to satisfy:
+#' * points are unique and not `NA`;
+#' * every segment joins two known, different points, and any expected
+#'   `length` is positive;
+#' * every joint pairs two different, defined segments, about an `axis` that is
+#'   `"x"`, `"y"`, `"z"` or a segment name;
+#' * a joint's `min` is not above its `max`, and its `rest` lies between them;
+#' * `root` is one of the points, or `NA`.
+#'
+#' [anistructure()] and [set_structure()] call it, so a structure built there is
+#' already valid; call it yourself after editing a structure's parts by hand.
+#'
 #' @param x An `anistructure`.
 #'
 #' @return `x`, invisibly; errors naming the first problem otherwise.

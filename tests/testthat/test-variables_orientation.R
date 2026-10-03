@@ -102,7 +102,10 @@ test_that("yaw is 2D and quaternions 3D", {
 test_that("a frame with no known coordinate system takes either", {
   df <- data.frame(time = 1:3, u = 1:3, v = 1:3, h = 0)
   af <- suppressWarnings(as_anipoint(df, variables_where = c("u", "v")))
-  af <- set_variables(af, where = list(orientation = c(yaw = "h")))
+  expect_warning(
+    af <- set_variables(af, where = list(orientation = c(yaw = "h"))),
+    "Could not infer coordinate system"
+  )
   expect_equal(get_variables(af, "where", "orientation"), c(yaw = "h"))
 })
 

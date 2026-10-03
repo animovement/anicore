@@ -95,7 +95,9 @@ test_that("an unnamed declaration that matches nothing still warns rather than a
   )
   expect_equal(as.character(get_metadata(af, "coordinate_system")), "unknown")
   expect_equal(get_variables(af, "where"), c("u", "v"))
-  expect_equal(get_axes(af), stats::setNames(character(), character()))
+  # get_axes() re-derives the axes, and so warns again
+  expect_warning(axes <- get_axes(af), "Could not infer coordinate system")
+  expect_equal(axes, stats::setNames(character(), character()))
 })
 
 test_that("set_variables() accepts a role mapping for where", {
@@ -468,5 +470,9 @@ test_that("resolve_axes() gives nothing when the columns name no system", {
   ))
   md$variables$where$position <- c("u", "v")
 
-  expect_equal(resolve_axes(md), stats::setNames(character(), character()))
+  expect_warning(
+    axes <- resolve_axes(md),
+    "Could not infer coordinate system"
+  )
+  expect_equal(axes, stats::setNames(character(), character()))
 })
