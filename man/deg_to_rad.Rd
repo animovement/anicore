@@ -22,6 +22,7 @@ deg_to_rad(c(0, 90, 180))
 }
 \seealso{
 Other angle utilities:
+\code{\link[=angle_to_rad]{angle_to_rad()}},
 \code{\link[=rad_to_deg]{rad_to_deg()}},
 \code{\link[=unwrap_angle]{unwrap_angle()}},
 \code{\link[=wrap_angle]{wrap_angle()}}

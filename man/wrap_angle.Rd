@@ -38,6 +38,7 @@ wrap_angle(angles, "asis")
 }
 \seealso{
 Other angle utilities:
+\code{\link[=angle_to_rad]{angle_to_rad()}},
 \code{\link[=deg_to_rad]{deg_to_rad()}},
 \code{\link[=rad_to_deg]{rad_to_deg()}},
 \code{\link[=unwrap_angle]{unwrap_angle()}}

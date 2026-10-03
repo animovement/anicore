@@ -22,6 +22,7 @@ rad_to_deg(c(0, pi / 2, pi))
 }
 \seealso{
 Other angle utilities:
+\code{\link[=angle_to_rad]{angle_to_rad()}},
 \code{\link[=deg_to_rad]{deg_to_rad()}},
 \code{\link[=unwrap_angle]{unwrap_angle()}},
 \code{\link[=wrap_angle]{wrap_angle()}}

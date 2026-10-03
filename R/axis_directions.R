@@ -410,7 +410,7 @@ reflect_angular_axis <- function(data, role) {
 #' @return The reflected angles, in the same unit and range.
 #' @keywords internal
 reflect_angle <- function(x, about, unit, wrap = TRUE, signed = FALSE) {
-  radians <- if (identical(unit, "deg")) deg_to_rad(x) else x
+  radians <- angle_to_rad(x, unit)
 
   reflected <- if (identical(about, "half_turn")) pi - radians else -radians
 
@@ -418,5 +418,5 @@ reflect_angle <- function(x, about, unit, wrap = TRUE, signed = FALSE) {
     reflected <- wrap_angle(reflected, modulo = if (signed) "pi" else "2pi")
   }
 
-  if (identical(unit, "deg")) rad_to_deg(reflected) else reflected
+  angle_from_rad(reflected, unit)
 }

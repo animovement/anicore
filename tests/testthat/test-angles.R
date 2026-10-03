@@ -101,3 +101,57 @@ test_that("the degree converters round-trip", {
   expect_equal(deg_to_rad(180), pi)
   expect_equal(deg_to_rad(rad_to_deg(c(0, 1, 2))), c(0, 1, 2))
 })
+
+# Converting between radians and a frame's unit (#170) ------------------------
+
+test_that("angle_from_rad() and angle_to_rad() follow a degree frame", {
+  af <- set_metadata(
+    example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1),
+    unit_angle = "deg"
+  )
+
+  expect_equal(angle_from_rad(c(0, pi / 2, -pi), af), c(0, 90, -180))
+  expect_equal(angle_to_rad(c(0, 90, -180), af), c(0, pi / 2, -pi))
+})
+
+test_that("a radian frame is left as it is", {
+  af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
+  expect_equal(as.character(get_metadata(af, "unit_angle")), "rad")
+
+  expect_equal(angle_from_rad(c(0, 1, NA), af), c(0, 1, NA))
+  expect_equal(angle_to_rad(c(0, 1, NA), af), c(0, 1, NA))
+})
+
+test_that("the unit can be given as a string or a factor", {
+  expect_equal(angle_from_rad(pi, "deg"), 180)
+  expect_equal(angle_to_rad(180, "deg"), pi)
+  expect_equal(angle_from_rad(pi, "rad"), pi)
+  expect_equal(angle_to_rad(180, factor("deg")), pi)
+})
+
+test_that("no declared angular unit is read as radians", {
+  expect_equal(angle_from_rad(pi, "none"), pi)
+  expect_equal(angle_to_rad(pi, "none"), pi)
+
+  # An anievent has no spatial metadata at all
+  ae <- anievent(
+    individual = 1L,
+    channel = "behaviour",
+    label = "REM",
+    start = 3,
+    stop = 9
+  )
+  expect_null(get_metadata(ae, "unit_angle"))
+  expect_equal(angle_from_rad(pi, ae), pi)
+})
+
+test_that("an unknown unit is an error", {
+  expect_error(angle_to_rad(1, "turns"), "must be an aniframe or one of")
+  expect_error(angle_from_rad(1, c("rad", "deg")), "must be an aniframe")
+  expect_error(angle_from_rad(1, NULL), "must be an aniframe")
+})
+
+test_that("rates convert like angles", {
+  # 1 rad/s is 180/pi deg/s
+  expect_equal(angle_from_rad(1, "deg"), 180 / pi)
+})
