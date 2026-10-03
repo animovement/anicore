@@ -154,14 +154,26 @@ test_that("anievent methods preserve a downstream subclass", {
 # ---- the helper itself -------------------------------------------------
 
 test_that("preserve_animovement_class restores order and drops dplyr classes", {
-  bare <- dplyr::tibble(a = 1)
+  md <- list_default_metadata()
+  bare <- dplyr::tibble(!!!rlang::rep_named(list_frame_columns(md), 1), a = 1)
   cls <- c("test_kin", "aniframe", "grouped_df", "tbl_df", "tbl", "data.frame")
 
-  out <- preserve_animovement_class(bare, cls, list_default_metadata())
+  out <- preserve_animovement_class(bare, cls, md)
 
   expect_identical(
     class(out),
     c("test_kin", "aniframe", "tbl_df", "tbl", "data.frame")
   )
   expect_false(inherits(out, "grouped_df"))
+})
+
+test_that("preserve_animovement_class strips a result missing a frame column (#178)", {
+  md <- list_default_metadata()
+  cls <- c("anipoint", "aniframe", "tbl_df", "tbl", "data.frame")
+
+  out <- preserve_animovement_class(dplyr::tibble(a = 1), cls, md)
+
+  expect_identical(class(out), c("tbl_df", "tbl", "data.frame"))
+  expect_null(attr(out, "metadata"))
+  expect_identical(list_frame_columns(NULL), character())
 })

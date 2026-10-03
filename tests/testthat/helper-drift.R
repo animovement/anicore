@@ -34,3 +34,15 @@ drift_metadata <- function(data, ...) {
   }
   attach_metadata(data, md)
 }
+
+# Drop a column while keeping the frame's class and metadata. The methods
+# refuse to make a frame missing a key or its index (#178), so tests of what
+# catches one build it by hand.
+drop_column_unchecked <- function(data, col) {
+  cls <- class(data)
+  md <- get_metadata(data)
+  bare <- dplyr::ungroup(strip_animovement_class(data))
+  bare[[col]] <- NULL
+  class(bare) <- c(setdiff(cls, list_base_frame_classes()), class(bare))
+  attach_metadata(bare, md)
+}

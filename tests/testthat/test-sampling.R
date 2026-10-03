@@ -159,7 +159,7 @@ test_that("a non-numeric index does not abort construction", {
 
 test_that("no gaps are taken when the index column is gone", {
   af <- example_anipoint(n_obs = 5, n_individuals = 1, n_keypoints = 1)
-  stripped <- suppressWarnings(dplyr::select(dplyr::ungroup(af), -"time"))
+  stripped <- drop_column_unchecked(af, "time")
 
   expect_equal(compute_sampling_gaps(stripped), numeric())
 })

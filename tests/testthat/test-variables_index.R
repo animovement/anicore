@@ -259,8 +259,7 @@ test_that("validate_anipoint() catches an index column that has been dropped", {
     data.frame(frame = c(1, 2, 3), individual = "a", x = 1:3, y = 1:3),
     index = "frame"
   )
-  dropped <- af
-  dropped$frame <- NULL
+  dropped <- drop_column_unchecked(af, "frame")
 
   expect_error(validate_anipoint(dropped), "Index column")
 })
@@ -344,7 +343,7 @@ test_that("there is nothing to check when no key column is present", {
     data.frame(time = 1:3, x = 1:3, y = 1:3),
     variables_what = character(0)
   ))
-  stripped <- suppressWarnings(dplyr::select(dplyr::ungroup(af), -"time"))
+  stripped <- drop_column_unchecked(af, "time")
 
   expect_no_warning(warn_duplicate_observations(stripped))
   expect_true(warn_duplicate_observations(stripped))
