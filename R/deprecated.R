@@ -2,6 +2,9 @@
 
 #' Deprecated aniframe constructors
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
 #' The position-grain frame is now called `anipoint`; `aniframe` names the
 #' abstract parent class shared with [anievent][is_anievent()]. These
 #' aliases forward to their replacements.

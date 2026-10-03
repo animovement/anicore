@@ -13,6 +13,7 @@
 #'   slice
 #'   ungroup
 #'
+#' @importFrom lifecycle deprecated
 #' @importFrom rlang .data
 #' @keywords internal
 "_PACKAGE"
