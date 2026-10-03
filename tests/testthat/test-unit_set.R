@@ -412,9 +412,13 @@ test_that("convert_unit_space warns rather than silently claiming a unit it did 
     variables_where = c("u", "v")
   ))
 
+  # The frame has no known coordinate system, which is warned about too
   expect_warning(
-    convert_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10),
-    "No length axes found"
+    expect_warning(
+      convert_unit_space(data, to_unit = "cm", calibration_factor = 1 / 10),
+      "No length axes found"
+    ),
+    "Could not infer coordinate system"
   )
 })
 
