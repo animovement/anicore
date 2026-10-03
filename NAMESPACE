@@ -134,5 +134,6 @@ importFrom(dplyr,
   slice,
   ungroup
 )
+importFrom(lifecycle,deprecated)
 importFrom(pillar,tbl_sum)
 importFrom(rlang,.data)

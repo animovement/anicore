@@ -25,6 +25,8 @@ validate_aniframe(data)
 The replacement function's value.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
 The position-grain frame is now called \code{anipoint}; \code{aniframe} names the
 abstract parent class shared with \link[=is_anievent]{anievent}. These
 aliases forward to their replacements.
