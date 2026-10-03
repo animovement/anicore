@@ -1,5 +1,22 @@
 # Each method captures the class vector before dispatch and restores it, so
-# downstream subclasses survive a pipeline (#81).
+# downstream subclasses survive a pipeline (#81). A result missing a key,
+# the index or an interval bound comes back as a plain data frame instead,
+# and renaming carries the new names into the metadata (#178).
+
+#' The metadata for a verb's result
+#'
+#' `rename()` and `select()` rename through `names<-`, whose method has
+#' already carried the new names into the result's metadata; take it from
+#' there rather than restoring the stale copy captured before dispatch.
+#'
+#' @param x The result returned by `NextMethod()`.
+#' @param md Metadata captured before dispatch.
+#'
+#' @return Metadata list.
+#' @keywords internal
+renamed_metadata <- function(x, md) {
+  if (inherits(x, "aniframe")) get_metadata(x) else md
+}
 
 # ---- dplyr verb methods ----
 
@@ -60,7 +77,7 @@ select.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, renamed_metadata(x, md))
 }
 
 #' Filter rows of an aniframe
@@ -104,7 +121,7 @@ rename.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, renamed_metadata(x, md))
 }
 
 #' Relocate columns in an aniframe
@@ -117,9 +134,8 @@ rename.aniframe <- function(.data, ...) {
 relocate.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
-  class(.data) <- setdiff(class(.data), "aniframe")
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, renamed_metadata(x, md))
 }
 
 #' Slice rows from an aniframe
@@ -253,8 +269,10 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
 `names<-.aniframe` <- function(x, value) {
   cls <- class(x)
   md <- get_metadata(x)
+  from <- names(x)
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
+  md <- rename_metadata_columns(md, from, names(x))
   preserve_animovement_class(x, cls, md)
 }
 

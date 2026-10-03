@@ -11,10 +11,15 @@ preserve_animovement_class(x, cls, md)
 
 \item{cls}{Class vector of the original input, captured before dispatch.}
 
-\item{md}{Metadata captured before dispatch via \code{\link[=get_metadata]{get_metadata()}}.}
+\item{md}{Metadata captured before dispatch via \code{\link[=get_metadata]{get_metadata()}}.
+
+A result that has lost a column the frame is keyed, indexed or bounded by
+is no longer that frame: it comes back as the plain data frame, without
+metadata that would describe columns it does not have (#178).}
 }
 \value{
-\code{x} with the animovement classes and metadata restored.
+\code{x} with the animovement classes and metadata restored, or \code{x}
+without them when it lacks a column from \code{\link[=list_frame_columns]{list_frame_columns()}}.
 }
 \description{
 Restores the incoming class stack, so downstream subclasses survive

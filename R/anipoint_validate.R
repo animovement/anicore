@@ -266,9 +266,10 @@ ensure_is_spatial <- function(data) {
 #' @keywords internal
 warn_coordinate_system_drift <- function(data) {
   md <- get_metadata(data)
-  declared <- as.character(unname(md_where_position(md))[
-    !is.na(unname(md_where_position(md)))
-  ])
+  # The system follows from the axis roles, not the columns' names, which
+  # may be anything (#109, #178).
+  position <- md_where_position(md)
+  declared <- names(position) %||% unname(position)
   recorded <- as.character(md_field(md, "coordinate_system"))
   # The mismatch is reported below instead.
   implied <- suppressWarnings(infer_coordinate_system(declared))

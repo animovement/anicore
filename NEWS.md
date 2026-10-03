@@ -19,6 +19,8 @@
 
 * Structures replace connections (#154). An `anistructure()` holds points, segments with optional expected lengths, and joints: angles between two segments, with optional limits. A frame can hold several named structures, including several over one variable, through `set_structure()`, `get_structure()` and `remove_structure()`. The `*_connections()` functions are removed; stored connection tables become structures.
 
+* Subsetting a frame so that it loses a column it is keyed, indexed or bounded by gives a plain tibble rather than a frame whose metadata names columns it does not have (#178). This covers `[`, `select()`, `distinct()` and removing a column with `$<-` or `[[<-`. `af[c("x", "y")]` and `select(af, x, y)` used to return an anipoint missing its `time` and keys, which `ensure_is_anipoint()` accepted and later steps tripped over; they now return the columns asked for, ready for plain data-frame work. Dropping a declared value column (a position, an orientation) still returns the frame, so it can be re-declared.
+
 ## Added
 
 * `angle_to_rad()` and `angle_from_rad()` convert angle values between radians and a frame's declared `unit_angle`, for functions that compute angles in radians and return them in the frame's unit (#170). The frame's unit, or a unit string read once for use inside `mutate()`, says which. A frame that declares no angular unit (`"none"`, or an anievent) is read as radians. `as_anijoint()` and `reflect_axis()` use them in place of their own copies of the check.
@@ -50,6 +52,12 @@
   No behaviour changes. Detection emits the same order, and the order still carries through to column order and grouping, which is presentation: grouping by `(a, b)` and `(b, a)` gives the same groups.
 
 * Help pages now show each function's lifecycle stage (animovement/.github#46); a function without a badge is stable. The structure family is marked experimental, since its design is still being worked out (#154, #162): `anistructure()`, `validate_anistructure()`, `set_structure()`, `get_structure()`, `remove_structure()`, `as_anisegment()` and `as_anijoint()`, together with the `anisegment` and `anijoint` classes they return, and the `root` argument of `as_anipoint()`. Experimental functions may change without a deprecation cycle.
+
+## Fixed
+
+* Renaming columns carries the new names into the metadata (#178). `rename()`, `rename_with()`, renaming in `select()` or `relocate()`, and `names<-` used to leave the keys, the index, the interval, the declared variables and each structure's `variable` naming the old columns, so `rename(af, t = time)` gave a frame `validate_anipoint()` rejected.
+
+* `validate_anipoint()` no longer warns that `coordinate_system` is stale for a frame whose axis columns are named something other than their roles, as with `as_anipoint(df, variables_where = c(x = "u", y = "v"))` (#178). It compared the recorded system with one inferred from the column names rather than the axis roles.
 
 # anicore 0.8.0 (2026-08-28)
 

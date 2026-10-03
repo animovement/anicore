@@ -59,7 +59,30 @@ test_that("rename preserves anievent class and metadata", {
 
 test_that("select preserves anievent class and metadata", {
   ae <- make_anievent()
-  expect_anievent_with_md(dplyr::select(ae, "channel", "start", "stop"))
+  expect_anievent_with_md(
+    dplyr::select(ae, "individual", "channel", "start", "stop")
+  )
+})
+
+test_that("select without a key or a bound gives a plain data frame (#178)", {
+  ae <- make_anievent()
+  for (out in list(
+    dplyr::select(ae, "channel", "start", "stop"),
+    dplyr::select(ae, -"stop")
+  )) {
+    expect_false(inherits(out, "anievent"))
+    expect_null(attr(out, "metadata"))
+    expect_s3_class(out, "tbl_df")
+  }
+})
+
+test_that("renaming a bound carries it into the metadata (#178)", {
+  ae <- dplyr::rename(make_anievent(), onset = "start")
+  expect_anievent_with_md(ae)
+  expect_equal(
+    unname(get_variables(ae, "when", "interval")),
+    c("onset", "stop")
+  )
 })
 
 test_that("slice preserves anievent class and metadata", {

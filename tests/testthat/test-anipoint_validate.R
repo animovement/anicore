@@ -71,11 +71,7 @@ test_that("multiple missing columns are all named", {
 })
 
 test_that("a missing time column is caught", {
-  # Update `variables_when` too, or the declared-columns check fires first.
-  no_time <- drift_metadata(
-    dplyr::rename(make_flat_af(), moment = time),
-    variables_when = "moment"
-  )
+  no_time <- drop_column_unchecked(make_flat_af(), "time")
 
   expect_error(validate_anipoint(no_time), "required but not found")
 })
@@ -170,4 +166,13 @@ test_that("pluralisation reads correctly for one and several columns", {
     variables_where = c("x", "y")
   )
   expect_error(ensure_is_spatial(both), "columns:")
+})
+
+test_that("renamed axis columns do not look like a stale coordinate system", {
+  # The system follows from the axis roles, not the column names (#178)
+  af <- as_anipoint(
+    data.frame(time = 1:3, u = c(1, 2, 3), v = c(3, 2, 1)),
+    variables_where = c(x = "u", y = "v")
+  )
+  expect_silent(validate_anipoint(af))
 })
