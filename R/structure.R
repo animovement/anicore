@@ -1,6 +1,8 @@
 #' Attach, read and remove the structures of a frame
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' A frame can carry any number of named [anistructure()]s, each spanning the
 #' levels of one identity or temporal variable. Several may span the same
 #' variable and overlap: a football frame can hold `team`, `defence` and

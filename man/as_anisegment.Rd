@@ -16,6 +16,8 @@ one structure has segments.}
 An \code{anisegment}.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Re-expresses the positions of a structure's points as its segments. Each
 row is one segment at one time: its \code{length} and the unit vector \code{ux},
 \code{uy} (and \code{uz} in 3D) pointing from the segment's \code{from} point to its

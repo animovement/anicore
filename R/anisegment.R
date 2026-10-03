@@ -1,6 +1,8 @@
 #' Convert an anipoint to segments: a length and a direction per segment
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Re-expresses the positions of a structure's points as its segments. Each
 #' row is one segment at one time: its `length` and the unit vector `ux`,
 #' `uy` (and `uz` in 3D) pointing from the segment's `from` point to its

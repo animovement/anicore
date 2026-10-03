@@ -28,6 +28,8 @@ structures updated. \code{get_structure()}: a named list of structures, or
 one structure.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 A frame can carry any number of named \code{\link[=anistructure]{anistructure()}}s, each spanning the
 levels of one identity or temporal variable. Several may span the same
 variable and overlap: a football frame can hold \code{team}, \code{defence} and
