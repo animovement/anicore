@@ -1,5 +1,7 @@
 # Deprecated aniframe constructors
 
+**\[deprecated\]**
+
 The position-grain frame is now called `anipoint`; `aniframe` names the
 abstract parent class shared with
 [anievent](https://animovement.dev/anicore/reference/is_anievent.md).

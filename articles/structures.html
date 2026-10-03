@@ -186,18 +186,18 @@
 <span><span class="co">#&gt; # anisegment: 30 × 9</span></span>
 <span><span class="co">#&gt; # Groups:     individual, segment, session, trial [10]</span></span>
 <span><span class="co">#&gt; # Structure:  keypoint</span></span>
-<span><span class="co">#&gt;    individual segment       session trial  time length      ux     uy confidence</span></span>
-<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;           &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1          1 spine               1     1     1  1.08   0.0280 -1.000      0.693</span></span>
-<span><span class="co">#&gt;  2          1 spine               1     1     2  1.25   0.731  -0.682      0.582</span></span>
-<span><span class="co">#&gt;  3          1 spine               1     1     3  1.51   0.819  -0.573      0.523</span></span>
-<span><span class="co">#&gt;  4          1 head                1     1     1  1.20  -0.378   0.926      0.561</span></span>
-<span><span class="co">#&gt;  5          1 head                1     1     2  0.651 -0.760  -0.650      0.641</span></span>
-<span><span class="co">#&gt;  6          1 head                1     1     3  3.63  -0.863   0.506      0.424</span></span>
-<span><span class="co">#&gt;  7          1 shoulder_rig…       1     1     1  1.82  -0.964   0.265      0.693</span></span>
-<span><span class="co">#&gt;  8          1 shoulder_rig…       1     1     2  2.32  -0.934  -0.358      0.641</span></span>
-<span><span class="co">#&gt;  9          1 shoulder_rig…       1     1     3  3.06  -0.902   0.432      0.816</span></span>
-<span><span class="co">#&gt; 10          1 shoulder_left       1     1     1  2.40  -0.133   0.991      0.693</span></span>
+<span><span class="co">#&gt;    individual segment       session trial  time length     ux      uy confidence</span></span>
+<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;           &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1          1 spine               1     1     1   3.18  0.960 -0.280       0.285</span></span>
+<span><span class="co">#&gt;  2          1 spine               1     1     2   2.81 -0.550  0.835       0.716</span></span>
+<span><span class="co">#&gt;  3          1 spine               1     1     3   1.16  0.996 -0.0920      0.741</span></span>
+<span><span class="co">#&gt;  4          1 head                1     1     1   3.92 -0.757  0.653       0.686</span></span>
+<span><span class="co">#&gt;  5          1 head                1     1     2   2.14  0.889 -0.457       0.598</span></span>
+<span><span class="co">#&gt;  6          1 head                1     1     3   1.05 -0.823 -0.568       0.741</span></span>
+<span><span class="co">#&gt;  7          1 shoulder_rig…       1     1     1   2.35  0.154  0.988       0.691</span></span>
+<span><span class="co">#&gt;  8          1 shoulder_rig…       1     1     2   1.90  0.915 -0.403       0.616</span></span>
+<span><span class="co">#&gt;  9          1 shoulder_rig…       1     1     3   1.27 -0.634  0.773       0.523</span></span>
+<span><span class="co">#&gt; 10          1 shoulder_left       1     1     1   2.40 -0.977 -0.211       0.562</span></span>
 <span><span class="co">#&gt; # ℹ 20 more rows</span></span>
 <span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">seg</span>, <span class="st">"where"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "length" "ux"     "uy"</span></span></code></pre></div>
@@ -211,12 +211,12 @@
 <span><span class="co">#&gt; # A tibble: 6 × 5</span></span>
 <span><span class="co">#&gt;   individual segment        session trial length_sd</span></span>
 <span><span class="co">#&gt;        &lt;int&gt; &lt;fct&gt;            &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1          1 spine                1     1     0.217</span></span>
-<span><span class="co">#&gt; 2          1 head                 1     1     1.59 </span></span>
-<span><span class="co">#&gt; 3          1 shoulder_right       1     1     0.621</span></span>
-<span><span class="co">#&gt; 4          1 shoulder_left        1     1     0.507</span></span>
-<span><span class="co">#&gt; 5          1 hip_right            1     1     0.170</span></span>
-<span><span class="co">#&gt; 6          1 hip_left             1     1     0.472</span></span></code></pre></div>
+<span><span class="co">#&gt; 1          1 spine                1     1     1.07 </span></span>
+<span><span class="co">#&gt; 2          1 head                 1     1     1.45 </span></span>
+<span><span class="co">#&gt; 3          1 shoulder_right       1     1     0.544</span></span>
+<span><span class="co">#&gt; 4          1 shoulder_left        1     1     1.75 </span></span>
+<span><span class="co">#&gt; 5          1 hip_right            1     1     1.20 </span></span>
+<span><span class="co">#&gt; 6          1 hip_left             1     1     0.311</span></span></code></pre></div>
 </div>
 <p>Editing the segments and rebuilding the positions carries the edit into every point but the root. Holding each segment at its median length makes the body rigid:</p>
 <div class="cell">
@@ -230,18 +230,18 @@
 <span><span class="co">#&gt; #   shoulder_right, shoulder_left, foot_right, foot_left</span></span>
 <span><span class="co">#&gt; # Sessions:    1</span></span>
 <span><span class="co">#&gt; # Trials:      1</span></span>
-<span><span class="co">#&gt;    individual keypoint  session trial  time      x        y</span></span>
-<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;       &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1          1 abdomen         1     1     1 -0.701  0.0945 </span></span>
-<span><span class="co">#&gt;  2          1 abdomen         1     1     2 -0.113  0.848  </span></span>
-<span><span class="co">#&gt;  3          1 abdomen         1     1     3  0.201 -0.581  </span></span>
-<span><span class="co">#&gt;  4          1 neck            1     1     1 -0.665 -1.16   </span></span>
-<span><span class="co">#&gt;  5          1 neck            1     1     2  0.804 -0.00673</span></span>
-<span><span class="co">#&gt;  6          1 neck            1     1     3  1.23  -1.30   </span></span>
-<span><span class="co">#&gt;  7          1 hip_right       1     1     1 -1.30  -0.644  </span></span>
-<span><span class="co">#&gt;  8          1 hip_right       1     1     2 -0.600  0.0344 </span></span>
-<span><span class="co">#&gt;  9          1 hip_right       1     1     3  0.636 -1.42   </span></span>
-<span><span class="co">#&gt; 10          1 hip_left        1     1     1 -0.874 -1.67   </span></span>
+<span><span class="co">#&gt;    individual keypoint  session trial  time       x       y</span></span>
+<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;       &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1          1 abdomen         1     1     1 -1.96    0.284 </span></span>
+<span><span class="co">#&gt;  2          1 abdomen         1     1     2 -0.710  -0.936 </span></span>
+<span><span class="co">#&gt;  3          1 abdomen         1     1     3 -1.63   -1.19  </span></span>
+<span><span class="co">#&gt;  4          1 neck            1     1     1  0.737  -0.503 </span></span>
+<span><span class="co">#&gt;  5          1 neck            1     1     2 -2.26    1.41  </span></span>
+<span><span class="co">#&gt;  6          1 neck            1     1     3  1.18   -1.44  </span></span>
+<span><span class="co">#&gt;  7          1 hip_right       1     1     1 -0.555   0.0574</span></span>
+<span><span class="co">#&gt;  8          1 hip_right       1     1     2  0.0274  0.285 </span></span>
+<span><span class="co">#&gt;  9          1 hip_right       1     1     3 -0.218  -0.950 </span></span>
+<span><span class="co">#&gt; 10          1 hip_left        1     1     1  0.281  -1.10  </span></span>
 <span><span class="co">#&gt; # ℹ 23 more rows</span></span></code></pre></div>
 </div>
 <p>The rebuild walks the segments outward from the structure’s <code>root</code>, so it needs the root point’s trajectory; <code>root</code> can be the frame the segments came from.</p>
@@ -257,15 +257,15 @@
 <span><span class="co">#&gt; # Structure: keypoint</span></span>
 <span><span class="co">#&gt;   individual joint      session trial  time  angle confidence</span></span>
 <span><span class="co">#&gt;        &lt;int&gt; &lt;fct&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1          1 neck             1     1     1 -2.78       0.561</span></span>
-<span><span class="co">#&gt; 2          1 neck             1     1     2 -1.68       0.582</span></span>
-<span><span class="co">#&gt; 3          1 neck             1     1     3 -3.06       0.424</span></span>
-<span><span class="co">#&gt; 4          1 knee_right       1     1     1  3.01       0.477</span></span>
-<span><span class="co">#&gt; 5          1 knee_right       1     1     2 -0.460      0.585</span></span>
-<span><span class="co">#&gt; 6          1 knee_right       1     1     3 -1.90       0.845</span></span>
-<span><span class="co">#&gt; 7          1 knee_left        1     1     1  1.36       0.500</span></span>
-<span><span class="co">#&gt; 8          1 knee_left        1     1     2  2.20       0.387</span></span>
-<span><span class="co">#&gt; 9          1 knee_left        1     1     3  3.09       0.541</span></span></code></pre></div>
+<span><span class="co">#&gt; 1          1 neck             1     1     1  2.71       0.285</span></span>
+<span><span class="co">#&gt; 2          1 neck             1     1     2 -2.63       0.598</span></span>
+<span><span class="co">#&gt; 3          1 neck             1     1     3 -2.45       0.741</span></span>
+<span><span class="co">#&gt; 4          1 knee_right       1     1     1  2.11       0.483</span></span>
+<span><span class="co">#&gt; 5          1 knee_right       1     1     2  3.06       0.932</span></span>
+<span><span class="co">#&gt; 6          1 knee_right       1     1     3 -0.818      0.743</span></span>
+<span><span class="co">#&gt; 7          1 knee_left        1     1     1  0.914      0.496</span></span>
+<span><span class="co">#&gt; 8          1 knee_left        1     1     2 -2.64       0.511</span></span>
+<span><span class="co">#&gt; 9          1 knee_left        1     1     3 -3.06       0.830</span></span></code></pre></div>
 </div>
 <p>The same computation is available for any pair of vectors as <code><a href="../reference/angle_between.html">angle_between()</a></code>:</p>
 <div class="cell">
@@ -289,18 +289,18 @@
 <span><span class="co">#&gt; # Keypoints:   head, neck, shoulder_right, shoulder_left, abdomen</span></span>
 <span><span class="co">#&gt; # Sessions:    1</span></span>
 <span><span class="co">#&gt; # Trials:      1</span></span>
-<span><span class="co">#&gt;    individual keypoint session trial  time      x      y confidence</span></span>
-<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1          1 head           1     1     1  0.875 -0.313      0.309</span></span>
-<span><span class="co">#&gt;  2          1 head           1     1     2  0.989  0.450      0.746</span></span>
-<span><span class="co">#&gt;  3          1 head           1     1     3  1.45  -1.45       0.538</span></span>
-<span><span class="co">#&gt;  4          1 head           1     1     4 -0.759  2.27       0.629</span></span>
-<span><span class="co">#&gt;  5          1 head           1     1     5  1.36   1.20       0.916</span></span>
-<span><span class="co">#&gt;  6          1 head           1     1     6  1.20  -0.290      0.959</span></span>
-<span><span class="co">#&gt;  7          1 head           1     1     7  0.160  0.710      0.816</span></span>
-<span><span class="co">#&gt;  8          1 head           1     1     8 -1.31   0.195      0.423</span></span>
-<span><span class="co">#&gt;  9          1 head           1     1     9 -0.487  1.15       0.672</span></span>
-<span><span class="co">#&gt; 10          1 head           1     1    10  1.40  -0.126      0.775</span></span>
+<span><span class="co">#&gt;    individual keypoint session trial  time       x       y confidence</span></span>
+<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1          1 head           1     1     1  0.557  -2.69        0.849</span></span>
+<span><span class="co">#&gt;  2          1 head           1     1     2 -1.15    0.0612      0.652</span></span>
+<span><span class="co">#&gt;  3          1 head           1     1     3  0.850   0.498       0.622</span></span>
+<span><span class="co">#&gt;  4          1 head           1     1     4  0.767  -2.69        0.716</span></span>
+<span><span class="co">#&gt;  5          1 head           1     1     5  1.46    1.31        0.881</span></span>
+<span><span class="co">#&gt;  6          1 head           1     1     6  1.17    0.0534      0.865</span></span>
+<span><span class="co">#&gt;  7          1 head           1     1     7  0.0243 -0.397       0.365</span></span>
+<span><span class="co">#&gt;  8          1 head           1     1     8  1.47    0.471       0.766</span></span>
+<span><span class="co">#&gt;  9          1 head           1     1     9  1.05   -0.928       0.574</span></span>
+<span><span class="co">#&gt; 10          1 head           1     1    10 -2.30    0.315       0.559</span></span>
 <span><span class="co">#&gt; # ℹ 740 more rows</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
