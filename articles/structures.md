@@ -120,16 +120,16 @@ seg
 #> # Structure:  keypoint
 #>    individual segment       session trial  time length      ux     uy confidence
 #>         <int> <fct>           <int> <int> <int>  <dbl>   <dbl>  <dbl>      <dbl>
-#>  1          1 spine               1     1     1  3.18   0.0439  0.999      0.660
-#>  2          1 spine               1     1     2  3.92  -0.318  -0.948      0.339
-#>  3          1 spine               1     1     3  1.06   0.950  -0.311      0.488
-#>  4          1 head                1     1     1  1.89  -0.200  -0.980      0.349
-#>  5          1 head                1     1     2  1.61   0.370   0.929      0.339
-#>  6          1 head                1     1     3  1.91  -0.970  -0.243      0.488
-#>  7          1 shoulder_rig…       1     1     1  1.81  -0.903   0.429      0.660
-#>  8          1 shoulder_rig…       1     1     2  1.94  -0.365   0.931      0.245
-#>  9          1 shoulder_rig…       1     1     3  0.642 -0.988   0.155      0.488
-#> 10          1 shoulder_left       1     1     1  2.28  -0.961  -0.275      0.660
+#>  1          1 spine               1     1     1  4.27   0.0502  0.999      0.805
+#>  2          1 spine               1     1     2  0.416 -0.952   0.306      0.710
+#>  3          1 spine               1     1     3  1.46  -0.702   0.713      0.378
+#>  4          1 head                1     1     1  1.42  -0.336  -0.942      0.805
+#>  5          1 head                1     1     2  0.557 -0.973  -0.230      0.710
+#>  6          1 head                1     1     3  1.52   0.365  -0.931      0.378
+#>  7          1 shoulder_rig…       1     1     1  1.24  -0.560  -0.828      0.626
+#>  8          1 shoulder_rig…       1     1     2  0.783  0.102  -0.995      0.710
+#>  9          1 shoulder_rig…       1     1     3  1.88   0.654  -0.757      0.378
+#> 10          1 shoulder_left       1     1     1  1.06  -0.979  -0.203      0.611
 #> # ℹ 20 more rows
 get_variables(seg, "where")
 #> [1] "length" "ux"     "uy"
@@ -146,12 +146,12 @@ seg |>
 #> # A tibble: 6 × 5
 #>   individual segment        session trial length_sd
 #>        <int> <fct>            <int> <int>     <dbl>
-#> 1          1 spine                1     1     1.48 
-#> 2          1 head                 1     1     0.166
-#> 3          1 shoulder_right       1     1     0.717
-#> 4          1 shoulder_left        1     1     0.665
-#> 5          1 hip_right            1     1     0.524
-#> 6          1 hip_left             1     1     0.357
+#> 1          1 spine                1     1     1.99 
+#> 2          1 head                 1     1     0.529
+#> 3          1 shoulder_right       1     1     0.553
+#> 4          1 shoulder_left        1     1     0.496
+#> 5          1 hip_right            1     1     0.803
+#> 6          1 hip_left             1     1     2.36
 ```
 
 Editing the segments and rebuilding the positions carries the edit into
@@ -169,18 +169,18 @@ rigid
 #> #   shoulder_right, shoulder_left, foot_right, foot_left
 #> # Sessions:    1
 #> # Trials:      1
-#>    individual keypoint  session trial  time     x      y
-#>         <int> <fct>       <int> <int> <int> <dbl>  <dbl>
-#>  1          1 abdomen         1     1     1 0.793 -2.09 
-#>  2          1 abdomen         1     1     2 2.01   2.65 
-#>  3          1 abdomen         1     1     3 0.293  0.102
-#>  4          1 neck            1     1     1 0.932  1.08 
-#>  5          1 neck            1     1     2 1.00  -0.363
-#>  6          1 neck            1     1     3 3.31  -0.887
-#>  7          1 hip_right       1     1     1 1.25  -0.635
-#>  8          1 hip_right       1     1     2 0.889  1.61 
-#>  9          1 hip_right       1     1     3 1.54   0.982
-#> 10          1 hip_left        1     1     1 1.35   0.340
+#>    individual keypoint  session trial  time       x      y
+#>         <int> <fct>       <int> <int> <int>   <dbl>  <dbl>
+#>  1          1 abdomen         1     1     1 -0.0542 -3.14 
+#>  2          1 abdomen         1     1     2 -0.559   1.02 
+#>  3          1 abdomen         1     1     3  0.144  -0.363
+#>  4          1 neck            1     1     1  0.0188 -1.69 
+#>  5          1 neck            1     1     2 -1.94    1.46 
+#>  6          1 neck            1     1     3 -0.878   0.674
+#>  7          1 hip_right       1     1     1 -0.793  -1.21 
+#>  8          1 hip_right       1     1     2 -0.667  -1.05 
+#>  9          1 hip_right       1     1     3  2.18   -0.740
+#> 10          1 hip_left        1     1     1  0.113  -1.77 
 #> # ℹ 23 more rows
 ```
 
@@ -207,15 +207,15 @@ joints
 #> # Structure: keypoint
 #>   individual joint      session trial  time  angle confidence
 #>        <int> <fct>        <int> <int> <int>  <dbl>      <dbl>
-#> 1          1 neck             1     1     1  2.98       0.349
-#> 2          1 neck             1     1     2  3.09       0.339
-#> 3          1 neck             1     1     3 -2.58       0.488
-#> 4          1 knee_right       1     1     1 -3.06       0.595
-#> 5          1 knee_right       1     1     2 -2.64       0.688
-#> 6          1 knee_right       1     1     3 -2.86       0.750
-#> 7          1 knee_left        1     1     1 -0.480      0.363
-#> 8          1 knee_left        1     1     2 -3.05       0.555
-#> 9          1 knee_left        1     1     3 -2.34       0.441
+#> 1          1 neck             1     1     1  2.85       0.805
+#> 2          1 neck             1     1     2  0.543      0.710
+#> 3          1 neck             1     1     3  2.74       0.378
+#> 4          1 knee_right       1     1     1 -2.93       0.355
+#> 5          1 knee_right       1     1     2  2.75       0.391
+#> 6          1 knee_right       1     1     3  2.62       0.567
+#> 7          1 knee_left        1     1     1  1.70       0.647
+#> 8          1 knee_left        1     1     2 -2.42       0.582
+#> 9          1 knee_left        1     1     3  2.69       0.652
 ```
 
 The same computation is available for any pair of vectors as
@@ -248,17 +248,17 @@ example_anipoint(n_keypoints = 5) |>
 #> # Keypoints:   head, neck, shoulder_right, shoulder_left, abdomen
 #> # Sessions:    1
 #> # Trials:      1
-#>    individual keypoint session trial  time       x      y confidence
-#>         <int> <fct>      <int> <int> <int>   <dbl>  <dbl>      <dbl>
-#>  1          1 head           1     1     1 -1.08   -0.897      0.613
-#>  2          1 head           1     1     2  1.19    0.770      0.639
-#>  3          1 head           1     1     3  1.53   -2.08       0.814
-#>  4          1 head           1     1     4  0.596  -0.136      0.826
-#>  5          1 head           1     1     5  0.0406 -0.840      0.423
-#>  6          1 head           1     1     6  0.316  -0.513      0.738
-#>  7          1 head           1     1     7 -1.07   -1.48       0.808
-#>  8          1 head           1     1     8  1.16    0.936      0.450
-#>  9          1 head           1     1     9  0.225   0.492      0.561
-#> 10          1 head           1     1    10  0.177   1.51       0.919
+#>    individual keypoint session trial  time       x       y confidence
+#>         <int> <fct>      <int> <int> <int>   <dbl>   <dbl>      <dbl>
+#>  1          1 head           1     1     1 -0.462   0.239       0.656
+#>  2          1 head           1     1     2 -0.916  -0.760       0.557
+#>  3          1 head           1     1     3 -0.542  -0.516       0.851
+#>  4          1 head           1     1     4 -1.78   -0.672       0.718
+#>  5          1 head           1     1     5 -1.43    0.976       0.815
+#>  6          1 head           1     1     6 -0.0956 -0.0612      0.534
+#>  7          1 head           1     1     7  1.62   -0.248       0.817
+#>  8          1 head           1     1     8  1.27   -0.0675      0.538
+#>  9          1 head           1     1     9  0.850  -0.438       0.691
+#> 10          1 head           1     1    10  1.39    0.739       0.907
 #> # ℹ 740 more rows
 ```

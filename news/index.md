@@ -201,7 +201,7 @@
   The order is now documented as what auto-detection emits, not
   something a frame asserts. Nothing should read a position among the
   identity keys as meaning a level; a function that needs to know which
-  variable to act on asks for it — `animetric::add_centroid()` takes
+  variable to act on asks for it — `animetric::add_point()` takes
   `across`, `anispace::translate_coords()` takes `level`.
 
   No behaviour changes. Detection emits the same order, and the order
