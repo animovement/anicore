@@ -1,6 +1,8 @@
 #' Create a structure: points, the segments between them, and joints
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' An `anistructure` describes how the levels of one identity or temporal
 #' variable relate: the keypoints of a skeleton, or the players of a team.
 #' It has three parts, each optional beyond the first:
@@ -160,6 +162,9 @@ as_structure_joints <- function(joints) {
 
 
 #' Check that a structure is internally consistent
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' @param x An `anistructure`.
 #'

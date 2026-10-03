@@ -17,6 +17,8 @@ converted to segments first.}
 An \code{anijoint}.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Computes the angle of each joint of a structure from the directions of
 its two segments \code{a} and \code{b}, with \code{\link[=angle_between]{angle_between()}}:
 \itemize{

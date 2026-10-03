@@ -49,6 +49,8 @@
 
   No behaviour changes. Detection emits the same order, and the order still carries through to column order and grouping, which is presentation: grouping by `(a, b)` and `(b, a)` gives the same groups.
 
+* Help pages now show each function's lifecycle stage (animovement/.github#46); a function without a badge is stable. The structure family is marked experimental, since its design is still being worked out (#154, #162): `anistructure()`, `validate_anistructure()`, `set_structure()`, `get_structure()`, `remove_structure()`, `as_anisegment()` and `as_anijoint()`, together with the `anisegment` and `anijoint` classes they return, and the `root` argument of `as_anipoint()`. Experimental functions may change without a deprecation cycle.
+
 # anicore 0.8.0 (2026-08-28)
 
 ## Changed

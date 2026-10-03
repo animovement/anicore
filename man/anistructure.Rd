@@ -35,6 +35,8 @@ rebuilt from segments. \code{NA} if unset.}
 An \code{anistructure}.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 An \code{anistructure} describes how the levels of one identity or temporal
 variable relate: the keypoints of a skeleton, or the players of a team.
 It has three parts, each optional beyond the first:

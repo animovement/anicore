@@ -13,7 +13,7 @@ validate_anistructure(x)
 \code{x}, invisibly; errors naming the first problem otherwise.
 }
 \description{
-Check that a structure is internally consistent
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 }
 \examples{
 validate_anistructure(example_structure())
