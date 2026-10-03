@@ -149,6 +149,7 @@ reference:
     contents:
     - rad_to_deg
     - deg_to_rad
+    - angle_to_rad
     - wrap_angle
     - unwrap_angle
     - angle_between

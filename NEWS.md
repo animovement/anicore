@@ -21,6 +21,8 @@
 
 ## Added
 
+* `angle_to_rad()` and `angle_from_rad()` convert angle values between radians and a frame's declared `unit_angle`, for functions that compute angles in radians and return them in the frame's unit (#170). The frame's unit, or a unit string read once for use inside `mutate()`, says which. A frame that declares no angular unit (`"none"`, or an anievent) is read as radians. `as_anijoint()` and `reflect_axis()` use them in place of their own copies of the check.
+
 * `as_anisegment()` gives one row per segment of a structure: its `length` and unit direction (#154). `as_anipoint(seg, root = )` rebuilds positions from segments, for example after holding lengths constant.
 
 * `as_anijoint()` gives one angle per joint of a structure (#154). `angle_between()` is the underlying computation.

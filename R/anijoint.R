@@ -85,9 +85,7 @@ as_anijoint <- function(data, structure = NULL) {
   })
   out <- dplyr::bind_rows(joints)
   out$joint <- factor(out$joint, levels = struct$joints$joint)
-  if (identical(as.character(get_metadata(data, "unit_angle")), "deg")) {
-    out$angle <- rad_to_deg(out$angle)
-  }
+  out$angle <- angle_from_rad(out$angle, data)
 
   md <- get_metadata(data)
   what <- md$variables$what$keys
