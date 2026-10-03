@@ -9,7 +9,7 @@ without registering their own methods."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,12 +83,16 @@ without registering their own methods.</p>
 
 
 <dt id="arg-md">md<a class="anchor" aria-label="anchor" href="#arg-md"></a></dt>
-<dd><p>Metadata captured before dispatch via <code><a href="get_metadata.html">get_metadata()</a></code>.</p></dd>
+<dd><p>Metadata captured before dispatch via <code><a href="get_metadata.html">get_metadata()</a></code>.</p>
+<p>A result that has lost a column the frame is keyed, indexed or bounded by
+is no longer that frame: it comes back as the plain data frame, without
+metadata that would describe columns it does not have (#178).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>x</code> with the animovement classes and metadata restored.</p>
+    <p><code>x</code> with the animovement classes and metadata restored, or <code>x</code>
+without them when it lacks a column from <code><a href="list_frame_columns.html">list_frame_columns()</a></code>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -8,6 +8,7 @@
   parent of every frame class: `anipoint`, `anisegment`, `anijoint` and
   `anievent`
   ([\#154](https://github.com/animovement/anicore/issues/154)).
+
   - [`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md),
     [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md),
     [`example_anipoint()`](https://animovement.dev/anicore/reference/example_anipoint.md)
@@ -27,6 +28,7 @@
     [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md)
     or
     [`as_anievent()`](https://animovement.dev/anicore/reference/as_anievent.md).
+
 - Metadata is grouped into categories — `recording`, `time`, `space`,
   `variables` and `structure` — and `spec_version` becomes 3.0.0 for
   anipoint frames and 1.0.0 for anievents
@@ -37,6 +39,7 @@
   name returns the whole category. Reading `attr(x, "metadata")`
   directly no longer works. Objects in the old layout are migrated when
   read.
+
   - An anievent has no `space` category: its spatial fields read `NULL`,
     and spatial fields passed to
     [`as_anievent()`](https://animovement.dev/anicore/reference/as_anievent.md)
@@ -45,9 +48,11 @@
   - [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md)
     with several names returns a plain list, and setting a field to
     `NULL` errors (use `NA`).
+
 - `set_*()` functions now only declare; operations that change values
   have their own verbs
   ([\#155](https://github.com/animovement/anicore/issues/155)).
+
   - [`get_variables()`](https://animovement.dev/anicore/reference/variables.md),
     [`set_variables()`](https://animovement.dev/anicore/reference/variables.md),
     [`add_variables()`](https://animovement.dev/anicore/reference/variables.md)
@@ -78,6 +83,7 @@
     [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md).
     `set_sampling_rate()` also converted frames to seconds: use
     `set_metadata(x, sampling_rate = r) |> convert_unit_time("s")`.
+
 - Structures replace connections
   ([\#154](https://github.com/animovement/anicore/issues/154)). An
   [`anistructure()`](https://animovement.dev/anicore/reference/anistructure.md)
@@ -90,6 +96,19 @@
   [`remove_structure()`](https://animovement.dev/anicore/reference/structures.md).
   The `*_connections()` functions are removed; stored connection tables
   become structures.
+
+- Subsetting a frame so that it loses a column it is keyed, indexed or
+  bounded by gives a plain tibble rather than a frame whose metadata
+  names columns it does not have
+  ([\#178](https://github.com/animovement/anicore/issues/178)). This
+  covers `[`, `select()`, `distinct()` and removing a column with `$<-`
+  or `[[<-`. `af[c("x", "y")]` and `select(af, x, y)` used to return an
+  anipoint missing its `time` and keys, which
+  [`ensure_is_anipoint()`](https://animovement.dev/anicore/reference/ensure_is_anipoint.md)
+  accepted and later steps tripped over; they now return the columns
+  asked for, ready for plain data-frame work. Dropping a declared value
+  column (a position, an orientation) still returns the frame, so it can
+  be re-declared.
 
 ### Added
 
@@ -226,6 +245,25 @@
   the `root` argument of
   [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md).
   Experimental functions may change without a deprecation cycle.
+
+### Fixed
+
+- Renaming columns carries the new names into the metadata
+  ([\#178](https://github.com/animovement/anicore/issues/178)).
+  `rename()`, `rename_with()`, renaming in `select()` or `relocate()`,
+  and `names<-` used to leave the keys, the index, the interval, the
+  declared variables and each structure’s `variable` naming the old
+  columns, so `rename(af, t = time)` gave a frame
+  [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
+  rejected.
+
+- [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
+  no longer warns that `coordinate_system` is stale for a frame whose
+  axis columns are named something other than their roles, as with
+  `as_anipoint(df, variables_where = c(x = "u", y = "v"))`
+  ([\#178](https://github.com/animovement/anicore/issues/178)). It
+  compared the recorded system with one inferred from the column names
+  rather than the axis roles.
 
 ## anicore 0.8.0 (2026-08-28)
 

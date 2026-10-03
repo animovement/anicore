@@ -148,6 +148,7 @@
 <url><loc>https://animovement.dev/anicore/reference/list_direction_opposites.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/list_direction_pairs.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/list_direction_vectors.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/list_frame_columns.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/list_linear_axis_roles.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/list_main_variable_slots.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/list_metadata_categories.html</loc></url>
@@ -182,6 +183,8 @@
 <url><loc>https://animovement.dev/anicore/reference/regroup_frame.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/relocate.aniframe.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/rename.aniframe.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/rename_metadata_columns.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/renamed_metadata.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/resolve_axes.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/resolve_axis_directions.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/resolve_axis_extents.html</loc></url>

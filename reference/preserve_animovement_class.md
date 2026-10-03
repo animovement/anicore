@@ -25,6 +25,12 @@ preserve_animovement_class(x, cls, md)
   Metadata captured before dispatch via
   [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md).
 
+  A result that has lost a column the frame is keyed, indexed or bounded
+  by is no longer that frame: it comes back as the plain data frame,
+  without metadata that would describe columns it does not have (#178).
+
 ## Value
 
-`x` with the animovement classes and metadata restored.
+`x` with the animovement classes and metadata restored, or `x` without
+them when it lacks a column from
+[`list_frame_columns()`](https://animovement.dev/anicore/reference/list_frame_columns.md).
