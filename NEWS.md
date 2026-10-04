@@ -53,6 +53,8 @@
 
 * Help pages now show each function's lifecycle stage (animovement/.github#46); a function without a badge is stable. The structure family is marked experimental, since its design is still being worked out (#154, #162): `anistructure()`, `validate_anistructure()`, `set_structure()`, `get_structure()`, `remove_structure()`, `as_anisegment()` and `as_anijoint()`, together with the `anisegment` and `anijoint` classes they return, and the `root` argument of `as_anipoint()`. Experimental functions may change without a deprecation cycle.
 
+* `circ_median()`, and so `circ_mad()`, take O(n log n) time rather than O(n²), with the same results (#182). On 20,000 angles `circ_median()` takes 0.02 s rather than 7.6 s, and `animetric::summarise_aniframe()` on a 10-minute, 30 fps recording of 6 keypoints takes 0.4 s rather than 90 s.
+
 ## Fixed
 
 * Renaming columns carries the new names into the metadata (#178). `rename()`, `rename_with()`, renaming in `select()` or `relocate()`, and `names<-` used to leave the keys, the index, the interval, the declared variables and each structure's `variable` naming the old columns, so `rename(af, t = time)` gave a frame `validate_anipoint()` rejected.

@@ -36,6 +36,71 @@ test_that("circ_median() agrees with the reference implementation", {
   }
 })
 
+test_that("circ_summed_distance() is the summed distance to every observation", {
+  set.seed(147)
+  x <- wrap_angle(c(stats::runif(40, 0, 2 * pi), 0, pi, 2 * pi - 1e-12))
+  theta <- wrap_angle(c(x, x + pi, stats::runif(40, 0, 2 * pi)))
+
+  expect_equal(
+    circ_summed_distance(theta, x),
+    vapply(theta, function(t) sum(pi - abs(pi - abs(x - t))), numeric(1)),
+    tolerance = 1e-12
+  )
+})
+
+test_that("circ_median() picks the same minimisers as the brute-force search", {
+  set.seed(148)
+  sample_angles <- function(n) {
+    list(
+      uniform = stats::runif(n, -4 * pi, 4 * pi),
+      clustered = stats::rnorm(n, 1, 0.3),
+      across_zero = stats::rnorm(n, 0, 0.2),
+      bimodal = stats::rnorm(n, 0, 0.1) + pi * stats::rbinom(n, 1, 0.5),
+      whole_degrees = deg_to_rad(sample(0:359, n, replace = TRUE)),
+      clustered_degrees = deg_to_rad(round(stats::rnorm(n, 350, 20))),
+      coarse_degrees = deg_to_rad(sample(seq(0, 315, 45), n, replace = TRUE)),
+      antipodal_pairs = rep(stats::runif(ceiling(n / 2), 0, 2 * pi), 2) +
+        c(rep(0, ceiling(n / 2)), rep(pi, ceiling(n / 2)))
+    )
+  }
+
+  for (n in c(1, 2, 3, 4, 5, 8, 25, 100, 501, 2000)) {
+    for (x in sample_angles(n)) {
+      expect_identical(circ_median(x), circ_median_brute(x))
+    }
+  }
+})
+
+test_that("circ_median() handles ties and edge cases as the brute-force search does", {
+  ties <- list(
+    single = 2.5,
+    two = c(0.4, 1.1),
+    two_across_zero = c(6.1, 0.3),
+    antipodal = c(0, pi),
+    antipodal_degrees = deg_to_rad(c(90, 270)),
+    identical = rep(1.3, 10),
+    symmetric_odd = c(1 - 0.4, 1 - 0.1, 1, 1 + 0.1, 1 + 0.4),
+    symmetric_even = c(1 - 0.4, 1 - 0.1, 1 + 0.1, 1 + 0.4),
+    quarters = deg_to_rad(c(0, 90, 180, 270)),
+    evenly_spaced = seq(0, 2 * pi, length.out = 13)[-13],
+    wraps_to_two_pi = c(-1e-20, 0.5, 3),
+    reference = reference$tied_across_zero$x
+  )
+
+  for (x in ties) {
+    expect_identical(circ_median(x), circ_median_brute(x))
+    expect_identical(circ_median(x + pi), circ_median_brute(x + pi))
+  }
+})
+
+test_that("circ_median() scales to long recordings", {
+  skip_on_cran()
+  set.seed(149)
+  x <- stats::runif(20000, 0, 2 * pi)
+
+  expect_lt(system.time(circ_median(x))[["elapsed"]], 1)
+})
+
 test_that("circ_sd() agrees with the reference implementation", {
   for (case in reference) {
     expect_equal(circ_sd(case$x), case$sd, tolerance = 1e-8)
