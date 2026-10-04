@@ -170,9 +170,7 @@
 <url><loc>https://animovement.dev/anicore/reference/normalise_event_values.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/preserve_animovement_class.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/print.aniframe_metadata.html</loc></url>
-<url><loc>https://animovement.dev/anicore/reference/print_metadata_leaves.html</loc></url>
-<url><loc>https://animovement.dev/anicore/reference/print_metadata_structure.html</loc></url>
-<url><loc>https://animovement.dev/anicore/reference/print_metadata_variables.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/print.anistructure.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/rad_to_deg.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/reflect_angle.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/reflect_angular_axis.html</loc></url>

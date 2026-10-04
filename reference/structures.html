@@ -148,9 +148,15 @@ one structure.</p>
 <span class="r-in"><span><span class="fu">get_structure</span><span class="op">(</span><span class="va">af</span>, <span class="st">"keypoint"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;anistructure&gt; 11 points, 10 segments, 3 joints</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> variable: keypoint; root: abdomen</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Points: abdomen, neck, hip_right, hip_left, knee_right, knee_left, head, shoulder_right, shoulder_left, foot_right, foot_left</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Segments: spine (abdomen -&gt; neck), head (neck -&gt; head), shoulder_right (neck -&gt; shoulder_right), shoulder_left (neck -&gt; shoulder_left), hip_right (abdomen -&gt; hip_right), hip_left (abdomen -&gt; hip_left), thigh_right (hip_right -&gt; knee_right), thigh_left (hip_left -&gt; knee_left), shin_right (knee_right -&gt; foot_right), shin_left (knee_left -&gt; foot_left)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Joints: neck (spine, head), knee_right (thigh_right, shin_right), knee_left (thigh_left, shin_left)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Points: abdomen, neck, hip_right, hip_left, knee_right, knee_left, head,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   shoulder_right, shoulder_left, foot_right, foot_left</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Segments: spine: abdomen - neck, head: neck - head,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   shoulder_right: neck - shoulder_right, shoulder_left: neck - shoulder_left,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hip_right: abdomen - hip_right, hip_left: abdomen - hip_left,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   thigh_right: hip_right - knee_right, thigh_left: hip_left - knee_left,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   shin_right: knee_right - foot_right, shin_left: knee_left - foot_left</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Joints: neck: spine - head, knee_right: thigh_right - shin_right,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   knee_left: thigh_left - shin_left</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Several structures over the same variable</span></span></span>
 <span class="r-in"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="va">af</span> <span class="op">|&gt;</span></span></span>

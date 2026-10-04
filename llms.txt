@@ -109,6 +109,8 @@ value.
   : Set metadata
 - [`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md)
   : Default metadata structure
+- [`print(`*`<aniframe_metadata>`*`)`](https://animovement.dev/anicore/reference/print.aniframe_metadata.md)
+  : Print the metadata of a frame
 - [`get_sampling_interval()`](https://animovement.dev/anicore/reference/get_sampling_interval.md)
   : The interval between consecutive observations
 - [`is_sampling_regular()`](https://animovement.dev/anicore/reference/is_sampling_regular.md)
@@ -168,6 +170,10 @@ structures.
 - [`anistructure()`](https://animovement.dev/anicore/reference/anistructure.md)
   **\[experimental\]** : Create a structure: points, the segments
   between them, and joints
+
+- [`print(`*`<anistructure>`*`)`](https://animovement.dev/anicore/reference/print.anistructure.md)
+  [`format(`*`<anistructure>`*`)`](https://animovement.dev/anicore/reference/print.anistructure.md)
+  : Print a structure
 
 - [`example_structure()`](https://animovement.dev/anicore/reference/example_structure.md)
   :

@@ -29,43 +29,74 @@ for axis directions and orientation, see
 
 ## The metadata attribute
 
-You can see the full metadata by printing it directly:
+You can see the metadata by printing it directly. Fields that are not
+set are named together on the last line:
 
 ``` r
 
 data <- example_anipoint()
 get_metadata(data)
 #> ── animovement metadata ────────────────────────────────────────────────────────
-#> spec_version: aniframe 3.0.0, anievent 1.0.0
-#> 
-#> ── recording 
-#> source         (character) : <NA>
-#> source_version (character) : <NA>
-#> source_format  (character) : <NA>
-#> filename       (character) : <NA>
 #> 
 #> ── time 
-#> unit_time         (factor)  : "frame"
-#>                               [levels: unknown, frame, ns, us, ms, s, m, h]
-#> sampling_rate     (numeric) : <NA>
-#> sampling_interval (numeric) : 1
-#> start_datetime    (POSIXct) : <NA>
+#> unit_time: frame
+#> sampling_interval: 1 frame
 #> 
 #> ── space 
-#> coordinate_system (factor)    : "cartesian_2d"
-#>                                 [levels: unknown, cartesian_1d, cartesian_2d, cartesian_3d, polar, cylindrical, spherical]
-#> reference_frame   (factor)    : "allocentric"
-#>                                 [levels: allocentric, egocentric, none]
-#> handedness        (factor)    : "unknown"
-#>                                 [levels: right, left, unknown]
-#> axis_directions   (character) : 
-#> axis_extents      (numeric)   : 
-#> unit_space        (factor)    : "px"
-#>                                 [levels: px, none, nm, um, mm, cm, m, km]
-#> unit_angle        (factor)    : "rad"
-#>                                 [levels: rad, deg, none]
-#> euler_sequence    (character) : <NA>
-#> euler_intrinsic   (logical)   : <NA>
+#> coordinate_system: cartesian_2d
+#> reference_frame: allocentric
+#> handedness: unknown
+#> unit_space: px
+#> unit_angle: rad
+#> 
+#> ── variables 
+#> what   keys: individual, keypoint
+#> when   index: time | keys: session, trial
+#> where  position: x = x, y = y
+#> event  state: - | point: -
+#> 
+#> Not set: source, source_version, source_format, filename, sampling_rate,
+#>   start_datetime, axis_directions, axis_extents, euler_sequence,
+#>   euler_intrinsic, structure
+```
+
+`all = TRUE` prints every field, the values each factor field allows,
+and `spec_version`:
+
+``` r
+
+print(get_metadata(data), all = TRUE)
+#> ── animovement metadata ────────────────────────────────────────────────────────
+#> 
+#> ── recording 
+#> source: -
+#> source_version: -
+#> source_format: -
+#> filename: -
+#> 
+#> ── time 
+#> unit_time: frame
+#>   levels: unknown, frame, ns, us, ms, s, m, h
+#> sampling_rate: -
+#> sampling_interval: 1 frame
+#> start_datetime: -
+#> 
+#> ── space 
+#> coordinate_system: cartesian_2d
+#>   levels: unknown, cartesian_1d, cartesian_2d, cartesian_3d, polar, cylindrical,
+#>     spherical
+#> reference_frame: allocentric
+#>   levels: allocentric, egocentric, none
+#> handedness: unknown
+#>   levels: right, left, unknown
+#> axis_directions: -
+#> axis_extents: -
+#> unit_space: px
+#>   levels: px, none, nm, um, mm, cm, m, km
+#> unit_angle: rad
+#>   levels: rad, deg, none
+#> euler_sequence: -
+#> euler_intrinsic: -
 #> 
 #> ── variables 
 #> what   keys: individual, keypoint
@@ -74,7 +105,9 @@ get_metadata(data)
 #> event  state: - | point: -
 #> 
 #> ── structure 
-#> (empty)
+#> -
+#> 
+#> spec_version: aniframe 3.0.0, anievent 1.0.0
 ```
 
 The fields and their defaults are defined in one place,

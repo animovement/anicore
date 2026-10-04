@@ -67,9 +67,15 @@ af <- set_structure(af, example_structure())
 get_structure(af, "keypoint")
 #> <anistructure> 11 points, 10 segments, 3 joints
 #> variable: keypoint; root: abdomen
-#> Points: abdomen, neck, hip_right, hip_left, knee_right, knee_left, head, shoulder_right, shoulder_left, foot_right, foot_left
-#> Segments: spine (abdomen -> neck), head (neck -> head), shoulder_right (neck -> shoulder_right), shoulder_left (neck -> shoulder_left), hip_right (abdomen -> hip_right), hip_left (abdomen -> hip_left), thigh_right (hip_right -> knee_right), thigh_left (hip_left -> knee_left), shin_right (knee_right -> foot_right), shin_left (knee_left -> foot_left)
-#> Joints: neck (spine, head), knee_right (thigh_right, shin_right), knee_left (thigh_left, shin_left)
+#> Points: abdomen, neck, hip_right, hip_left, knee_right, knee_left, head,
+#>   shoulder_right, shoulder_left, foot_right, foot_left
+#> Segments: spine: abdomen - neck, head: neck - head,
+#>   shoulder_right: neck - shoulder_right, shoulder_left: neck - shoulder_left,
+#>   hip_right: abdomen - hip_right, hip_left: abdomen - hip_left,
+#>   thigh_right: hip_right - knee_right, thigh_left: hip_left - knee_left,
+#>   shin_right: knee_right - foot_right, shin_left: knee_left - foot_left
+#> Joints: neck: spine - head, knee_right: thigh_right - shin_right,
+#>   knee_left: thigh_left - shin_left
 
 # Several structures over the same variable
 af <- af |>
