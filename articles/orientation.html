@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -251,12 +251,31 @@
 <span><span class="fu"><a href="../reference/get_angle_direction.html">get_angle_direction</a></span><span class="op">(</span><span class="va">right</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "counter_clockwise"</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h2 id="which-way-an-entity-faces">Which way an entity faces<a class="anchor" aria-label="anchor" href="#which-way-an-entity-faces"></a>
+<section class="level3"><h3 id="the-range-of-a-direction">The range of a direction<a class="anchor" aria-label="anchor" href="#the-range-of-a-direction"></a>
+</h3>
+<p>A direction is written in one range throughout the suite: signed, in (-π, π], or (-180°, 180°] in degrees. It is the range <code><a href="https://rdrr.io/r/base/Trig.html" class="external-link">atan2()</a></code> returns, so per-row directions come out in it already. <code>0</code> points along <code>x</code>, and the sign says which side of <code>x</code> a direction lies on, positive toward <code>y</code>. Which way that turns on screen is the angle direction above.</p>
+<p>The circular summaries return the same range, so a summary reads like the values it summarises:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">course</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.05</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/circ_mean.html">circ_mean</a></span><span class="op">(</span><span class="va">course</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -0.1375884</span></span>
+<span><span class="fu"><a href="../reference/circ_median.html">circ_median</a></span><span class="op">(</span><span class="va">course</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -0.15</span></span></code></pre></div>
+</div>
+<p>The range changes how a direction is written, not which direction it is: -π/2 and 3π/2 are the same, and every <code>circ_*()</code> function treats them alike. <code><a href="../reference/wrap_angle.html">wrap_angle()</a></code> wraps to the signed range by default; to report directions in [0, 2π) instead, wrap at the end:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/wrap_angle.html">wrap_angle</a></span><span class="op">(</span><span class="fu"><a href="../reference/circ_median.html">circ_median</a></span><span class="op">(</span><span class="va">course</span><span class="op">)</span>, <span class="st">"2pi"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6.133185</span></span></code></pre></div>
+</div>
+<p>Unwrapped angles, such as a heading followed continuously with <code><a href="../reference/unwrap_angle.html">unwrap_angle()</a></code>, are the exception: they count whole turns, so they are not confined to any range.</p>
+</section></section><section class="level2"><h2 id="which-way-an-entity-faces">Which way an entity faces<a class="anchor" aria-label="anchor" href="#which-way-an-entity-faces"></a>
 </h2>
 <p>Position says where an entity is; orientation says which way it faces. It is declared next to position, in the <code>where</code> role’s <code>orientation</code> slot, with the same pattern: a closed set of roles mapped to columns of any name.</p>
 <p>A 2D frame uses <code>yaw</code>, measured from <code>x</code> toward <code>y</code> in <code>unit_angle</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -270,7 +289,7 @@
 </div>
 <p>A 3D frame uses a unit quaternion, <code>qw</code>, <code>qx</code>, <code>qy</code>, <code>qz</code> (Hamilton convention, scalar first). This one turns a quarter-turn about <code>z</code> between the two rows:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">body</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anipoint.html">anipoint</a></span><span class="op">(</span></span>
 <span>  individual <span class="op">=</span> <span class="fl">1L</span>, time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,</span>
 <span>  x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">0</span>, z <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -286,7 +305,7 @@
 </div>
 <p>The declaration is checked against the frame. A quaternion needs a 3D frame and <code>yaw</code> a 2D one, and a quaternion must have unit norm:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">body</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>qx <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/variables.html">set_variables</a></span><span class="op">(</span></span>
@@ -298,7 +317,7 @@
 </div>
 <p>Declared orientation follows the frame. <code><a href="../reference/reflect_axis.html">reflect_axis()</a></code> reflects it with the positions — <code>yaw</code> like an angle, a quaternion by negating the two components off the reflected axis — and <code><a href="../reference/convert_unit_angle.html">convert_unit_angle()</a></code> converts <code>yaw</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reflect_axis.html">reflect_axis</a></span><span class="op">(</span><span class="va">fly</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">$</span><span class="va">heading</span></span>
 <span><span class="co">#&gt; [1] 0.000000 5.497787 4.712389</span></span>
 <span><span class="fu"><a href="../reference/convert_unit_angle.html">convert_unit_angle</a></span><span class="op">(</span><span class="va">fly</span>, <span class="st">"deg"</span><span class="op">)</span><span class="op">$</span><span class="va">heading</span></span>
@@ -310,7 +329,7 @@
 </h3>
 <p>Euler angles are how most sources report 3D orientation, and they break under ordinary operations. Each angle wraps at ±π, so a mean or an interpolation across the wrap gives the opposite direction:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">roll</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.1</span>, <span class="op">-</span><span class="fl">3.1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">roll</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
@@ -320,7 +339,7 @@
 <p><code><a href="../reference/circ_mean.html">circ_mean()</a></code> fixes one column, but three Euler angles are not three independent circular variables: near gimbal lock two of them describe the same rotation, and no per-column treatment recovers it. A <code>summarise()</code> or an interpolation over Euler columns gives a wrong rotation without complaint. A quaternion has neither problem, so that is what the frame stores.</p>
 <p>Showing and entering orientation is a different matter, and there the source’s convention is what people know. A frame can record it, so tools don’t need it retyped each time:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">body</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_metadata.html">set_metadata</a></span><span class="op">(</span><span class="va">body</span>, euler_sequence <span class="op">=</span> <span class="st">"ZYX"</span>, euler_intrinsic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">body</span>, <span class="st">"euler_sequence"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "ZYX"</span></span></code></pre></div>

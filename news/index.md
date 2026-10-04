@@ -110,6 +110,26 @@
   column (a position, an orientation) still returns the frame, so it can
   be re-declared.
 
+- Directions are signed, in `(-pi, pi]`, throughout
+  ([\#181](https://github.com/animovement/anicore/issues/181)).
+  [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
+  now wraps to `(-pi, pi]` by default (`modulo = "pi"`), and
+  [`circ_mean()`](https://animovement.dev/anicore/reference/circ_mean.md)
+  and
+  [`circ_median()`](https://animovement.dev/anicore/reference/circ_median.md)
+  return that range, so a summary such as
+  `animetric::summarise_aniframe()`’s `median_course` matches the
+  per-row directions it summarises: a course of a little below zero now
+  has a median of a little below zero, not a little below `2 * pi`. It
+  is the range [`atan2()`](https://rdrr.io/r/base/Trig.html) gives,
+  which per-row directions already used. The range does not change any
+  direction, only how it is written. For the old range, wrap at the end
+  with `wrap_angle(x, "2pi")`, and pass `"2pi"` explicitly to any
+  [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
+  call that relied on the default.
+  [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)’s
+  help page documents the convention.
+
 ### Added
 
 - [`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
@@ -273,6 +293,13 @@
     10; `print(x, n = Inf)` shows all.
 
 ### Fixed
+
+- [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
+  no longer returns the end of its range that the range excludes
+  ([\#181](https://github.com/animovement/anicore/issues/181)). An angle
+  a rounding error above `pi` wrapped to `-pi`, and one a rounding error
+  below zero wrapped to `2 * pi` with `modulo = "2pi"`; both now land on
+  the other end, which is the same angle.
 
 - Renaming columns carries the new names into the metadata
   ([\#178](https://github.com/animovement/anicore/issues/178)).

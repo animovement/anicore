@@ -14,7 +14,7 @@ circ_median(x, na_rm = TRUE)
 
 - x:
 
-  A numeric vector of angles, in radians.
+  A numeric vector of angles, in radians, in any range.
 
 - na_rm:
 
@@ -23,8 +23,16 @@ circ_median(x, na_rm = TRUE)
 
 ## Value
 
-A single angle in `[0, 2*pi)`, or `NA_real_` when there is nothing to
+A single angle in `(-pi, pi]`, or `NA_real_` when there is nothing to
 summarise.
+
+## Details
+
+The median is signed, in `(-pi, pi]`, the range the suite uses for every
+direction (see
+[`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)),
+so it can be compared directly with the angles it summarises. Wrap it
+with `wrap_angle(x, "2pi")` for `[0, 2*pi)`.
 
 ## See also
 
@@ -38,10 +46,13 @@ Other circular statistics:
 ## Examples
 
 ``` r
-circ_median(c(0.1, 0.2, 6.2))
-#> [1] 0.1
+# a little below zero, not a little below 2 * pi
+circ_median(c(-0.1, -0.2, 0.05))
+#> [1] -0.1
 
 # unaffected by where the circle is cut
+circ_median(c(0.1, 0.2, 6.2))
+#> [1] 0.1
 circ_median(c(0.1, 0.2, 6.2) + pi)
-#> [1] 3.241593
+#> [1] -3.041593
 ```

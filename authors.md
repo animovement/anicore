@@ -33,6 +33,6 @@ structures for movement data.”
       author = {Mikkel Roald-Arbøl},
       year = {2026},
       doi = {10.5281/zenodo.17344597},
-      version = {0.8.0.9005},
+      version = {0.8.0.9006},
       url = {https://animovement.dev/anicore/},
     }

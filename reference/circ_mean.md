@@ -13,7 +13,7 @@ circ_mean(x, na_rm = TRUE)
 
 - x:
 
-  A numeric vector of angles, in radians.
+  A numeric vector of angles, in radians, in any range.
 
 - na_rm:
 
@@ -22,8 +22,16 @@ circ_mean(x, na_rm = TRUE)
 
 ## Value
 
-A single angle in `[0, 2*pi)`, or `NA_real_` when there is nothing to
+A single angle in `(-pi, pi]`, or `NA_real_` when there is nothing to
 summarise.
+
+## Details
+
+The mean is signed, in `(-pi, pi]`, the range the suite uses for every
+direction (see
+[`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)),
+so it can be compared directly with the angles it summarises. Wrap it
+with `wrap_angle(x, "2pi")` for `[0, 2*pi)`.
 
 ## See also
 
@@ -40,4 +48,8 @@ Other circular statistics:
 # 10 degrees; an arithmetic mean would say 190
 rad_to_deg(circ_mean(deg_to_rad(c(350, 30))))
 #> [1] 10
+
+# -10 degrees, in the range of the angles themselves
+rad_to_deg(circ_mean(deg_to_rad(c(-30, 10))))
+#> [1] -10
 ```

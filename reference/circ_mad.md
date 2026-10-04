@@ -12,7 +12,7 @@ circ_mad(x, na_rm = TRUE)
 
 - x:
 
-  A numeric vector of angles, in radians.
+  A numeric vector of angles, in radians, in any range.
 
 - na_rm:
 
@@ -21,7 +21,7 @@ circ_mad(x, na_rm = TRUE)
 
 ## Value
 
-A single non-negative number in radians, or `NA_real_` when there is
+A single number in radians, in `[0, pi]`, or `NA_real_` when there is
 nothing to summarise.
 
 ## See also

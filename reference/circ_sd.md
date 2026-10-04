@@ -14,7 +14,7 @@ circ_sd(x, na_rm = TRUE)
 
 - x:
 
-  A numeric vector of angles, in radians.
+  A numeric vector of angles, in radians, in any range.
 
 - na_rm:
 

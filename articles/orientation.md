@@ -200,6 +200,45 @@ get_angle_direction(right)
 #> [1] "counter_clockwise"
 ```
 
+### The range of a direction
+
+A direction is written in one range throughout the suite: signed, in
+(-π, π\], or (-180°, 180°\] in degrees. It is the range
+[`atan2()`](https://rdrr.io/r/base/Trig.html) returns, so per-row
+directions come out in it already. `0` points along `x`, and the sign
+says which side of `x` a direction lies on, positive toward `y`. Which
+way that turns on screen is the angle direction above.
+
+The circular summaries return the same range, so a summary reads like
+the values it summarises:
+
+``` r
+
+course <- c(-0.3, -0.2, -0.1, 0.05)
+circ_mean(course)
+#> [1] -0.1375884
+circ_median(course)
+#> [1] -0.15
+```
+
+The range changes how a direction is written, not which direction it is:
+-π/2 and 3π/2 are the same, and every `circ_*()` function treats them
+alike.
+[`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
+wraps to the signed range by default; to report directions in \[0, 2π)
+instead, wrap at the end:
+
+``` r
+
+wrap_angle(circ_median(course), "2pi")
+#> [1] 6.133185
+```
+
+Unwrapped angles, such as a heading followed continuously with
+[`unwrap_angle()`](https://animovement.dev/anicore/reference/unwrap_angle.md),
+are the exception: they count whole turns, so they are not confined to
+any range.
+
 ## Which way an entity faces
 
 Position says where an entity is; orientation says which way it faces.

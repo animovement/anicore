@@ -9,7 +9,7 @@ along each observation."><meta property="og:image" content="https://animovement.
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,7 @@ along each observation.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A numeric vector of angles, in radians.</p></dd>
+<dd><p>A numeric vector of angles, in radians, in any range.</p></dd>
 
 
 <dt id="arg-na-rm">na_rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
@@ -85,8 +85,14 @@ values are removed before computing. When <code>FALSE</code>, any <code>NA</code
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A single angle in <code>[0, 2*pi)</code>, or <code>NA_real_</code> when there is nothing to
+    <p>A single angle in <code>(-pi, pi]</code>, or <code>NA_real_</code> when there is nothing to
 summarise.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The mean is signed, in <code>(-pi, pi]</code>, the range the suite uses for every
+direction (see <code><a href="wrap_angle.html">wrap_angle()</a></code>), so it can be compared directly with the
+angles it summarises. Wrap it with <code>wrap_angle(x, "2pi")</code> for <code>[0, 2*pi)</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -103,6 +109,10 @@ summarise.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># 10 degrees; an arithmetic mean would say 190</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rad_to_deg.html">rad_to_deg</a></span><span class="op">(</span><span class="fu">circ_mean</span><span class="op">(</span><span class="fu"><a href="deg_to_rad.html">deg_to_rad</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">350</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># -10 degrees, in the range of the angles themselves</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="rad_to_deg.html">rad_to_deg</a></span><span class="op">(</span><span class="fu">circ_mean</span><span class="op">(</span><span class="fu"><a href="deg_to_rad.html">deg_to_rad</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">30</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -10</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
