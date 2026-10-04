@@ -7,7 +7,7 @@
 circ_sd(x, na_rm = TRUE)
 }
 \arguments{
-\item{x}{A numeric vector of angles, in radians.}
+\item{x}{A numeric vector of angles, in radians, in any range.}
 
 \item{na_rm}{A logical value (default \code{TRUE}) determining whether missing
 values are removed before computing. When \code{FALSE}, any \code{NA} gives \code{NA}.}

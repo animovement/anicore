@@ -4,33 +4,55 @@
 \alias{wrap_angle}
 \title{Constrain angles to a standard range}
 \usage{
-wrap_angle(x, modulo = c("2pi", "pi", "asis"))
+wrap_angle(x, modulo = c("pi", "2pi", "asis"))
 }
 \arguments{
 \item{x}{A numeric vector of angles, in radians.}
 
-\item{modulo}{A character string (default \code{"2pi"}) giving the target range:
+\item{modulo}{A character string (default \code{"pi"}) giving the target range:
 \describe{
-\item{\code{"2pi"}}{Wrap to \verb{[0, 2*pi)}.}
 \item{\code{"pi"}}{Wrap to \verb{(-pi, pi]}.}
+\item{\code{"2pi"}}{Wrap to \verb{[0, 2*pi)}.}
 \item{\code{"asis"}}{Return unchanged.}
-}
-
-[0, 2\emph{pi)\verb{.\} \\item\{}"pi"\verb{\}\{Wrap to }(-pi, pi]: R:0,\%202}pi)\%60.\%7D\%0A\%20\%20\%5C\%5Citem\%7B\%60\%22pi\%22\%60\%7D\%7BWrap\%20to\%20\%60(-pi,\%20pi}
+}}
 }
 \value{
 A numeric vector the same length as \code{x}, wrapped to the chosen range.
 }
 \description{
 Wraps a vector of angles to a standard interval using modulo arithmetic.
+By default that is the signed range \verb{(-pi, pi]}, which the suite uses for
+every direction; see the section below.
 }
+\section{The range of a direction}{
+
+Directions throughout the animovement suite are signed, in \verb{(-pi, pi]}
+(\verb{(-180, 180]} in degrees). It is the range \code{\link[=atan2]{atan2()}} returns, so per-row
+directions such as a course or a heading come out in it already, and the
+circular summaries \code{\link[=circ_mean]{circ_mean()}} and \code{\link[=circ_median]{circ_median()}} return it too, so a
+summary can be compared with the values it summarises. \code{0} points along
+\code{x}, and the sign says which side of \code{x} a direction lies on: positive
+toward \code{y}, negative away from it. Which way that turns on screen is the
+frame's angle direction, \code{\link[=get_angle_direction]{get_angle_direction()}}.
+
+The range does not change what a direction means: \code{-pi / 2} and
+\code{3 * pi / 2} are the same direction, and every \verb{circ_*()} function treats
+them alike. To report directions in \verb{[0, 2*pi)} instead, wrap at the end
+with \code{wrap_angle(x, "2pi")}. Differences (\code{\link[=circ_difference]{circ_difference()}}) are signed
+in \verb{(-pi, pi]} as well, while unwrapped and cumulative angles
+(\code{\link[=unwrap_angle]{unwrap_angle()}}) are not confined to any range. The
+\href{https://animovement.dev/anicore/articles/orientation.html#the-range-of-a-direction}{orientation article}
+covers the convention alongside the frame's axis directions.
+}
+
 \examples{
-angles <- c(-pi, 0, pi, 2 * pi, 3 * pi)
+angles <- c(-pi, 0, pi, 3 * pi / 2, 2 * pi, 3 * pi)
 
+# The signed range, which directions use throughout the suite
+wrap_angle(angles)
+
+# The same angles on [0, 2*pi)
 wrap_angle(angles, "2pi")
-
-# The same angles on the signed interval
-wrap_angle(angles, "pi")
 
 # "asis" is a no-op, useful when the range is chosen by a caller
 wrap_angle(angles, "asis")

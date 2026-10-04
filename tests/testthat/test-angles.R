@@ -75,19 +75,62 @@ test_that("unwrap_angle preserves monotonicity across 2*pi boundary", {
   expect_true(result[5] > 2 * pi)
 })
 
-test_that("wrap_angle() wraps angles to [0, 2pi)", {
+test_that("unwrap_angle() continues across pi in the signed range", {
+  x <- wrap_angle(seq(0, 3 * pi, length.out = 7))
+  result <- unwrap_angle(x)
+
+  expect_true(any(x < 0))
+  expect_equal(result, seq(0, 3 * pi, length.out = 7), tolerance = 1e-12)
+})
+
+test_that("wrap_angle() wraps angles to (-pi, pi] by default", {
   expect_equal(wrap_angle(0), 0)
+  expect_equal(wrap_angle(pi), pi)
+  expect_equal(wrap_angle(-pi), pi)
   expect_equal(wrap_angle(2 * pi), 0)
-  expect_equal(wrap_angle(-pi / 2), 3 * pi / 2)
+  expect_equal(wrap_angle(-pi / 2), -pi / 2)
+  expect_equal(wrap_angle(3 * pi / 2), -pi / 2)
   expect_equal(wrap_angle(3 * pi), pi)
-  expect_equal(wrap_angle(4 * pi), 0)
-  expect_equal(wrap_angle(5 * pi / 2), pi / 2)
+  expect_equal(wrap_angle(-5 * pi / 2), -pi / 2)
+  expect_identical(wrap_angle(c(0.3, -2)), wrap_angle(c(0.3, -2), "pi"))
+})
+
+test_that('wrap_angle("2pi") wraps angles to [0, 2pi)', {
+  expect_equal(wrap_angle(0, "2pi"), 0)
+  expect_equal(wrap_angle(2 * pi, "2pi"), 0)
+  expect_equal(wrap_angle(-pi / 2, "2pi"), 3 * pi / 2)
+  expect_equal(wrap_angle(3 * pi, "2pi"), pi)
+  expect_equal(wrap_angle(4 * pi, "2pi"), 0)
+  expect_equal(wrap_angle(5 * pi / 2, "2pi"), pi / 2)
 })
 
 test_that("wrap_angle() is vectorised", {
   input <- c(-pi / 2, 0, pi / 2, pi, 3 * pi / 2, 2 * pi)
-  expected <- c(3 * pi / 2, 0, pi / 2, pi, 3 * pi / 2, 0)
-  expect_equal(wrap_angle(input), expected)
+
+  expect_equal(wrap_angle(input), c(-pi / 2, 0, pi / 2, pi, -pi / 2, 0))
+  expect_equal(
+    wrap_angle(input, "2pi"),
+    c(3 * pi / 2, 0, pi / 2, pi, 3 * pi / 2, 0)
+  )
+})
+
+test_that("wrap_angle() never returns the end its range excludes", {
+  # The next double above pi, and just below zero, wrap onto the excluded end
+  # in floating point.
+  above_pi <- pi + 2 * .Machine$double.eps
+  below_zero <- -1e-17
+
+  expect_identical(wrap_angle(above_pi), pi)
+  expect_identical(wrap_angle(below_zero, "2pi"), 0)
+  expect_identical(
+    wrap_angle(c(NA, above_pi, 1), "pi"),
+    c(NA, pi, 1)
+  )
+  expect_identical(wrap_angle(c(NA, below_zero, 1), "2pi"), c(NA, 0, 1))
+})
+
+test_that("wrap_angle() rejects an unknown range", {
+  expect_error(wrap_angle(1, "360"), "should be one of")
 })
 
 test_that('wrap_angle("asis") leaves the angles alone', {

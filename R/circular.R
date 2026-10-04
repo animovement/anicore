@@ -6,15 +6,21 @@
 #' distance to every observation. Where two directions tie, their mean
 #' direction is returned.
 #'
-#' @param x A numeric vector of angles, in radians.
+#' The median is signed, in `(-pi, pi]`, the range the suite uses for every
+#' direction (see [wrap_angle()]), so it can be compared directly with the
+#' angles it summarises. Wrap it with `wrap_angle(x, "2pi")` for `[0, 2*pi)`.
+#'
+#' @param x A numeric vector of angles, in radians, in any range.
 #' @param na_rm A logical value (default `TRUE`) determining whether missing
 #'   values are removed before computing. When `FALSE`, any `NA` gives `NA`.
-#' @return A single angle in `[0, 2*pi)`, or `NA_real_` when there is nothing to
+#' @return A single angle in `(-pi, pi]`, or `NA_real_` when there is nothing to
 #'   summarise.
 #' @examples
-#' circ_median(c(0.1, 0.2, 6.2))
+#' # a little below zero, not a little below 2 * pi
+#' circ_median(c(-0.1, -0.2, 0.05))
 #'
 #' # unaffected by where the circle is cut
+#' circ_median(c(0.1, 0.2, 6.2))
 #' circ_median(c(0.1, 0.2, 6.2) + pi)
 #'
 #' @family circular statistics
@@ -25,10 +31,12 @@ circ_median <- function(x, na_rm = TRUE) {
     return(NA_real_)
   }
 
-  x <- wrap_angle(x)
+  # The search runs on [0, 2*pi), which circ_summed_distance() expects;
+  # circ_mean() returns the result in (-pi, pi].
+  x <- wrap_angle(x, "2pi")
 
   # The minimiser is an observation or its antipode, so the search is exact.
-  candidates <- wrap_angle(c(x, x + pi))
+  candidates <- wrap_angle(c(x, x + pi), "2pi")
   distance <- circ_summed_distance(candidates, x)
 
   circ_mean(candidates[distance <= min(distance) + .Machine$double.eps^0.5])
@@ -39,7 +47,7 @@ circ_median <- function(x, na_rm = TRUE) {
 #'
 #' Equal to `sum(pi - abs(pi - abs(x - t)))` for each `t` in `theta`, but in
 #' O((m + n) log n) rather than O(m * n). Both arguments are expected in
-#' `[0, 2*pi]`, as [wrap_angle()] gives.
+#' `[0, 2*pi]`, as `wrap_angle(x, "2pi")` gives.
 #'
 #' Sorted, the observations split into four runs relative to `t`: more than
 #' `pi` below it, within `pi` below, within `pi` above, and more than `pi`
@@ -76,12 +84,19 @@ circ_summed_distance <- function(theta, x) {
 #' The mean direction: the angle of the vector sum of the unit vectors pointing
 #' along each observation.
 #'
+#' The mean is signed, in `(-pi, pi]`, the range the suite uses for every
+#' direction (see [wrap_angle()]), so it can be compared directly with the
+#' angles it summarises. Wrap it with `wrap_angle(x, "2pi")` for `[0, 2*pi)`.
+#'
 #' @inheritParams circ_median
-#' @return A single angle in `[0, 2*pi)`, or `NA_real_` when there is nothing to
+#' @return A single angle in `(-pi, pi]`, or `NA_real_` when there is nothing to
 #'   summarise.
 #' @examples
 #' # 10 degrees; an arithmetic mean would say 190
 #' rad_to_deg(circ_mean(deg_to_rad(c(350, 30))))
+#'
+#' # -10 degrees, in the range of the angles themselves
+#' rad_to_deg(circ_mean(deg_to_rad(c(-30, 10))))
 #'
 #' @family circular statistics
 #' @export
@@ -91,7 +106,7 @@ circ_mean <- function(x, na_rm = TRUE) {
     return(NA_real_)
   }
 
-  wrap_angle(atan2(mean(sin(x)), mean(cos(x))))
+  wrap_angle(atan2(mean(sin(x)), mean(cos(x))), "pi")
 }
 
 
@@ -128,7 +143,7 @@ circ_sd <- function(x, na_rm = TRUE) {
 #' The median of the angular distances from the circular median.
 #'
 #' @inheritParams circ_median
-#' @return A single non-negative number in radians, or `NA_real_` when there is
+#' @return A single number in radians, in `[0, pi]`, or `NA_real_` when there is
 #'   nothing to summarise.
 #' @examples
 #' circ_mad(c(0.1, 0.2, 6.2))

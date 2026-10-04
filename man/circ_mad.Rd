@@ -7,13 +7,13 @@
 circ_mad(x, na_rm = TRUE)
 }
 \arguments{
-\item{x}{A numeric vector of angles, in radians.}
+\item{x}{A numeric vector of angles, in radians, in any range.}
 
 \item{na_rm}{A logical value (default \code{TRUE}) determining whether missing
 values are removed before computing. When \code{FALSE}, any \code{NA} gives \code{NA}.}
 }
 \value{
-A single non-negative number in radians, or \code{NA_real_} when there is
+A single number in radians, in \verb{[0, pi]}, or \code{NA_real_} when there is
 nothing to summarise.
 }
 \description{

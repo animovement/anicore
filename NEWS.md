@@ -21,6 +21,8 @@
 
 * Subsetting a frame so that it loses a column it is keyed, indexed or bounded by gives a plain tibble rather than a frame whose metadata names columns it does not have (#178). This covers `[`, `select()`, `distinct()` and removing a column with `$<-` or `[[<-`. `af[c("x", "y")]` and `select(af, x, y)` used to return an anipoint missing its `time` and keys, which `ensure_is_anipoint()` accepted and later steps tripped over; they now return the columns asked for, ready for plain data-frame work. Dropping a declared value column (a position, an orientation) still returns the frame, so it can be re-declared.
 
+* Directions are signed, in `(-pi, pi]`, throughout (#181). `wrap_angle()` now wraps to `(-pi, pi]` by default (`modulo = "pi"`), and `circ_mean()` and `circ_median()` return that range, so a summary such as `animetric::summarise_aniframe()`'s `median_course` matches the per-row directions it summarises: a course of a little below zero now has a median of a little below zero, not a little below `2 * pi`. It is the range `atan2()` gives, which per-row directions already used. The range does not change any direction, only how it is written. For the old range, wrap at the end with `wrap_angle(x, "2pi")`, and pass `"2pi"` explicitly to any `wrap_angle()` call that relied on the default. `wrap_angle()`'s help page documents the convention.
+
 ## Added
 
 * `angle_to_rad()` and `angle_from_rad()` convert angle values between radians and a frame's declared `unit_angle`, for functions that compute angles in radians and return them in the frame's unit (#170). The frame's unit, or a unit string read once for use inside `mutate()`, says which. A frame that declares no angular unit (`"none"`, or an anievent) is read as radians. `as_anijoint()` and `reflect_axis()` use them in place of their own copies of the check.
@@ -56,6 +58,8 @@
 * `circ_median()`, and so `circ_mad()`, take O(n log n) time rather than O(n²), with the same results (#182). On 20,000 angles `circ_median()` takes 0.02 s rather than 7.6 s, and `animetric::summarise_aniframe()` on a 10-minute, 30 fps recording of 6 keypoints takes 0.4 s rather than 90 s.
 
 ## Fixed
+
+* `wrap_angle()` no longer returns the end of its range that the range excludes (#181). An angle a rounding error above `pi` wrapped to `-pi`, and one a rounding error below zero wrapped to `2 * pi` with `modulo = "2pi"`; both now land on the other end, which is the same angle.
 
 * Renaming columns carries the new names into the metadata (#178). `rename()`, `rename_with()`, renaming in `select()` or `relocate()`, and `names<-` used to leave the keys, the index, the interval, the declared variables and each structure's `variable` naming the old columns, so `rename(af, t = time)` gave a frame `validate_anipoint()` rejected.
 

@@ -7,13 +7,13 @@
 circ_median(x, na_rm = TRUE)
 }
 \arguments{
-\item{x}{A numeric vector of angles, in radians.}
+\item{x}{A numeric vector of angles, in radians, in any range.}
 
 \item{na_rm}{A logical value (default \code{TRUE}) determining whether missing
 values are removed before computing. When \code{FALSE}, any \code{NA} gives \code{NA}.}
 }
 \value{
-A single angle in \verb{[0, 2*pi)}, or \code{NA_real_} when there is nothing to
+A single angle in \verb{(-pi, pi]}, or \code{NA_real_} when there is nothing to
 summarise.
 }
 \description{
@@ -21,10 +21,17 @@ Fisher's circular median: the direction minimising the summed angular
 distance to every observation. Where two directions tie, their mean
 direction is returned.
 }
+\details{
+The median is signed, in \verb{(-pi, pi]}, the range the suite uses for every
+direction (see \code{\link[=wrap_angle]{wrap_angle()}}), so it can be compared directly with the
+angles it summarises. Wrap it with \code{wrap_angle(x, "2pi")} for \verb{[0, 2*pi)}.
+}
 \examples{
-circ_median(c(0.1, 0.2, 6.2))
+# a little below zero, not a little below 2 * pi
+circ_median(c(-0.1, -0.2, 0.05))
 
 # unaffected by where the circle is cut
+circ_median(c(0.1, 0.2, 6.2))
 circ_median(c(0.1, 0.2, 6.2) + pi)
 
 }
