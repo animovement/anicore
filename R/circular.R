@@ -29,13 +29,45 @@ circ_median <- function(x, na_rm = TRUE) {
 
   # The minimiser is an observation or its antipode, so the search is exact.
   candidates <- wrap_angle(c(x, x + pi))
-  distance <- vapply(
-    candidates,
-    function(theta) sum(pi - abs(pi - abs(x - theta))),
-    numeric(1)
-  )
+  distance <- circ_summed_distance(candidates, x)
 
   circ_mean(candidates[distance <= min(distance) + .Machine$double.eps^0.5])
+}
+
+
+#' Summed angular distance from each of `theta` to every one of `x`
+#'
+#' Equal to `sum(pi - abs(pi - abs(x - t)))` for each `t` in `theta`, but in
+#' O((m + n) log n) rather than O(m * n). Both arguments are expected in
+#' `[0, 2*pi]`, as [wrap_angle()] gives.
+#'
+#' Sorted, the observations split into four runs relative to `t`: more than
+#' `pi` below it, within `pi` below, within `pi` above, and more than `pi`
+#' above. Within each run the distance is linear in the observation (`t - x`,
+#' `x - t`, or `2*pi` less one of those), so a run contributes its count times a
+#' term in `t`, plus or minus its sum, read off prefix sums of the sorted
+#' observations. An observation exactly `pi` away is `pi` from either side, so
+#' which run it falls in does not matter.
+#' @noRd
+circ_summed_distance <- function(theta, x) {
+  n <- length(x)
+  sorted <- sort(x)
+  prefix <- c(0, cumsum(sorted))
+
+  # How many observations lie at or below `theta - pi`, `theta`, `theta + pi`.
+  n_lo <- findInterval(theta - pi, sorted)
+  n_mid <- findInterval(theta, sorted)
+  n_hi <- findInterval(theta + pi, sorted)
+
+  # The sum of the smallest `k` observations.
+  cum <- function(k) prefix[k + 1]
+
+  far_below <- n_lo * (2 * pi - theta) + cum(n_lo)
+  near_below <- (n_mid - n_lo) * theta - (cum(n_mid) - cum(n_lo))
+  near_above <- (cum(n_hi) - cum(n_mid)) - (n_hi - n_mid) * theta
+  far_above <- (n - n_hi) * (2 * pi + theta) - (cum(n) - cum(n_hi))
+
+  far_below + near_below + near_above + far_above
 }
 
 
