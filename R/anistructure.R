@@ -354,72 +354,132 @@ example_structure <- function() {
 }
 
 
+#' Print a structure
+#'
+#' @description
+#' Prints the counts of a structure's points, segments and joints, then each
+#' list wrapped to the console width. A segment prints as `from - to` when
+#' its name is the default `from-to`, and as `name: from - to` when it has a
+#' name of its own; joints likewise, over their two segments.
+#'
+#' Like a tibble's rows, a list of more than 20 prints its first 10 and how
+#' many more there are. `n` sets how many to print; `n = Inf` prints all.
+#'
+#' @param x An [anistructure()].
+#' @param n How many points, segments and joints to print. `NULL` (the
+#'   default) prints a list in full up to 20 entries, and the first 10 of a
+#'   longer one.
+#' @param width Width to wrap the lists to (default the console width).
+#' @param ... Unused.
+#'
+#' @return `print()`: `x`, invisibly. `format()`: a character vector of lines.
+#'
+#' @examples
+#' s <- example_structure()
+#' s
+#' print(s, n = 3)
 #' @export
-print.anistructure <- function(x, ...) {
-  cat(format(x, ...), sep = "\n")
+print.anistructure <- function(x, n = NULL, ...) {
+  cat(format(x, n = n, ...), sep = "\n")
   invisible(x)
 }
 
+#' @rdname print.anistructure
 #' @export
-format.anistructure <- function(x, ...) {
-  count <- function(n, what) paste(n, if (n == 1) what else paste0(what, "s"))
-  header <- paste0(
-    "<anistructure> ",
-    paste(
-      count(length(x$points), "point"),
-      count(nrow(x$segments), "segment"),
-      count(nrow(x$joints), "joint"),
-      sep = ", "
-    )
-  )
+format.anistructure <- function(
+  x,
+  n = NULL,
+  width = cli::console_width(),
+  ...
+) {
   details <- c(
     variable = x$variable,
     root = x$root
   )
   details <- details[!is.na(details)]
-  lines <- header
+  lines <- paste("<anistructure>", format_structure_counts(x))
   if (length(details) > 0L) {
     lines <- c(
       lines,
       paste(names(details), details, sep = ": ", collapse = "; ")
     )
   }
-  if (length(x$points) > 0L) {
-    lines <- c(lines, paste("Points:", paste(x$points, collapse = ", ")))
-  }
-  if (nrow(x$segments) > 0L) {
-    lines <- c(
-      lines,
-      paste(
-        "Segments:",
-        paste0(
-          x$segments$segment,
-          " (",
-          x$segments$from,
-          " -> ",
-          x$segments$to,
-          ")",
-          collapse = ", "
+  segments <- x$segments
+  joints <- x$joints
+  lists <- list(
+    Points = x$points,
+    Segments = format_structure_pairs(
+      segments$segment,
+      segments$from,
+      segments$to
+    ),
+    Joints = format_structure_pairs(joints$joint, joints$a, joints$b)
+  )
+  for (label in names(lists)) {
+    items <- lists[[label]]
+    if (length(items) > 0L) {
+      lines <- c(
+        lines,
+        wrap_items(
+          paste0(label, ":"),
+          truncate_items(items, n),
+          width
         )
       )
-    )
-  }
-  if (nrow(x$joints) > 0L) {
-    lines <- c(
-      lines,
-      paste(
-        "Joints:",
-        paste0(
-          x$joints$joint,
-          " (",
-          x$joints$a,
-          ", ",
-          x$joints$b,
-          ")",
-          collapse = ", "
-        )
-      )
-    )
+    }
   }
   lines
+}
+
+
+#' Count a structure's points, segments and joints
+#'
+#' @return `"11 points, 10 segments, 3 joints"`.
+#' @noRd
+format_structure_counts <- function(x) {
+  count <- function(n, what) paste(n, if (n == 1) what else paste0(what, "s"))
+  paste(
+    count(length(x$points), "point"),
+    count(nrow(x$segments), "segment"),
+    count(nrow(x$joints), "joint"),
+    sep = ", "
+  )
+}
+
+
+#' Write each pair once: `from - to`, or `name: from - to` when the name is
+#' not the default `from-to`
+#'
+#' @noRd
+format_structure_pairs <- function(name, from, to) {
+  pair <- paste(from, to, sep = " - ")
+  named <- name != paste(from, to, sep = "-")
+  pair[named] <- paste0(name[named], ": ", pair[named])
+  pair
+}
+
+
+#' Keep the first `n` items, then say how many more there are
+#'
+#' `n = NULL` keeps up to 20 items, and the first 10 of more, as a tibble
+#' does with rows.
+#'
+#' @noRd
+truncate_items <- function(items, n = NULL) {
+  if (is.null(n)) {
+    n <- if (length(items) > 20L) 10L else Inf
+  }
+  if (
+    !is.numeric(n) ||
+      length(n) != 1L ||
+      is.na(n) ||
+      n < 0 ||
+      (is.finite(n) && n != round(n))
+  ) {
+    cli::cli_abort("{.arg n} must be a single non-negative whole number.")
+  }
+  if (length(items) <= n) {
+    return(items)
+  }
+  c(items[seq_len(n)], paste("...", "and", length(items) - n, "more"))
 }

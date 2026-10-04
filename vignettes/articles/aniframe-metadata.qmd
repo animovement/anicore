@@ -41,11 +41,19 @@ connections, which live in the `structure` category, see
 
 ## The metadata attribute
 
-You can see the full metadata by printing it directly:
+You can see the metadata by printing it directly. Fields that are not
+set are named together on the last line:
 
 ```{r}
 data <- example_anipoint()
 get_metadata(data)
+```
+
+`all = TRUE` prints every field, the values each factor field allows, and
+`spec_version`:
+
+```{r}
+print(get_metadata(data), all = TRUE)
 ```
 
 The fields and their defaults are defined in one place,

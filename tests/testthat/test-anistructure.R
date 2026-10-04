@@ -131,4 +131,69 @@ test_that("printing summarises the parts", {
     print(anistructure(points = "a")),
     "1 point, 0 segments, 0 joints"
   )
+  expect_snapshot(print(example_structure()))
+})
+
+test_that("a segment prints once, with its name only when it has its own", {
+  s <- anistructure(
+    segments = data.frame(
+      segment = c("a-b", "shin"),
+      from = c("a", "b"),
+      to = c("b", "c")
+    ),
+    joints = data.frame(a = "a-b", b = "shin")
+  )
+  out <- format(s, width = 80)
+  expect_equal(out[[3]], "Segments: a - b, shin: b - c")
+  expect_equal(out[[4]], "Joints: a-b - shin")
+})
+
+test_that("printing wraps the lists to the width", {
+  s <- anistructure(
+    segments = lapply(1:8, function(i) {
+      paste0("point_", c(i, i + 1))
+    })
+  )
+  out <- format(s, width = 40)
+  expect_true(all(nchar(out[-1]) <= 40))
+  expect_equal(out[[2]], "Points: point_1, point_2, point_3,")
+  expect_equal(out[[3]], "  point_4, point_5, point_6, point_7,")
+
+  local_reproducible_output(width = 50)
+  expect_snapshot(print(s))
+})
+
+test_that("long lists are truncated like tibble rows", {
+  chain <- anistructure(
+    segments = lapply(1:23, function(i) {
+      paste0("s", c(i, i + 1))
+    })
+  )
+  out <- format(chain, width = Inf)
+  expect_equal(
+    out[[2]],
+    "Points: s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, ... and 14 more"
+  )
+  expect_match(out[[3]], "s10 - s11, ... and 13 more$")
+
+  all_shown <- format(chain, n = Inf, width = Inf)
+  expect_match(all_shown[[3]], "s23 - s24$")
+  expect_no_match(paste(all_shown, collapse = " "), "more")
+
+  expect_equal(
+    format(chain, n = 2, width = Inf)[[2]],
+    "Points: s1, s2, ... and 22 more"
+  )
+  expect_snapshot(print(chain, n = 3))
+})
+
+test_that("n must be a non-negative whole number", {
+  s <- example_structure()
+  expect_error(format(s, n = -1), "non-negative whole number")
+  expect_error(format(s, n = 1.5), "non-negative whole number")
+  expect_error(format(s, n = "a"), "non-negative whole number")
+  expect_equal(
+    format(s, n = 0, width = 80)[[3]],
+    "Points: ... and 11 more"
+  )
 })

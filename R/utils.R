@@ -156,3 +156,37 @@ rename_metadata_columns <- function(md, from, to) {
   }
   md
 }
+
+
+#' Wrap a label and comma-separated items to a width
+#'
+#' Lines break between items, never inside one; continuation lines are
+#' indented. An item too long for a line overflows it rather than being split.
+#'
+#' @param label Text before the first item, such as `"Points:"`.
+#' @param items Character vector.
+#' @param width Line width in characters.
+#' @param indent Indent of the continuation lines.
+#'
+#' @return Character vector of lines.
+#' @noRd
+wrap_items <- function(label, items, width, indent = 2) {
+  if (length(items) == 0) {
+    return(label)
+  }
+  items <- paste0(items, c(rep(",", length(items) - 1), ""))
+  lines <- character()
+  line <- label
+  has_item <- FALSE
+  for (item in items) {
+    candidate <- paste(line, item)
+    if (!has_item || cli::ansi_nchar(candidate, type = "width") <= width) {
+      line <- candidate
+    } else {
+      lines <- c(lines, line)
+      line <- paste0(strrep(" ", indent), item)
+    }
+    has_item <- TRUE
+  }
+  c(lines, line)
+}
