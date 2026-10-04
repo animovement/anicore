@@ -7,21 +7,23 @@
 unwrap_angle(x)
 }
 \arguments{
-\item{x}{A numeric vector of angles, in radians.}
+\item{x}{A numeric vector of angles, in radians, in any range.}
 }
 \value{
 A numeric vector the same length as \code{x}, without wrapping
-discontinuities.
+discontinuities. It starts at the first non-missing angle of \code{x} and is
+not confined to any range.
 }
 \description{
 Reverses the discontinuity introduced by wrapping, by accumulating the
-shortest step between successive angles. A heading that crosses \code{2*pi}
-therefore continues to increase rather than jumping back to zero, which is
-what makes it differentiable. \code{NA} values are preserved in place.
+shortest step between successive angles. A heading that crosses the end of
+its range, \code{pi} in the signed range \code{\link[=wrap_angle]{wrap_angle()}} gives, therefore
+continues to increase rather than jumping back to \code{-pi}, which is what makes
+it differentiable. \code{NA} values are preserved in place.
 }
 \examples{
-# A heading turning steadily past a full circle, wrapped to [0, 2*pi)
-wrapped <- wrap_angle(seq(0, 3 * pi, length.out = 7), "2pi")
+# A heading turning steadily past a full circle, wrapped to (-pi, pi]
+wrapped <- wrap_angle(seq(0, 3 * pi, length.out = 7))
 wrapped
 
 # Unwrapping restores the steady progression

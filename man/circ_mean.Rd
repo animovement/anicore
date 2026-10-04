@@ -7,22 +7,30 @@
 circ_mean(x, na_rm = TRUE)
 }
 \arguments{
-\item{x}{A numeric vector of angles, in radians.}
+\item{x}{A numeric vector of angles, in radians, in any range.}
 
 \item{na_rm}{A logical value (default \code{TRUE}) determining whether missing
 values are removed before computing. When \code{FALSE}, any \code{NA} gives \code{NA}.}
 }
 \value{
-A single angle in \verb{[0, 2*pi)}, or \code{NA_real_} when there is nothing to
+A single angle in \verb{(-pi, pi]}, or \code{NA_real_} when there is nothing to
 summarise.
 }
 \description{
 The mean direction: the angle of the vector sum of the unit vectors pointing
 along each observation.
 }
+\details{
+The mean is signed, in \verb{(-pi, pi]}, the range the suite uses for every
+direction (see \code{\link[=wrap_angle]{wrap_angle()}}), so it can be compared directly with the
+angles it summarises. Wrap it with \code{wrap_angle(x, "2pi")} for \verb{[0, 2*pi)}.
+}
 \examples{
 # 10 degrees; an arithmetic mean would say 190
 rad_to_deg(circ_mean(deg_to_rad(c(350, 30))))
+
+# -10 degrees, in the range of the angles themselves
+rad_to_deg(circ_mean(deg_to_rad(c(-30, 10))))
 
 }
 \seealso{

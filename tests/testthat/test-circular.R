@@ -31,15 +31,23 @@ reference <- list(
 )
 
 test_that("circ_median() agrees with the reference implementation", {
+  # The reference medians are in [0, 2*pi); circ_median() is in (-pi, pi].
   for (case in reference) {
-    expect_equal(circ_median(case$x), case$median, tolerance = 1e-8)
+    expect_equal(
+      wrap_angle(circ_median(case$x), "2pi"),
+      case$median,
+      tolerance = 1e-8
+    )
   }
 })
 
 test_that("circ_summed_distance() is the summed distance to every observation", {
   set.seed(147)
-  x <- wrap_angle(c(stats::runif(40, 0, 2 * pi), 0, pi, 2 * pi - 1e-12))
-  theta <- wrap_angle(c(x, x + pi, stats::runif(40, 0, 2 * pi)))
+  x <- wrap_angle(
+    c(stats::runif(40, 0, 2 * pi), 0, pi, 2 * pi - 1e-12),
+    "2pi"
+  )
+  theta <- wrap_angle(c(x, x + pi, stats::runif(40, 0, 2 * pi)), "2pi")
 
   expect_equal(
     circ_summed_distance(theta, x),
@@ -124,12 +132,35 @@ test_that("circ_mean() is the mean direction, not the arithmetic mean", {
     tolerance = 1e-9
   )
 
-  # The mean of 350 and 10 degrees is 0, reached from below in [0, 2*pi).
+  # The mean of 350 and 10 degrees is 0, which floating point may reach from
+  # either side of zero.
   expect_equal(
     circ_difference(0, circ_mean(deg_to_rad(c(350, 10)))),
     0,
     tolerance = 1e-9
   )
+})
+
+test_that("circ_mean() and circ_median() are signed, in (-pi, pi]", {
+  # Directions just below zero stay just below zero, like the data.
+  expect_equal(circ_mean(c(-0.3, -0.1)), -0.2, tolerance = 1e-12)
+  expect_equal(circ_median(c(-0.3, -0.2, -0.1)), -0.2, tolerance = 1e-12)
+  expect_equal(circ_median(c(6.0, 6.1, 6.2)), 6.1 - 2 * pi, tolerance = 1e-12)
+
+  # The direction opposite x comes out as pi, the included end, not -pi.
+  expect_identical(circ_mean(pi), pi)
+  expect_identical(circ_mean(-pi), pi)
+  expect_identical(circ_median(-pi), pi)
+  expect_identical(circ_median(c(-pi, pi)), pi)
+
+  set.seed(181)
+  for (i in 1:50) {
+    x <- stats::runif(stats::rpois(1, 20) + 1, -6 * pi, 6 * pi)
+    for (summary in c(circ_mean(x), circ_median(x))) {
+      expect_gt(summary, -pi)
+      expect_lte(summary, pi)
+    }
+  }
 })
 
 test_that("the summaries do not depend on where the circle is cut", {

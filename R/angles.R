@@ -108,35 +108,68 @@ resolve_unit_angle <- function(unit, call = rlang::caller_env()) {
 #' Constrain angles to a standard range
 #'
 #' Wraps a vector of angles to a standard interval using modulo arithmetic.
+#' By default that is the signed range `(-pi, pi]`, which the suite uses for
+#' every direction; see the section below.
+#'
+#' @section The range of a direction:
+#' Directions throughout the animovement suite are signed, in `(-pi, pi]`
+#' (`(-180, 180]` in degrees). It is the range [atan2()] returns, so per-row
+#' directions such as a course or a heading come out in it already, and the
+#' circular summaries [circ_mean()] and [circ_median()] return it too, so a
+#' summary can be compared with the values it summarises. `0` points along
+#' `x`, and the sign says which side of `x` a direction lies on: positive
+#' toward `y`, negative away from it. Which way that turns on screen is the
+#' frame's angle direction, [get_angle_direction()].
+#'
+#' The range does not change what a direction means: `-pi / 2` and
+#' `3 * pi / 2` are the same direction, and every `circ_*()` function treats
+#' them alike. To report directions in `[0, 2*pi)` instead, wrap at the end
+#' with `wrap_angle(x, "2pi")`. Differences ([circ_difference()]) are signed
+#' in `(-pi, pi]` as well, while unwrapped and cumulative angles
+#' ([unwrap_angle()]) are not confined to any range. The
+#' [orientation article](https://animovement.dev/anicore/articles/orientation.html#the-range-of-a-direction)
+#' covers the convention alongside the frame's axis directions.
 #'
 #' @param x A numeric vector of angles, in radians.
-#' @param modulo A character string (default `"2pi"`) giving the target range:
+#' @param modulo A character string (default `"pi"`) giving the target range:
 #'   \describe{
-#'     \item{`"2pi"`}{Wrap to `[0, 2*pi)`.}
 #'     \item{`"pi"`}{Wrap to `(-pi, pi]`.}
+#'     \item{`"2pi"`}{Wrap to `[0, 2*pi)`.}
 #'     \item{`"asis"`}{Return unchanged.}
 #'   }
 #' @return A numeric vector the same length as `x`, wrapped to the chosen range.
 #' @examples
-#' angles <- c(-pi, 0, pi, 2 * pi, 3 * pi)
+#' angles <- c(-pi, 0, pi, 3 * pi / 2, 2 * pi, 3 * pi)
 #'
+#' # The signed range, which directions use throughout the suite
+#' wrap_angle(angles)
+#'
+#' # The same angles on [0, 2*pi)
 #' wrap_angle(angles, "2pi")
-#'
-#' # The same angles on the signed interval
-#' wrap_angle(angles, "pi")
 #'
 #' # "asis" is a no-op, useful when the range is chosen by a caller
 #' wrap_angle(angles, "asis")
 #'
 #' @family angle utilities
 #' @export
-wrap_angle <- function(x, modulo = c("2pi", "pi", "asis")) {
+wrap_angle <- function(x, modulo = c("pi", "2pi", "asis")) {
   modulo <- match.arg(modulo)
 
+  # A value within a rounding error of where the range wraps can land exactly
+  # on the end it excludes, so that end is folded onto the other: the same
+  # angle, inside the range.
   switch(
     modulo,
-    "2pi" = x %% (2 * pi),
-    "pi" = pi - ((pi - x) %% (2 * pi)),
+    "pi" = {
+      wrapped <- pi - ((pi - x) %% (2 * pi))
+      wrapped[!is.na(wrapped) & wrapped <= -pi] <- pi
+      wrapped
+    },
+    "2pi" = {
+      wrapped <- x %% (2 * pi)
+      wrapped[!is.na(wrapped) & wrapped >= 2 * pi] <- 0
+      wrapped
+    },
     "asis" = x
   )
 }
@@ -145,16 +178,18 @@ wrap_angle <- function(x, modulo = c("2pi", "pi", "asis")) {
 #' Remove wrapping from a sequence of angles
 #'
 #' Reverses the discontinuity introduced by wrapping, by accumulating the
-#' shortest step between successive angles. A heading that crosses `2*pi`
-#' therefore continues to increase rather than jumping back to zero, which is
-#' what makes it differentiable. `NA` values are preserved in place.
+#' shortest step between successive angles. A heading that crosses the end of
+#' its range, `pi` in the signed range [wrap_angle()] gives, therefore
+#' continues to increase rather than jumping back to `-pi`, which is what makes
+#' it differentiable. `NA` values are preserved in place.
 #'
-#' @param x A numeric vector of angles, in radians.
+#' @param x A numeric vector of angles, in radians, in any range.
 #' @return A numeric vector the same length as `x`, without wrapping
-#'   discontinuities.
+#'   discontinuities. It starts at the first non-missing angle of `x` and is
+#'   not confined to any range.
 #' @examples
-#' # A heading turning steadily past a full circle, wrapped to [0, 2*pi)
-#' wrapped <- wrap_angle(seq(0, 3 * pi, length.out = 7), "2pi")
+#' # A heading turning steadily past a full circle, wrapped to (-pi, pi]
+#' wrapped <- wrap_angle(seq(0, 3 * pi, length.out = 7))
 #' wrapped
 #'
 #' # Unwrapping restores the steady progression
