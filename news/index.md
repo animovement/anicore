@@ -246,6 +246,17 @@
   [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md).
   Experimental functions may change without a deprecation cycle.
 
+- [`circ_median()`](https://animovement.dev/anicore/reference/circ_median.md),
+  and so
+  [`circ_mad()`](https://animovement.dev/anicore/reference/circ_mad.md),
+  take O(n log n) time rather than O(n²), with the same results
+  ([\#182](https://github.com/animovement/anicore/issues/182)). On
+  20,000 angles
+  [`circ_median()`](https://animovement.dev/anicore/reference/circ_median.md)
+  takes 0.02 s rather than 7.6 s, and `animetric::summarise_aniframe()`
+  on a 10-minute, 30 fps recording of 6 keypoints takes 0.4 s rather
+  than 90 s.
+
 ### Fixed
 
 - Renaming columns carries the new names into the metadata
