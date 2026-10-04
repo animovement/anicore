@@ -2,12 +2,15 @@
 % Please edit documentation in R/metadata_print.R
 \name{print.aniframe_metadata}
 \alias{print.aniframe_metadata}
-\title{Print method for animovement metadata}
+\title{Print the metadata of a frame}
 \usage{
-\method{print}{aniframe_metadata}(x, ...)
+\method{print}{aniframe_metadata}(x, all = FALSE, ...)
 }
 \arguments{
-\item{x}{An \code{aniframe_metadata} list.}
+\item{x}{An \code{aniframe_metadata} object, as returned by \code{\link[=get_metadata]{get_metadata()}}.}
+
+\item{all}{Whether to print every field (default \code{FALSE}): those not set,
+the allowed values of factor fields, and \code{spec_version}.}
 
 \item{...}{Unused.}
 }
@@ -15,6 +18,17 @@
 \code{x}, invisibly.
 }
 \description{
-Shared by \code{\link[=anipoint]{anipoint()}} and \code{\link[=anievent]{anievent()}} despite the class name.
+Prints the metadata of an \code{\link[=anipoint]{anipoint()}} or \code{\link[=anievent]{anievent()}} one category at a
+time, one \code{name: value} line per field, wrapped to the console width.
+Values carry their units where the metadata declares them, such as
+\verb{sampling_rate: 30 Hz}. Fields that are not set are left out and named
+together on a closing line.
+
+\code{all = TRUE} prints every field, including those not set, the values each
+factor field allows, and \code{spec_version}.
 }
-\keyword{internal}
+\examples{
+md <- get_metadata(set_metadata(example_anipoint(), sampling_rate = 30))
+md
+print(md, all = TRUE)
+}

@@ -55,6 +55,10 @@
 
 * `circ_median()`, and so `circ_mad()`, take O(n log n) time rather than O(n²), with the same results (#182). On 20,000 angles `circ_median()` takes 0.02 s rather than 7.6 s, and `animetric::summarise_aniframe()` on a 10-minute, 30 fps recording of 6 keypoints takes 0.4 s rather than 90 s.
 
+* Metadata and structures print more compactly (#180).
+  * Metadata prints one `name: value` line per field, wrapped to the console width, with units where the metadata declares them (`sampling_rate: 30 Hz`, `axis_extents: x = 1920 px`). Fields that are not set are named on one closing line rather than printed as `<NA>`, and storage types, the allowed values of factor fields and `spec_version` are left out. `print(get_metadata(x), all = TRUE)` shows everything.
+  * A structure writes each segment once, as `from - to`, with its name only when it has one of its own, and wraps its lists to the console width. Like a tibble's rows, a list of more than 20 shows its first 10; `print(x, n = Inf)` shows all.
+
 ## Fixed
 
 * Renaming columns carries the new names into the metadata (#178). `rename()`, `rename_with()`, renaming in `select()` or `relocate()`, and `names<-` used to leave the keys, the index, the interval, the declared variables and each structure's `variable` naming the old columns, so `rename(af, t = time)` gave a frame `validate_anipoint()` rejected.

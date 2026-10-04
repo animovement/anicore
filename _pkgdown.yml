@@ -57,6 +57,7 @@ reference:
       - get_metadata
       - set_metadata
       - list_default_metadata
+      - print.aniframe_metadata
       - get_sampling_interval
       - is_sampling_regular
       - get_axis_directions
@@ -93,6 +94,7 @@ reference:
       structures.
     contents:
       - anistructure
+      - print.anistructure
       - example_structure
       - validate_anistructure
       - is_anistructure
