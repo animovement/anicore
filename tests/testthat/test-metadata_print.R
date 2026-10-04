@@ -149,7 +149,10 @@ test_that("start_datetime prints as a date-time", {
 
   out <- capture_md_print(get_metadata(data))
 
-  expect_true(any(grepl("^start_datetime: 2024-01-15 14:30:00", out)))
+  # anytime parses in the system timezone, which differs on Windows, so the
+  # expected text comes from the same parse rather than a fixed clock time
+  expected <- format(anytime::anytime("2024-01-15 14:30:00"), usetz = TRUE)
+  expect_true(any(out == paste0("start_datetime: ", expected)))
 })
 
 test_that("print returns input invisibly", {
