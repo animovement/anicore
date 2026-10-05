@@ -4,14 +4,18 @@
 \alias{preserve_animovement_class}
 \title{Re-clothe a dispatched result with its animovement classes and metadata}
 \usage{
-preserve_animovement_class(x, cls, md)
+preserve_animovement_class(x, cls, md, before = NULL)
 }
 \arguments{
 \item{x}{The bare result returned by \code{NextMethod()}.}
 
 \item{cls}{Class vector of the original input, captured before dispatch.}
 
-\item{md}{Metadata captured before dispatch via \code{\link[=get_metadata]{get_metadata()}}.
+\item{md}{Metadata captured before dispatch via \code{\link[=get_metadata]{get_metadata()}}.}
+
+\item{before}{The frame the verb was given. The stored
+\code{sampling_interval} is measured again unless its index and keys are
+unchanged; \code{NULL} measures it always.
 
 A result that has lost a column the frame is keyed, indexed or bounded by
 is no longer that frame: it comes back as the plain data frame, without

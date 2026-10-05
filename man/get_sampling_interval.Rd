@@ -7,24 +7,27 @@
 get_sampling_interval(data)
 }
 \arguments{
-\item{data}{An anipoint object.
-
-Refreshed whenever the frame is re-declared, so like
-\code{coordinate_system} it can lag raw dplyr edits. \code{\link[=is_sampling_regular]{is_sampling_regular()}}
-reads the data directly and is always current.}
+\item{data}{An anipoint object.}
 }
 \value{
 Numeric scalar, or \code{NA} when the frame is too short to measure.
 }
 \description{
-Derived from the index at construction rather than declared, in the unit
-the index is in -- so a frame indexed by frame number has an interval in
-frames, and one indexed by seconds has it in seconds.
+Derived from the index rather than declared, in the unit the index is in
+-- so a frame indexed by frame number has an interval in frames, and one
+indexed by seconds has it in seconds.
 }
 \details{
 Measured per key: identity plus temporal context. The index restarts in
 each group, so pooling them would measure the restarts rather than the
 sampling.
+
+Measured again whenever the rows or the index change: by
+\code{\link[dplyr:filter]{dplyr::filter()}}, \code{\link[dplyr:slice]{dplyr::slice()}}, \code{[}, a \code{\link[dplyr:mutate]{dplyr::mutate()}} of the
+index or a key, and the other dplyr verbs anicore provides methods for.
+A frame that keeps every third row of a 30 Hz recording then reports the
+10 Hz spacing it now has, and \code{\link[=validate_anipoint]{validate_anipoint()}} says that its
+\code{sampling_rate} no longer matches.
 }
 \examples{
 af <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1)

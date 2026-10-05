@@ -336,7 +336,7 @@ test_that("convert_unit_time leaves an unknown sampling_interval unknown", {
   expect_equal(result$time, 1000)
 })
 
-test_that("convert_unit_time does not add sampling_interval to older metadata", {
+test_that("convert_unit_time measures sampling_interval on older metadata", {
   data <- dplyr::tibble(x = c(10, 20, 30), time = c(0, 1, 2)) |>
     as_anipoint() |>
     set_metadata(unit_time = "s")
@@ -346,7 +346,8 @@ test_that("convert_unit_time does not add sampling_interval to older metadata", 
 
   result <- convert_unit_time(data, "ms")
 
-  expect_null(attr(result, "metadata")$time$sampling_interval)
+  # Any verb that changes the index measures it, field or no field (#190).
+  expect_equal(get_sampling_interval(result), 1000)
   expect_equal(result$time, c(0, 1000, 2000))
 })
 

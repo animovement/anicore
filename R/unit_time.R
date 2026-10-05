@@ -40,16 +40,11 @@ convert_unit_time.anipoint <- function(
   factor <- resolve_unit_time_calibration(data, to_unit, calibration_factor)
 
   index <- get_index(data)
-  # The interval is in the unit being converted from, like the index (#185).
-  interval <- get_sampling_interval(data)
-
+  # `mutate()` measures the interval again, in the new unit (#185, #190).
   data <- data |>
     dplyr::mutate(
       dplyr::across(dplyr::all_of(index), function(x) x * factor)
     )
-  if (!is.na(interval)) {
-    data <- set_metadata(data, sampling_interval = interval * factor)
-  }
   set_metadata(data, unit_time = to_unit)
 }
 
