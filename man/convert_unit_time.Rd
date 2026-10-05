@@ -47,7 +47,9 @@ spaced and multiplying by the rate gives them back.
 
 Converting back to frames is also how a wrong rate is put right: convert
 to \code{"frame"} with the rate the frame declares, declare the right one, and
-convert forward again (see the examples).
+convert forward again (see the examples). When it is the camera's rate
+that was wrong, declare it as \code{source_sampling_rate} too, which records
+the rate the device recorded at (see \code{\link[=set_metadata]{set_metadata()}}).
 
 To declare a unit without changing values, use
 \code{set_metadata(data, unit_time = "s")}.
@@ -86,7 +88,7 @@ in_seconds
 # The camera was really 25 fps: back to frames, then forward at 25 fps
 in_seconds |>
   convert_unit_time("frame") |>
-  set_metadata(sampling_rate = 25) |>
+  set_metadata(sampling_rate = 25, source_sampling_rate = 25) |>
   convert_unit_time("s")
 
 # Times off the frame grid by a little jitter round to whole frames

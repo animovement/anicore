@@ -25,6 +25,12 @@
 
 ## Added
 
+* A `source_sampling_rate` metadata field, in `recording`, holds the rate the device recorded at, apart from `sampling_rate`, the rate of the data as it is now (#190). Resampling changes the current rate and never the recorded one; filters, `convert_unit_time()` and the rate check keep using `sampling_rate`.
+  * The first rate declared fills both: `set_metadata(sampling_rate = )` on a frame with neither rate set also sets `source_sampling_rate`, so readers that declare a rate record the camera's without changing. This applies to `as_anipoint(metadata = )` too. After that `sampling_rate` changes on its own, so correcting a wrong camera rate means setting `source_sampling_rate` in the same call.
+  * `source_sampling_rate = NaN` declares that the device has no fixed rate, such as an event-driven sensor whose readings a reader integrates into windows. The first declaration leaves it alone, where `NA` means not declared yet.
+  * The compact metadata print and the frame header show the recorded rate only when it differs: `sampling_rate: 50 Hz (recorded at 200 Hz)`.
+  * Metadata saved before the field existed still validates, and a frame that already declared a rate does not fill it later, since its later rates may be resampled ones.
+
 * `convert_unit_time()` converts to `"frame"` (#190). Frame numbers a file records are data, and frames computed from a rate are only nominal, so it never invents them:
   * A frame with a column named `frame`, not its index, holds the recorded frame numbers, and converting to `"frame"` makes that column the index again. The column it replaces is kept.
   * Otherwise frames are computed from the declared `sampling_rate`, counting from 0 (seconds times the rate), and rounded to the nearest whole frame. The conversion refuses when the sampling is irregular, a gap more than 1% from a whole number of frames, or when rounding would put two times of the same keys on one frame.

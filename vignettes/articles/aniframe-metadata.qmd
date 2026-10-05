@@ -69,7 +69,7 @@ question:
 
 | Category      | Fields                                                              |
 |---------------|---------------------------------------------------------------------|
-| `recording`   | provenance: `source`, `source_version`, `source_format`, `filename` |
+| `recording`   | provenance: `source`, `source_version`, `source_format`, `source_sampling_rate`, `filename` |
 | `time`        | `unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime` |
 | `space`       | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`, `euler_sequence`, `euler_intrinsic` |
 | `variables`   | which columns play which role: `what`, `when`, `where`, `event`, each a list of named slots |
@@ -82,6 +82,29 @@ its metadata simply has no `space` rather than a set of "none" values.
 
 `filename` accepts a character vector — readers like
 `aniread::read_trackball()` populate it with all source paths.
+
+### Two sampling rates
+
+A frame keeps two rates apart. `source_sampling_rate` is the rate the
+device recorded at: provenance, which no processing changes.
+`sampling_rate` is the rate of the data as it is now, the one filters
+and conversions compute with, and the one resampling changes. The first
+rate declared fills both, so a reader that sets `sampling_rate` records
+the camera's rate without saying so:
+
+```{r}
+rates <- set_metadata(example_anipoint(), sampling_rate = 200)
+get_metadata(rates, "source_sampling_rate")
+
+rates <- set_metadata(rates, sampling_rate = 50) # e.g. after resampling
+get_metadata(rates, "time")$sampling_rate
+get_metadata(rates)
+```
+
+The compact print shows the recorded rate beside the current one only
+when they differ. A device with no fixed rate, such as an event-driven
+sensor, is declared with `source_sampling_rate = NaN`, which the first
+declaration leaves alone; `NA` means the rate has not been declared yet.
 
 ## Reading and writing metadata
 
@@ -227,12 +250,13 @@ range(data_s$time) # frames divided by fps
 
 Frames count from 0, so the first frame is at 0 s. Converting back to
 frames uses the rate the frame declares, which is how a wrong rate is put
-right: back to frames, declare the right rate, and forward again.
+right: back to frames, declare the right rate, and forward again. A wrong
+camera rate is the recorded rate too, so it is declared as both.
 
 ```{r}
 data_s |>
   convert_unit_time("frame") |>
-  set_metadata(sampling_rate = 25) |>
+  set_metadata(sampling_rate = 25, source_sampling_rate = 25) |>
   convert_unit_time("s") |>
   get_sampling_interval()
 ```

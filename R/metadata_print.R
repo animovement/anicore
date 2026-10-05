@@ -5,10 +5,13 @@
 #' time, one `name: value` line per field, wrapped to the console width.
 #' Values carry their units where the metadata declares them, such as
 #' `sampling_rate: 30 Hz`. Fields that are not set are left out and named
-#' together on a closing line.
+#' together on a closing line. The rate the device recorded at is shown
+#' with the current rate, and only when the two differ, as in
+#' `sampling_rate: 50 Hz (recorded at 200 Hz)`.
 #'
 #' `all = TRUE` prints every field, including those not set, the values each
-#' factor field allows, and `spec_version`.
+#' factor field allows, and `spec_version`. `source_sampling_rate` then has
+#' a line of its own.
 #'
 #' @param x An `aniframe_metadata` object, as returned by [get_metadata()].
 #' @param all Whether to print every field (default `FALSE`): those not set,
@@ -83,7 +86,21 @@ print_metadata_category <- function(values, category, md, all, width) {
     print_metadata_structure(values)
     return(character())
   }
-  set <- !vapply(values, is_metadata_unset, logical(1))
+  # The recorded rate goes with the current one, which says if they differ.
+  if (
+    !all &&
+      identical(category, "recording") &&
+      !is_metadata_unset(md_field(md, "sampling_rate"))
+  ) {
+    values$source_sampling_rate <- NULL
+  }
+  set <- !vapply(
+    names(values),
+    function(field) {
+      is_metadata_unset(values[[field]], field)
+    },
+    logical(1)
+  )
   if (all || any(set)) {
     cli::cli_h3(category)
   }
@@ -102,7 +119,7 @@ print_metadata_fields <- function(values, md, all, width) {
   unset <- character()
   for (field in names(values)) {
     value <- values[[field]]
-    if (is_metadata_unset(value)) {
+    if (is_metadata_unset(value, field)) {
       unset <- c(unset, field)
       if (all) {
         cli::cli_verbatim(paste0(field, ": -"))
@@ -110,6 +127,9 @@ print_metadata_fields <- function(values, md, all, width) {
       next
     }
     items <- format_metadata_value(field, value, md)
+    if (!all && identical(field, "sampling_rate")) {
+      items <- format_sampling_rate(md)
+    }
     cli::cli_verbatim(wrap_items(paste0(field, ":"), items, width))
     if (all && is.factor(value)) {
       cli::cli_verbatim(wrap_items(
@@ -139,9 +159,41 @@ print_metadata_unset <- function(unset, all, width) {
 
 #' Is a metadata value unset: absent, empty, or all `NA`?
 #'
+#' A `source_sampling_rate` of `NaN` declares that the device has no fixed
+#' rate, so it is set.
+#'
 #' @noRd
-is_metadata_unset <- function(value) {
+is_metadata_unset <- function(value, field = NULL) {
+  if (identical(field, "source_sampling_rate") && is_no_fixed_rate(value)) {
+    return(FALSE)
+  }
   length(value) == 0 || all(is.na(value))
+}
+
+
+#' The current sampling rate, with the recorded one when they differ
+#'
+#' `"50 Hz (recorded at 200 Hz)"`, or `"50 Hz"` when they agree or nothing
+#' was recorded.
+#'
+#' @param md The whole metadata.
+#'
+#' @return Character scalar, or `NULL` when no rate is set.
+#' @noRd
+format_sampling_rate <- function(md) {
+  rate <- md_field(md, "sampling_rate")
+  if (is_metadata_unset(rate)) {
+    return(NULL)
+  }
+  shown <- format_metadata_value("sampling_rate", rate, md)
+  recorded <- md_field(md, "source_sampling_rate")
+  if (is_no_fixed_rate(recorded)) {
+    return(paste(shown, "(recorded with no fixed rate)"))
+  }
+  if (is_metadata_unset(recorded) || isTRUE(all.equal(recorded, rate))) {
+    return(shown)
+  }
+  paste0(shown, " (recorded at ", format(recorded), " Hz)")
 }
 
 
@@ -157,6 +209,9 @@ is_metadata_unset <- function(value) {
 #' @return Character vector.
 #' @noRd
 format_metadata_value <- function(field, value, md) {
+  if (identical(field, "source_sampling_rate") && is_no_fixed_rate(value)) {
+    return("no fixed rate")
+  }
   value <- value[!is.na(value)]
   shown <- if (inherits(value, "POSIXt")) {
     format(value, usetz = TRUE)
@@ -168,7 +223,8 @@ format_metadata_value <- function(field, value, md) {
 
   unit <- switch(
     field,
-    sampling_rate = "Hz",
+    sampling_rate = ,
+    source_sampling_rate = "Hz",
     sampling_interval = as.character(md_field(md, "unit_time") %||% NA),
     axis_extents = as.character(md_field(md, "unit_space") %||% NA),
     NA_character_

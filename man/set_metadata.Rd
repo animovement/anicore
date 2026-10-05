@@ -30,6 +30,29 @@ variable declaration goes through its dedicated setters.
 Character values for factor fields will be automatically converted to
 factors if they match allowed levels.
 }
+\section{The recorded and the current sampling rate}{
+
+A frame keeps two rates apart. \code{source_sampling_rate}, with the other
+provenance in \code{recording}, is the rate the device recorded at, and no
+processing changes it. \code{sampling_rate}, in \code{time}, is the rate of the
+data as it is now: the rate filters and conversions compute with, and
+the one resampling changes.
+
+The first declaration of a rate fills both. Setting \code{sampling_rate} on a
+frame that has neither rate yet also sets \code{source_sampling_rate}, since
+that is the moment the camera's rate is declared; this holds for
+\code{as_anipoint(metadata = )} too. After that \code{sampling_rate} changes on its
+own, so correcting a wrong camera rate means setting
+\code{source_sampling_rate} as well, in the same call.
+
+A device with no fixed rate, such as an event-driven sensor whose
+readings a reader integrates into windows, is declared with
+\code{source_sampling_rate = NaN}: "no fixed rate", as distinct from \code{NA},
+"not declared yet". The first declaration then leaves it alone, and
+\code{is.na()} is still \code{TRUE} for code that only asks whether there is a
+recorded rate to use.
+}
+
 \examples{
 \dontrun{
 # Set metadata using named arguments
@@ -39,6 +62,20 @@ data <- set_metadata(data, sampling_rate = 30, source = "sleap")
 md <- list(sampling_rate = 30, source = "sleap")
 data <- set_metadata(data, metadata = md)
 }
+
+# The first declared rate is also recorded as the device's
+af <- set_metadata(example_anipoint(), sampling_rate = 200)
+get_metadata(af, "source_sampling_rate")
+
+# Later rates are the data's own, as after resampling
+af <- set_metadata(af, sampling_rate = 50)
+get_metadata(af, c("sampling_rate", "source_sampling_rate"))
+
+# A sensor with no fixed rate
+trackball <- example_anipoint() |>
+  set_metadata(source_sampling_rate = NaN) |>
+  set_metadata(sampling_rate = 100)
+get_metadata(trackball, "source_sampling_rate")
 
 }
 \seealso{

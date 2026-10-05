@@ -51,9 +51,9 @@ tbl_sum.anievent <- function(x, ...) {
     }
   }
 
-  sampling_rate <- md_field(md, "sampling_rate")
-  if (!is.null(sampling_rate) && !is.na(sampling_rate)) {
-    new_header <- c(new_header, "Sampling rate" = paste(sampling_rate, "Hz"))
+  sampling_rate <- format_sampling_rate(md)
+  if (!is.null(sampling_rate)) {
+    new_header <- c(new_header, "Sampling rate" = sampling_rate)
   }
 
   new_header

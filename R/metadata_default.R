@@ -11,9 +11,12 @@
 #' The categories:
 #'
 #' * `recording` — provenance: `source`, `source_version`,
-#'   `source_format`, `filename`.
-#' * `time` — `unit_time`, `sampling_rate` (declared), `sampling_interval`
-#'   (derived from the index; read it with [get_sampling_interval()]),
+#'   `source_format`, `source_sampling_rate`, `filename`.
+#'   `source_sampling_rate` is the rate the device recorded at, in Hz, and
+#'   no processing changes it; see [set_metadata()] for how it is filled.
+#' * `time` — `unit_time`, `sampling_rate` (declared: the rate of the data
+#'   as it is now, which resampling changes), `sampling_interval` (derived
+#'   from the index; read it with [get_sampling_interval()]),
 #'   `start_datetime`.
 #' * `space` — `coordinate_system`, `reference_frame`, `handedness`,
 #'   `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`, and
@@ -60,6 +63,7 @@ list_default_metadata <- function(class = c("anipoint", "anievent")) {
       source = as.character(NA),
       source_version = as.character(NA),
       source_format = as.character(NA),
+      source_sampling_rate = as.numeric(NA),
       filename = as.character(NA)
     ),
     time = list(

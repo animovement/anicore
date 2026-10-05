@@ -22,10 +22,13 @@ Prints the metadata of an \code{\link[=anipoint]{anipoint()}} or \code{\link[=an
 time, one \code{name: value} line per field, wrapped to the console width.
 Values carry their units where the metadata declares them, such as
 \verb{sampling_rate: 30 Hz}. Fields that are not set are left out and named
-together on a closing line.
+together on a closing line. The rate the device recorded at is shown
+with the current rate, and only when the two differ, as in
+\verb{sampling_rate: 50 Hz (recorded at 200 Hz)}.
 
 \code{all = TRUE} prints every field, including those not set, the values each
-factor field allows, and \code{spec_version}.
+factor field allows, and \code{spec_version}. \code{source_sampling_rate} then has
+a line of its own.
 }
 \examples{
 md <- get_metadata(set_metadata(example_anipoint(), sampling_rate = 30))
