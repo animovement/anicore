@@ -1,9 +1,10 @@
 # Convert the time unit of an anipoint or anievent
 
 Rescales the temporal columns — the index of an anipoint, `start` and
-`stop` of an anievent — and records the new `unit_time`. Between SI
-units the factor is derived; from `"frame"` it is derived from the
-declared `sampling_rate`.
+`stop` of an anievent — and records the new `unit_time`. An anipoint's
+`sampling_interval` is rescaled with its index; `sampling_rate` is in Hz
+and is left as it is. Between SI units the factor is derived; from
+`"frame"` it is derived from the declared `sampling_rate`.
 
 To declare a unit without changing values, use
 `set_metadata(data, unit_time = "s")`.
@@ -45,7 +46,8 @@ convert_unit_time(data, to_unit, calibration_factor = NULL)
 
 ## Value
 
-`data`, rescaled, with `unit_time` updated.
+`data`, rescaled, with `unit_time` and, for an anipoint,
+`sampling_interval` updated.
 
 ## Examples
 

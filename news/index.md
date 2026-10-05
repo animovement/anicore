@@ -294,6 +294,13 @@
 
 ### Fixed
 
+- [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md)
+  converts `sampling_interval` along with the index
+  ([\#185](https://github.com/animovement/anicore/issues/185)). It used
+  to stay in the old unit, so frames at 30 Hz converted to seconds kept
+  an interval of 1 rather than 1/30. `sampling_rate` is in Hz and is
+  unchanged.
+
 - [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)
   no longer returns the end of its range that the range excludes
   ([\#181](https://github.com/animovement/anicore/issues/181)). An angle
