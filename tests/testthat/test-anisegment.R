@@ -187,4 +187,5 @@ test_that("unit conversions rescale the index and the length", {
 
   s <- convert_unit_time(set_metadata(seg, sampling_rate = 2), "s")
   expect_equal(s$time, seg$time / 2)
+  expect_equal(get_sampling_interval(s), get_sampling_interval(seg) / 2)
 })

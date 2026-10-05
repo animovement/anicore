@@ -63,6 +63,8 @@
 
 ## Fixed
 
+* `convert_unit_time()` converts `sampling_interval` along with the index (#185). It used to stay in the old unit, so frames at 30 Hz converted to seconds kept an interval of 1 rather than 1/30. `sampling_rate` is in Hz and is unchanged.
+
 * `wrap_angle()` no longer returns the end of its range that the range excludes (#181). An angle a rounding error above `pi` wrapped to `-pi`, and one a rounding error below zero wrapped to `2 * pi` with `modulo = "2pi"`; both now land on the other end, which is the same angle.
 
 * Renaming columns carries the new names into the metadata (#178). `rename()`, `rename_with()`, renaming in `select()` or `relocate()`, and `names<-` used to leave the keys, the index, the interval, the declared variables and each structure's `variable` naming the old columns, so `rename(af, t = time)` gave a frame `validate_anipoint()` rejected.

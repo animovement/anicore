@@ -260,6 +260,96 @@ test_that("convert_unit_time preserves spatial and other columns", {
   expect_equal(result$value, c(100, 200, 300))
 })
 
+# convert_unit_time rescales sampling_interval with the index (#185) ----
+
+test_that("convert_unit_time converts sampling_interval from frames via the rate", {
+  data <- dplyr::tibble(x = c(10, 20, 30), time = c(0, 1, 2)) |>
+    as_anipoint() |>
+    set_metadata(unit_time = "frame", sampling_rate = 30)
+  expect_equal(get_sampling_interval(data), 1)
+
+  result <- convert_unit_time(data, "s")
+
+  expect_equal(get_sampling_interval(result), 1 / 30)
+  expect_equal(get_sampling_interval(result), diff(result$time)[[1]])
+  expect_equal(get_metadata(result, "sampling_rate"), 30)
+  # A stale interval disagreed with the rate once the unit was seconds.
+  expect_no_warning(validate_anipoint(result))
+})
+
+test_that("convert_unit_time converts sampling_interval between time units", {
+  cases <- list(
+    list(from = "s", to = "ms", interval = 1000),
+    list(from = "ms", to = "s", interval = 1 / 1000),
+    list(from = "s", to = "m", interval = 1 / 60),
+    list(from = "m", to = "h", interval = 1 / 60),
+    list(from = "h", to = "s", interval = 3600),
+    list(from = "s", to = "us", interval = 1e6),
+    list(from = "us", to = "ns", interval = 1000)
+  )
+  for (case in cases) {
+    data <- dplyr::tibble(x = c(10, 20, 30), time = c(0, 1, 2)) |>
+      as_anipoint() |>
+      set_metadata(unit_time = case$from, sampling_rate = 2)
+    result <- convert_unit_time(data, case$to)
+
+    expect_equal(get_sampling_interval(result), case$interval)
+    expect_equal(get_sampling_interval(result), diff(result$time)[[1]])
+    expect_equal(get_metadata(result, "sampling_rate"), 2)
+  }
+})
+
+test_that("convert_unit_time converts sampling_interval by a calibration_factor", {
+  data <- dplyr::tibble(x = c(10, 20, 30), time = c(0, 2, 4)) |>
+    as_anipoint() |>
+    set_metadata(unit_time = "frame")
+  expect_equal(get_sampling_interval(data), 2)
+
+  result <- convert_unit_time(data, "s", calibration_factor = 1 / 30)
+
+  expect_equal(get_sampling_interval(result), 2 / 30)
+  expect_true(is.na(get_metadata(result, "sampling_rate")))
+})
+
+test_that("convert_unit_time round-trips sampling_interval", {
+  data <- example_anipoint(n_obs = 5, n_individuals = 2, n_keypoints = 1) |>
+    set_metadata(sampling_rate = 25)
+
+  result <- data |>
+    convert_unit_time("s") |>
+    convert_unit_time("ms") |>
+    convert_unit_time("s", calibration_factor = 25 / 1000)
+
+  expect_equal(get_sampling_interval(result), 1)
+  expect_equal(result$time, data$time)
+})
+
+test_that("convert_unit_time leaves an unknown sampling_interval unknown", {
+  data <- dplyr::tibble(x = 10, time = 1) |>
+    as_anipoint() |>
+    set_metadata(unit_time = "s")
+  expect_true(is.na(get_sampling_interval(data)))
+
+  result <- convert_unit_time(data, "ms")
+
+  expect_true(is.na(get_sampling_interval(result)))
+  expect_equal(result$time, 1000)
+})
+
+test_that("convert_unit_time does not add sampling_interval to older metadata", {
+  data <- dplyr::tibble(x = c(10, 20, 30), time = c(0, 1, 2)) |>
+    as_anipoint() |>
+    set_metadata(unit_time = "s")
+  md <- attr(data, "metadata")
+  md$time$sampling_interval <- NULL
+  attr(data, "metadata") <- md
+
+  result <- convert_unit_time(data, "ms")
+
+  expect_null(attr(result, "metadata")$time$sampling_interval)
+  expect_equal(result$time, c(0, 1000, 2000))
+})
+
 # Test list_conversion_factors_space ----
 
 test_that("list_conversion_factors_space returns correct matrix structure", {

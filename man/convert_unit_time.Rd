@@ -29,13 +29,15 @@ Required when converting from \code{"frame"} without a \code{sampling_rate}, or
 from \code{"unknown"}.}
 }
 \value{
-\code{data}, rescaled, with \code{unit_time} updated.
+\code{data}, rescaled, with \code{unit_time} and, for an anipoint,
+\code{sampling_interval} updated.
 }
 \description{
 Rescales the temporal columns — the index of an anipoint, \code{start} and
-\code{stop} of an anievent — and records the new \code{unit_time}. Between SI units
-the factor is derived; from \code{"frame"} it is derived from the declared
-\code{sampling_rate}.
+\code{stop} of an anievent — and records the new \code{unit_time}. An anipoint's
+\code{sampling_interval} is rescaled with its index; \code{sampling_rate} is in Hz
+and is left as it is. Between SI units the factor is derived; from
+\code{"frame"} it is derived from the declared \code{sampling_rate}.
 
 To declare a unit without changing values, use
 \code{set_metadata(data, unit_time = "s")}.
