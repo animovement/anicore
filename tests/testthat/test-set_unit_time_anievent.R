@@ -59,6 +59,17 @@ test_that("convert_unit_time on a frame anievent uses the declared sampling_rate
   expect_equal(get_metadata(result, "sampling_rate"), 30)
 })
 
+test_that("convert_unit_time leaves an anievent without a sampling_interval", {
+  # A bout has no index to measure an interval from (#185).
+  ae <- set_metadata(make_frame_anievent(), sampling_rate = 30)
+  expect_true(is.na(get_sampling_interval(ae)))
+
+  result <- convert_unit_time(ae, "s")
+
+  expect_true(is.na(get_sampling_interval(result)))
+  expect_equal(get_metadata(result, "sampling_rate"), 30)
+})
+
 test_that("declaring sampling_rate on an SI-unit anievent only updates metadata", {
   result <- set_metadata(make_seconds_anievent(), sampling_rate = 30)
 

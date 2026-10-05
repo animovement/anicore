@@ -2,9 +2,10 @@
 #'
 #' @description
 #' Rescales the temporal columns — the index of an anipoint, `start` and
-#' `stop` of an anievent — and records the new `unit_time`. Between SI units
-#' the factor is derived; from `"frame"` it is derived from the declared
-#' `sampling_rate`.
+#' `stop` of an anievent — and records the new `unit_time`. An anipoint's
+#' `sampling_interval` is rescaled with its index; `sampling_rate` is in Hz
+#' and is left as it is. Between SI units the factor is derived; from
+#' `"frame"` it is derived from the declared `sampling_rate`.
 #'
 #' To declare a unit without changing values, use
 #' `set_metadata(data, unit_time = "s")`.
@@ -16,7 +17,8 @@
 #'   Required when converting from `"frame"` without a `sampling_rate`, or
 #'   from `"unknown"`.
 #'
-#' @return `data`, rescaled, with `unit_time` updated.
+#' @return `data`, rescaled, with `unit_time` and, for an anipoint,
+#'   `sampling_interval` updated.
 #'
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
@@ -38,13 +40,17 @@ convert_unit_time.anipoint <- function(
   factor <- resolve_unit_time_calibration(data, to_unit, calibration_factor)
 
   index <- get_index(data)
+  # The interval is in the unit being converted from, like the index (#185).
+  interval <- get_sampling_interval(data)
 
   data <- data |>
     dplyr::mutate(
       dplyr::across(dplyr::all_of(index), function(x) x * factor)
-    ) |>
-    set_metadata(unit_time = to_unit)
-  data
+    )
+  if (!is.na(interval)) {
+    data <- set_metadata(data, sampling_interval = interval * factor)
+  }
+  set_metadata(data, unit_time = to_unit)
 }
 
 #' @rdname convert_unit_time
