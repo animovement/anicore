@@ -7,6 +7,7 @@
 resolve_unit_time_calibration(data, to_unit, calibration_factor)
 }
 \description{
-The multiplier for a unit_time conversion
+Through seconds, with the declared \code{sampling_rate} standing in for
+\code{"frame"} at either end.
 }
 \keyword{internal}

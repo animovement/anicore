@@ -225,13 +225,17 @@ is_sampling_regular <- function(data, tolerance = 1e-6) {
 
 #' Warn when a declared sampling rate disagrees with the index
 #'
-#' Only checkable when the index is in a real time unit, not frames.
+#' Only checkable when the index is in a real time unit, not frames. The
+#' measured spacing is the median gap, so a dropped frame does not move it,
+#' and the comparison is relative: a timestamp log jitters, and a camera
+#' logging at 30.11 Hz is a 30 Hz camera.
 #'
 #' @param data An anipoint object.
+#' @param tolerance Relative tolerance, a single non-negative number.
 #'
 #' @return `TRUE`, invisibly.
 #' @keywords internal
-warn_sampling_rate_mismatch <- function(data) {
+warn_sampling_rate_mismatch <- function(data, tolerance = 0.01) {
   if (isTRUE(getOption("aniframe.quiet", FALSE))) {
     return(invisible(TRUE))
   }
@@ -255,10 +259,10 @@ warn_sampling_rate_mismatch <- function(data) {
 
   observed <- interval * compute_seconds_per_time_unit(unit, rate)
   expected <- 1 / rate
-  if (!is.na(observed) && abs(observed - expected) > 1e-6 * expected) {
+  if (!is.na(observed) && abs(observed - expected) > tolerance * expected) {
     cli::cli_warn(c(
       "{.field sampling_rate} says {.val {rate}} Hz, but the index is spaced {.val {signif(1 / observed, 4)}} Hz.",
-      "i" = "The interval is derived from the data; the rate is declared.",
+      "i" = "The interval is derived from the data; the rate is declared. They differ by more than {format(signif(100 * tolerance, 3), scientific = FALSE)}%.",
       "i" = "Read the measured spacing with {.fn get_sampling_interval}."
     ))
   }

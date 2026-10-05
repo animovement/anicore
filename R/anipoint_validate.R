@@ -14,10 +14,16 @@
 #'   than declared, so it can be refreshed;
 #' * identity, temporal context and the index together name one
 #'   observation per row — **warning** only (#49);
-#' * a declared `sampling_rate` agrees with the spacing of the index —
-#'   **warning** only (#114).
+#' * a declared `sampling_rate` agrees with the spacing of the index, to
+#'   within `rate_tolerance` — **warning** only (#114). The spacing is the
+#'   median gap, so a few dropped frames do not count against it.
 #'
 #' @param data An anipoint object.
+#' @param rate_tolerance How far the declared `sampling_rate` may be from the
+#'   rate the index is spaced at before it warns, relative to the declared
+#'   rate. The default, `0.01`, lets real timestamps through: a camera log
+#'   that averages 30.11 Hz agrees with a declared 30 Hz. Lower it for a
+#'   strict check, such as `1e-6` for an index computed from the rate.
 #'
 #' @return The input `data`, invisibly.
 #'
@@ -30,15 +36,25 @@
 #' validate_anipoint(af)
 #'
 #' @export
-validate_anipoint <- function(data) {
+validate_anipoint <- function(data, rate_tolerance = 0.01) {
   ensure_is_anipoint(data)
+  if (
+    !is.numeric(rate_tolerance) ||
+      length(rate_tolerance) != 1L ||
+      is.na(rate_tolerance) ||
+      rate_tolerance < 0
+  ) {
+    cli::cli_abort(
+      "{.arg rate_tolerance} must be a single non-negative number."
+    )
+  }
   # Before the generic check, which reports a missing index less helpfully.
   ensure_has_index(data)
   ensure_has_declared_variables(data)
   ensure_is_spatial(data)
   warn_coordinate_system_drift(data)
   warn_duplicate_observations(data)
-  warn_sampling_rate_mismatch(data)
+  warn_sampling_rate_mismatch(data, rate_tolerance)
   invisible(data)
 }
 

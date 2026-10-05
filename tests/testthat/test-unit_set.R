@@ -416,12 +416,22 @@ test_that("get_conversion_factor_time covers ns and us", {
   expect_equal(get_conversion_factor_time("s", "us"), 1e6)
 })
 
-test_that("convert_unit_time refuses frame and unknown as targets", {
+test_that("convert_unit_time refuses unknown as a target", {
   data <- dplyr::tibble(x = 1:3, time = c(1, 2, 3)) |>
     as_anipoint() |>
     set_metadata(unit_time = "s")
-  expect_error(convert_unit_time(data, "frame"), "can only be converted to")
   expect_error(convert_unit_time(data, "unknown"), "can only be converted to")
+})
+
+test_that("convert_unit_time to frame needs a rate or a calibration_factor", {
+  data <- dplyr::tibble(x = 1:3, time = c(0, 0.5, 1)) |>
+    as_anipoint() |>
+    set_metadata(unit_time = "s")
+  expect_error(convert_unit_time(data, "frame"), "calibration_factor")
+
+  result <- convert_unit_time(data, "frame", calibration_factor = 4)
+  expect_equal(result$time, c(0, 2, 4))
+  expect_equal(as.character(get_metadata(result, "unit_time")), "frame")
 })
 
 test_that("get_conversion_factor_time returns 1 for same units", {
