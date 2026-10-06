@@ -30,7 +30,8 @@
 #'   with the data, and converting to `"frame"` makes that column the index
 #'   again rather than computing frames from the rate. The column it
 #'   replaces stays in the frame as an ordinary column, so the times are
-#'   not lost.
+#'   not lost. [set_index()] puts the frame numbers there when it moves
+#'   the index from frames to another column, such as recorded timestamps.
 #' * **Computed frame numbers.** Otherwise each time is multiplied by the
 #'   rate and rounded to the nearest whole frame. Rather than invent frame
 #'   numbers, the conversion refuses when the sampling is irregular, with a
@@ -240,10 +241,8 @@ index_by_recorded_frames <- function(data, calibration_factor) {
       "i" = "To compute frames from {.field {get_index(data)}} instead, rename or drop {.field frame} first."
     ))
   }
-  ensure_valid_index(data, "frame")
   # The old index stays as an ordinary column.
-  data <- set_variables(data, when = list(index = "frame"))
-  set_metadata(data, unit_time = "frame")
+  set_index(data, "frame", unit = "frame")
 }
 
 
@@ -298,7 +297,7 @@ ensure_whole_frames <- function(
         "Cannot convert {.field {columns}} to frames: the sampling is irregular.",
         "x" = "A gap of {signif(gaps[off][[1]], 3)} frames is more than {format(100 * tolerance)}% from a whole number of frames.",
         "i" = "Frame numbers are computed only from regular sampling, so none are invented. Check that {.field sampling_rate} matches the data.",
-        "i" = "For times logged with the data, keep the recorded frame numbers in a column named {.field frame}, and converting to {.val frame} uses it."
+        "i" = "For times logged with the data, keep the recorded frame numbers in a column named {.field frame}, as {.fn set_index} does, and converting to {.val frame} uses it."
       ),
       call = call
     )
@@ -310,7 +309,7 @@ ensure_whole_frames <- function(
       c(
         "Cannot convert {.field {columns}} to frames: two different times of the same keys round to frame {at}.",
         "i" = "Their spacing drifts from {.field sampling_rate}, or they are less than a frame apart.",
-        "i" = "For times logged with the data, keep the recorded frame numbers in a column named {.field frame}, and converting to {.val frame} uses it."
+        "i" = "For times logged with the data, keep the recorded frame numbers in a column named {.field frame}, as {.fn set_index} does, and converting to {.val frame} uses it."
       ),
       call = call
     )

@@ -4,28 +4,99 @@
 \alias{set_index}
 \title{Declare which column an anipoint is indexed by}
 \usage{
-set_index(data, column)
+set_index(data, column, unit = NULL)
 }
 \arguments{
 \item{data}{An anipoint object.}
 
 \item{column}{Length-one character vector naming the index column. It
 must exist in \code{data} and be numeric.}
+
+\item{unit}{The unit of the new index, one of the levels of \code{unit_time}
+in \code{\link[=list_default_metadata]{list_default_metadata()}}. \code{NULL}, the default, leaves \code{unit_time}
+as it is.}
 }
 \value{
 \code{data}, re-indexed and restructured.
 }
 \description{
-Shorthand for \code{set_variables(data, when = list(index = column))}. The
-frame is re-sorted. A column that was a \code{when} key stops being one; the
-previous index becomes an undeclared column rather than a key.
+Makes \code{column} the index, the \code{when$index} slot, and re-sorts the frame.
+A column that was a \code{when} key stops being one. \code{unit} declares the unit
+of the new index in the same call; without it, the frame goes on
+declaring the unit of the old index.
+
+The new index must be numeric, with no missing values, and must increase
+within each group of keys (identity plus temporal context) in the order
+of the old index, so the rows keep their order: values that go backwards
+have been matched to the wrong rows. Date-times are refused: the index
+holds the time since the start, as numbers, and the start goes in
+\code{start_datetime}, so absolute time is \code{start_datetime} plus the index.
 }
+\section{The old index}{
+
+The previous index becomes an ordinary, undeclared column rather than a
+key, as grouping by it would put each row in a group of its own.
+
+When it counted frames (\code{unit_time} is \code{"frame"}), it is renamed
+\code{frame}. Frame numbers recorded with the data are data, not something to
+compute again from a rate, and \code{\link[=convert_unit_time]{convert_unit_time()}} makes the \code{frame}
+column the index again when converting to \code{"frame"}. An old index
+already named \code{frame} keeps its name, and so does one replaced by a new
+index named \code{frame}. If the frame has another column named \code{frame},
+\code{set_index()} refuses rather than overwrite either; rename one first.
+}
+
+\section{Indexing by recorded timestamps}{
+
+Timestamps recorded alongside the data, such as a camera's log of when
+each frame was taken, are added as a column and made the index with
+their unit:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{data |>
+  dplyr::mutate(timestamp = stamps[time + 1]) |>
+  set_index("timestamp", unit = "s")
+}\if{html}{\out{</div>}}
+
+Here the log has one entry per frame and frames count from 0, so the
+timestamp of a row is matched by its frame number. Matching by position,
+assigning the log in row order, lines up only when every group is
+complete and sorted: an anipoint has one row per time per key, and a
+keypoint can be missing from some frames. Bringing a log, or any other
+data, into a frame is a join question, tracked in
+\href{https://github.com/animovement/anicore/issues/1}{anicore#1}.
+
+The frame numbers move to a column named \code{frame}, and a declared
+\code{sampling_rate} is kept as the nominal rate. \code{sampling_interval} is
+measured from the timestamps, and \code{\link[=validate_anipoint]{validate_anipoint()}} allows the two to
+differ by 1\%. Overwriting \code{time} with \code{\link[dplyr:mutate]{dplyr::mutate()}} instead would
+lose the frame numbers and leave the frame saying the index counts frames
+when it holds seconds.
+}
+
 \examples{
 df <- data.frame(frame = 1:3, individual = "a", x = c(1, 2, 3), y = c(0, 1, 0))
 af <- as_anipoint(df, index = "frame")
 get_index(af)
 
+# A camera log, one timestamp per frame, frames counted from 0
+af <- as_anipoint(data.frame(
+  individual = "a",
+  keypoint = rep(c("head", "tail"), each = 4),
+  time = rep(0:3, 2),
+  x = 1:8,
+  y = 1:8
+))
+stamps <- c(0, 0.0332, 0.0668, 0.1001)
+logged <- af |>
+  dplyr::mutate(timestamp = stamps[time + 1]) |>
+  set_index("timestamp", unit = "s")
+logged
+
+# The frame numbers are kept, and become the index again
+get_index(convert_unit_time(logged, "frame"))
+
 }
 \seealso{
-\code{\link[=get_index]{get_index()}}
+\code{\link[=get_index]{get_index()}}, \code{\link[=convert_unit_time]{convert_unit_time()}} to rescale the index into
+another unit.
 }

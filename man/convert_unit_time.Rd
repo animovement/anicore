@@ -64,7 +64,8 @@ sampling.
 with the data, and converting to \code{"frame"} makes that column the index
 again rather than computing frames from the rate. The column it
 replaces stays in the frame as an ordinary column, so the times are
-not lost.
+not lost. \code{\link[=set_index]{set_index()}} puts the frame numbers there when it moves
+the index from frames to another column, such as recorded timestamps.
 \item \strong{Computed frame numbers.} Otherwise each time is multiplied by the
 rate and rounded to the nearest whole frame. Rather than invent frame
 numbers, the conversion refuses when the sampling is irregular, with a
