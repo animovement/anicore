@@ -139,14 +139,16 @@ encode_scalar <- function(x) {
 }
 
 # The shortest decimal that reads back as exactly `x`: 29.97, not
-# 29.969999999999999
+# 29.969999999999999. Read back as set_metadata_json() reads it, with
+# jsonlite's parser: R's own is inexact for extreme exponents on platforms
+# without a long double, such as macOS on arm64.
 encode_number <- function(x) {
   if (!is.finite(x)) {
     return(jsonlite::unbox(if (x > 0) "Inf" else "-Inf"))
   }
   for (digits in 15:17) {
     text <- formatC(x, digits = digits, format = "g")
-    if (as.numeric(text) == x) {
+    if (isTRUE(read_json_number(text) == x)) {
       break
     }
   }
@@ -194,6 +196,10 @@ format_datetime <- function(x) {
     return(NA_character_)
   }
   format(x, "%Y-%m-%dT%H:%M:%OS6Z", tz = "UTC")
+}
+
+read_json_number <- function(text) {
+  as.double(jsonlite::fromJSON(text))
 }
 
 # Decoding ---------------------------------------------------------------------

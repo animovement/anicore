@@ -109,9 +109,12 @@ test_that("the layout is readable without R", {
 })
 
 test_that("numbers are written as the shortest decimal that reads back", {
+  skip_if_not_installed("jsonlite")
+  # Read back as set_metadata_json() reads it, with jsonlite: R's own parser
+  # is inexact for 1e-300 on macOS arm64, which has no long double
   for (x in c(29.97, 0.1 + 0.2, 1 / 3, 1e-300, -0.5, 2^53)) {
     text <- encode_number(x)
-    expect_identical(as.numeric(text), x)
+    expect_identical(read_json_number(text), x)
   }
   expect_identical(as.character(encode_number(29.97)), "29.97")
   expect_identical(as.character(encode_number(Inf)), "Inf")
