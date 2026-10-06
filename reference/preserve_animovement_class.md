@@ -6,7 +6,7 @@ without registering their own methods.
 ## Usage
 
 ``` r
-preserve_animovement_class(x, cls, md)
+preserve_animovement_class(x, cls, md, before = NULL)
 ```
 
 ## Arguments
@@ -24,6 +24,12 @@ preserve_animovement_class(x, cls, md)
 
   Metadata captured before dispatch via
   [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md).
+
+- before:
+
+  The frame the verb was given. The stored `sampling_interval` is
+  measured again unless its index and keys are unchanged; `NULL`
+  measures it always.
 
   A result that has lost a column the frame is keyed, indexed or bounded
   by is no longer that frame: it comes back as the plain data frame,

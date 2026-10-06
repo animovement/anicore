@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,18 +125,18 @@
 <span><span class="co">#&gt; # Keypoints:   head, neck, shoulder_right</span></span>
 <span><span class="co">#&gt; # Sessions:    1</span></span>
 <span><span class="co">#&gt; # Trials:      1</span></span>
-<span><span class="co">#&gt;    individual keypoint session trial  time        x       y confidence</span></span>
-<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1          1 head           1     1     1  0.337   -0.166       0.381</span></span>
-<span><span class="co">#&gt;  2          1 head           1     1     2  0.837   -0.0449      0.766</span></span>
-<span><span class="co">#&gt;  3          1 head           1     1     3 -0.885    1.62        0.743</span></span>
-<span><span class="co">#&gt;  4          1 head           1     1     4 -0.556    0.813       0.660</span></span>
-<span><span class="co">#&gt;  5          1 head           1     1     5  0.748   -1.49        0.870</span></span>
-<span><span class="co">#&gt;  6          1 neck           1     1     1  0.00453  0.434       0.820</span></span>
-<span><span class="co">#&gt;  7          1 neck           1     1     2 -0.362   -0.178       0.455</span></span>
-<span><span class="co">#&gt;  8          1 neck           1     1     3 -0.815   -0.385       0.652</span></span>
-<span><span class="co">#&gt;  9          1 neck           1     1     4  0.0246   0.779       0.821</span></span>
-<span><span class="co">#&gt; 10          1 neck           1     1     5 -1.58     0.921       0.841</span></span>
+<span><span class="co">#&gt;    individual keypoint session trial  time      x      y confidence</span></span>
+<span><span class="co">#&gt;         &lt;int&gt; &lt;fct&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1          1 head           1     1     1  0.788  0.190      0.296</span></span>
+<span><span class="co">#&gt;  2          1 head           1     1     2 -2.59  -0.233      0.761</span></span>
+<span><span class="co">#&gt;  3          1 head           1     1     3 -0.757 -1.04       0.865</span></span>
+<span><span class="co">#&gt;  4          1 head           1     1     4 -0.412  0.564      0.836</span></span>
+<span><span class="co">#&gt;  5          1 head           1     1     5  0.539  0.986      0.818</span></span>
+<span><span class="co">#&gt;  6          1 neck           1     1     1  0.270 -1.34       0.786</span></span>
+<span><span class="co">#&gt;  7          1 neck           1     1     2  1.48   0.862      0.757</span></span>
+<span><span class="co">#&gt;  8          1 neck           1     1     3  1.55   0.897      0.914</span></span>
+<span><span class="co">#&gt;  9          1 neck           1     1     4  1.25  -1.38       0.767</span></span>
+<span><span class="co">#&gt; 10          1 neck           1     1     5 -0.911  0.285      0.969</span></span>
 <span><span class="co">#&gt; # ℹ 20 more rows</span></span></code></pre></div>
 </div>
 <p>Two things to spot:</p>
@@ -229,20 +229,20 @@
 <span><span class="va">custom</span></span>
 <span><span class="co">#&gt; # Tracks: A, B, C</span></span>
 <span><span class="co">#&gt; # Trials: 1, 2</span></span>
-<span><span class="co">#&gt;    track trial  time     x      y</span></span>
-<span><span class="co">#&gt;    &lt;fct&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 A         1     1 0.868 0.336 </span></span>
-<span><span class="co">#&gt;  2 A         1     1 0.877 0.906 </span></span>
-<span><span class="co">#&gt;  3 A         1     2 0.901 0.291 </span></span>
-<span><span class="co">#&gt;  4 A         1     2 0.378 0.996 </span></span>
-<span><span class="co">#&gt;  5 B         1     1 0.218 0.350 </span></span>
-<span><span class="co">#&gt;  6 B         1     2 0.377 0.656 </span></span>
-<span><span class="co">#&gt;  7 B         2     1 0.726 0.406 </span></span>
-<span><span class="co">#&gt;  8 B         2     2 0.180 0.882 </span></span>
-<span><span class="co">#&gt;  9 C         2     1 0.759 0.337 </span></span>
-<span><span class="co">#&gt; 10 C         2     1 0.304 0.223 </span></span>
-<span><span class="co">#&gt; 11 C         2     2 0.509 0.758 </span></span>
-<span><span class="co">#&gt; 12 C         2     2 0.900 0.0686</span></span></code></pre></div>
+<span><span class="co">#&gt;    track trial  time      x      y</span></span>
+<span><span class="co">#&gt;    &lt;fct&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 A         1     1 0.831  0.0350</span></span>
+<span><span class="co">#&gt;  2 A         1     1 0.276  0.959 </span></span>
+<span><span class="co">#&gt;  3 A         1     2 0.671  0.714 </span></span>
+<span><span class="co">#&gt;  4 A         1     2 0.985  0.783 </span></span>
+<span><span class="co">#&gt;  5 B         1     1 0.842  0.917 </span></span>
+<span><span class="co">#&gt;  6 B         1     2 0.0455 0.348 </span></span>
+<span><span class="co">#&gt;  7 B         2     1 0.992  0.761 </span></span>
+<span><span class="co">#&gt;  8 B         2     2 0.313  0.0143</span></span>
+<span><span class="co">#&gt;  9 C         2     1 0.149  0.376 </span></span>
+<span><span class="co">#&gt; 10 C         2     1 0.998  0.269 </span></span>
+<span><span class="co">#&gt; 11 C         2     2 0.882  0.578 </span></span>
+<span><span class="co">#&gt; 12 C         2     2 0.306  0.892</span></span></code></pre></div>
 </div>
 </section></section><section class="level2"><h2 id="the-index">The index<a class="anchor" aria-label="anchor" href="#the-index"></a>
 </h2>
@@ -287,21 +287,24 @@
 <code class="sourceCode R"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_data.html" class="external-link">group_vars</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "individual" "keypoint"   "session"    "trial"</span></span></code></pre></div>
 </div>
-<p><code><a href="../reference/set_index.html">set_index()</a></code> changes it, re-ordering the frame to match. The column that was previously the index becomes an ordinary, undeclared one — it is not promoted to temporal context, for the reason just given:</p>
+<p><code><a href="../reference/set_index.html">set_index()</a></code> changes it, re-ordering the frame to match. It only says which column is the index: the new column’s unit is declared with <code>unit</code>, or the frame goes on saying it counts frames. The column that was previously the index becomes an ordinary, undeclared one, not promoted to temporal context, for the reason just given:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">timestamped</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>timestamp <span class="op">=</span> <span class="va">time</span> <span class="op">/</span> <span class="fl">30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/set_index.html">set_index</a></span><span class="op">(</span><span class="st">"timestamp"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/set_index.html">set_index</a></span><span class="op">(</span><span class="st">"timestamp"</span>, unit <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/get_index.html">get_index</a></span><span class="op">(</span><span class="va">timestamped</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "timestamp"</span></span>
+<span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">timestamped</span>, <span class="st">"unit_time"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] s</span></span>
+<span><span class="co">#&gt; Levels: unknown frame ns us ms s m h</span></span>
 <span><span class="fu"><a href="../reference/variables.html">get_variables</a></span><span class="op">(</span><span class="va">timestamped</span>, <span class="st">"when"</span>, <span class="st">"keys"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "session" "trial"</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_data.html" class="external-link">group_vars</a></span><span class="op">(</span><span class="va">timestamped</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "individual" "keypoint"   "session"    "trial"</span></span></code></pre></div>
 </div>
-<p><code>time</code> is still there as a column; it is simply no longer declared as anything.</p>
+<p>The old index counted frames, so it is kept as a column named <code>frame</code>: frame numbers are data, and <code>convert_unit_time(timestamped, "frame")</code> makes it the index again. Otherwise it is no longer declared as anything. The new index must increase with the old one within each group of keys; <code><a href="../reference/set_index.html">?set_index</a></code> shows how to match a camera’s timestamp log to the rows by frame number.</p>
 <p>Downstream operations (smoothing, derivatives) assume the index is monotonically ordered within each entity, which is how <code><a href="../reference/as_anipoint.html">as_anipoint()</a></code> arranges the frame.</p>
 </section><section class="level2"><h2 id="coordinate-systems">Coordinate systems<a class="anchor" aria-label="anchor" href="#coordinate-systems"></a>
 </h2>

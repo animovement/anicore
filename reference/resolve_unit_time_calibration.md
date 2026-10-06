@@ -1,6 +1,7 @@
 # The multiplier for a unit_time conversion
 
-The multiplier for a unit_time conversion
+Through seconds, with the declared `sampling_rate` standing in for
+`"frame"` at either end.
 
 ## Usage
 

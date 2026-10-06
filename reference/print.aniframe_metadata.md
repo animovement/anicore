@@ -6,10 +6,13 @@ Prints the metadata of an
 one category at a time, one `name: value` line per field, wrapped to the
 console width. Values carry their units where the metadata declares
 them, such as `sampling_rate: 30 Hz`. Fields that are not set are left
-out and named together on a closing line.
+out and named together on a closing line. The rate the device recorded
+at is shown with the current rate, and only when the two differ, as in
+`sampling_rate: 50 Hz (recorded at 200 Hz)`.
 
 `all = TRUE` prints every field, including those not set, the values
-each factor field allows, and `spec_version`.
+each factor field allows, and `spec_version`. `source_sampling_rate`
+then has a line of its own.
 
 ## Usage
 
@@ -72,6 +75,7 @@ print(md, all = TRUE)
 #> source: -
 #> source_version: -
 #> source_format: -
+#> source_sampling_rate: 30 Hz
 #> filename: -
 #> 
 #> ── time 

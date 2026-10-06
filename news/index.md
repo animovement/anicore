@@ -132,6 +132,50 @@
 
 ### Added
 
+- A `source_sampling_rate` metadata field, in `recording`, holds the
+  rate the device recorded at, apart from `sampling_rate`, the rate of
+  the data as it is now
+  ([\#190](https://github.com/animovement/anicore/issues/190)).
+  Resampling changes the current rate and never the recorded one;
+  filters,
+  [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md)
+  and the rate check keep using `sampling_rate`.
+
+  - The first rate declared fills both: `set_metadata(sampling_rate = )`
+    on a frame with neither rate set also sets `source_sampling_rate`,
+    so readers that declare a rate record the camera’s without changing.
+    This applies to `as_anipoint(metadata = )` too. After that
+    `sampling_rate` changes on its own, so correcting a wrong camera
+    rate means setting `source_sampling_rate` in the same call.
+  - `source_sampling_rate = NaN` declares that the device has no fixed
+    rate, such as an event-driven sensor whose readings a reader
+    integrates into windows. The first declaration leaves it alone,
+    where `NA` means not declared yet.
+  - The compact metadata print and the frame header show the recorded
+    rate only when it differs:
+    `sampling_rate: 50 Hz (recorded at 200 Hz)`.
+  - Metadata saved before the field existed still validates, and a frame
+    that already declared a rate does not fill it later, since its later
+    rates may be resampled ones.
+
+- [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md)
+  converts to `"frame"`
+  ([\#190](https://github.com/animovement/anicore/issues/190)). Frame
+  numbers a file records are data, and frames computed from a rate are
+  only nominal, so it never invents them:
+
+  - A frame with a column named `frame`, not its index, holds the
+    recorded frame numbers, and converting to `"frame"` makes that
+    column the index again. The column it replaces is kept.
+  - Otherwise frames are computed from the declared `sampling_rate`,
+    counting from 0 (seconds times the rate), and rounded to the nearest
+    whole frame. The conversion refuses when the sampling is irregular,
+    a gap more than 1% from a whole number of frames, or when rounding
+    would put two times of the same keys on one frame.
+  - A wrong rate can now be put right by converting back to frames,
+    declaring the right rate and converting forward again, rather than
+    with a hand-worked `calibration_factor`.
+
 - [`angle_to_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
   and
   [`angle_from_rad()`](https://animovement.dev/anicore/reference/angle_to_rad.md)
@@ -227,6 +271,27 @@
 
 ### Changed
 
+- [`set_index()`](https://animovement.dev/anicore/reference/set_index.md)
+  declares the unit of the new index in the same call, with `unit`, and
+  checks that the new index increases with the old one within each group
+  of keys ([\#190](https://github.com/animovement/anicore/issues/190)).
+  An index that counted frames is no longer left under its old name: it
+  is renamed `frame`, as recorded frame numbers are data, and
+  `convert_unit_time(x, "frame")` makes that column the index again.
+  [`set_index()`](https://animovement.dev/anicore/reference/set_index.md)
+  refuses when another `frame` column is in the way, and a new index
+  with missing values. Its help page shows how to index a frame by a
+  camera’s timestamp log, matched to rows by frame number.
+
+- [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
+  allows the declared `sampling_rate` and the measured spacing of the
+  index to differ by 1% before warning, rather than by one part in a
+  million ([\#190](https://github.com/animovement/anicore/issues/190)).
+  The spacing of a real timestamp log never matches the nominal rate
+  exactly, so the warning fired on every one: a camera log averaging
+  30.11 Hz against a declared 30 Hz. The new `rate_tolerance` argument
+  sets the margin; `rate_tolerance = 1e-6` gives the old, strict check.
+
 - The order of the identity keys (formerly `variables_what`) no longer
   asserts a hierarchy
   ([\#140](https://github.com/animovement/anicore/issues/140),
@@ -293,6 +358,18 @@
     10; `print(x, n = Inf)` shows all.
 
 ### Fixed
+
+- `sampling_interval` follows the rows and the index
+  ([\#190](https://github.com/animovement/anicore/issues/190)).
+  [`filter()`](https://rdrr.io/r/stats/filter.html), `slice()`, `[`, and
+  changing the index or a key with `mutate()`, `$<-`, `[<-` or `[[<-`
+  measure it again, so a 30 Hz recording thinned to every third frame
+  reports the 10 Hz spacing it now has, and
+  [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
+  warns that its `sampling_rate` no longer matches. It used to keep the
+  spacing measured when the frame was built. Verbs that leave the rows
+  and the index alone, such as a `mutate()` of another column,
+  `rename()` or `select()`, keep the stored value without measuring.
 
 - [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md)
   converts `sampling_interval` along with the index

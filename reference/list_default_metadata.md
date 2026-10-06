@@ -10,10 +10,14 @@ a category name returns the whole category.
 The categories:
 
 - `recording` — provenance: `source`, `source_version`, `source_format`,
-  `filename`.
+  `source_sampling_rate`, `filename`. `source_sampling_rate` is the rate
+  the device recorded at, in Hz, and no processing changes it; see
+  [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md)
+  for how it is filled.
 
-- `time` — `unit_time`, `sampling_rate` (declared), `sampling_interval`
-  (derived from the index; read it with
+- `time` — `unit_time`, `sampling_rate` (declared: the rate of the data
+  as it is now, which resampling changes), `sampling_interval` (derived
+  from the index; read it with
   [`get_sampling_interval()`](https://animovement.dev/anicore/reference/get_sampling_interval.md)),
   `start_datetime`.
 

@@ -5,15 +5,16 @@ The median gap, robust to a few dropped frames.
 ## Usage
 
 ``` r
-compute_sampling_interval(data)
+compute_sampling_interval(gaps)
 ```
 
 ## Arguments
 
-- data:
+- gaps:
 
-  An anipoint object.
+  Numeric vector of gaps, from
+  [`measure_sampling_gaps()`](https://animovement.dev/anicore/reference/measure_sampling_gaps.md).
 
 ## Value
 
-Numeric scalar, or `NA` when the frame has no gaps to measure.
+Numeric scalar, or `NA` when there are no gaps to measure.

@@ -55,8 +55,8 @@ get_metadata(data)
 #> where  position: x = x, y = y
 #> event  state: - | point: -
 #> 
-#> Not set: source, source_version, source_format, filename, sampling_rate,
-#>   start_datetime, axis_directions, axis_extents, euler_sequence,
+#> Not set: source, source_version, source_format, source_sampling_rate, filename,
+#>   sampling_rate, start_datetime, axis_directions, axis_extents, euler_sequence,
 #>   euler_intrinsic, structure
 ```
 
@@ -72,6 +72,7 @@ print(get_metadata(data), all = TRUE)
 #> source: -
 #> source_version: -
 #> source_format: -
+#> source_sampling_rate: -
 #> filename: -
 #> 
 #> ── time 
@@ -122,11 +123,12 @@ str(list_default_metadata(), max.level = 2)
 #>  $ spec_version:List of 2
 #>   ..$ aniframe: chr "3.0.0"
 #>   ..$ anievent: chr "1.0.0"
-#>  $ recording   :List of 4
-#>   ..$ source        : chr NA
-#>   ..$ source_version: chr NA
-#>   ..$ source_format : chr NA
-#>   ..$ filename      : chr NA
+#>  $ recording   :List of 5
+#>   ..$ source              : chr NA
+#>   ..$ source_version      : chr NA
+#>   ..$ source_format       : chr NA
+#>   ..$ source_sampling_rate: num NA
+#>   ..$ filename            : chr NA
 #>  $ time        :List of 4
 #>   ..$ unit_time        : Factor w/ 8 levels "unknown","frame",..: 2
 #>   ..$ sampling_rate    : num NA
@@ -158,7 +160,7 @@ question:
 
 | Category | Fields |
 |----|----|
-| `recording` | provenance: `source`, `source_version`, `source_format`, `filename` |
+| `recording` | provenance: `source`, `source_version`, `source_format`, `source_sampling_rate`, `filename` |
 | `time` | `unit_time`, `sampling_rate`, `sampling_interval`, `start_datetime` |
 | `space` | `coordinate_system`, `reference_frame`, `handedness`, `axis_directions`, `axis_extents`, `unit_space`, `unit_angle`, `euler_sequence`, `euler_intrinsic` |
 | `variables` | which columns play which role: `what`, `when`, `where`, `event`, each a list of named slots |
@@ -171,6 +173,54 @@ its metadata simply has no `space` rather than a set of “none” values.
 
 `filename` accepts a character vector — readers like
 `aniread::read_trackball()` populate it with all source paths.
+
+### Two sampling rates
+
+A frame keeps two rates apart. `source_sampling_rate` is the rate the
+device recorded at: provenance, which no processing changes.
+`sampling_rate` is the rate of the data as it is now, the one filters
+and conversions compute with, and the one resampling changes. The first
+rate declared fills both, so a reader that sets `sampling_rate` records
+the camera’s rate without saying so:
+
+``` r
+
+rates <- set_metadata(example_anipoint(), sampling_rate = 200)
+get_metadata(rates, "source_sampling_rate")
+#> [1] 200
+
+rates <- set_metadata(rates, sampling_rate = 50) # e.g. after resampling
+get_metadata(rates, "time")$sampling_rate
+#> [1] 50
+get_metadata(rates)
+#> ── animovement metadata ────────────────────────────────────────────────────────
+#> 
+#> ── time 
+#> unit_time: frame
+#> sampling_rate: 50 Hz (recorded at 200 Hz)
+#> sampling_interval: 1 frame
+#> 
+#> ── space 
+#> coordinate_system: cartesian_2d
+#> reference_frame: allocentric
+#> handedness: unknown
+#> unit_space: px
+#> unit_angle: rad
+#> 
+#> ── variables 
+#> what   keys: individual, keypoint
+#> when   index: time | keys: session, trial
+#> where  position: x = x, y = y
+#> event  state: - | point: -
+#> 
+#> Not set: source, source_version, source_format, filename, start_datetime,
+#>   axis_directions, axis_extents, euler_sequence, euler_intrinsic, structure
+```
+
+The compact print shows the recorded rate beside the current one only
+when they differ. A device with no fixed rate, such as an event-driven
+sensor, is declared with `source_sampling_rate = NaN`, which the first
+declaration leaves alone; `NA` means the rate has not been declared yet.
 
 ## Reading and writing metadata
 
@@ -209,7 +259,7 @@ and update the metadata to match:
 | Function | Does |
 |----|----|
 | [`convert_unit_space()`](https://animovement.dev/anicore/reference/convert_unit_space.md) | rescales the length axes to another unit |
-| [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md) | rescales the index to another unit, using `sampling_rate` from frames |
+| [`convert_unit_time()`](https://animovement.dev/anicore/reference/convert_unit_time.md) | rescales the index to another unit, using `sampling_rate` to and from frames |
 | [`convert_unit_angle()`](https://animovement.dev/anicore/reference/convert_unit_angle.md) | converts `phi`/`theta` (and any `cols`) between rad and deg |
 | [`reflect_axis()`](https://animovement.dev/anicore/reference/reflect_axis.md) | turns an axis over, reflecting its column |
 
@@ -347,7 +397,7 @@ Declare a unit with
 [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md);
 convert values with `convert_unit_*()`. Factors between standard units
 are derived; converting from `px` or `unknown` needs a
-`calibration_factor`, and from `frame` a declared `sampling_rate`.
+`calibration_factor`, and to or from `frame` a declared `sampling_rate`.
 
 ``` r
 
@@ -368,6 +418,28 @@ data_s <- convert_unit_time(data, "s")
 range(data_s$time) # frames divided by fps
 #> [1] 0.03333333 1.66666667
 ```
+
+Frames count from 0, so the first frame is at 0 s. Converting back to
+frames uses the rate the frame declares, which is how a wrong rate is
+put right: back to frames, declare the right rate, and forward again. A
+wrong camera rate is the recorded rate too, so it is declared as both.
+
+``` r
+
+data_s |>
+  convert_unit_time("frame") |>
+  set_metadata(sampling_rate = 25, source_sampling_rate = 25) |>
+  convert_unit_time("s") |>
+  get_sampling_interval()
+#> [1] 0.04
+```
+
+Frames computed from a rate are nominal, so converting to frames rounds
+to the nearest whole frame and refuses sampling that is irregular by
+more than 1%, or rounding that would put two times on one frame. Frame
+numbers a file recorded are data: if the frame has a column named
+`frame` that is not its index, converting to frames makes that column
+the index again.
 
 Spatial angular columns (`phi`, `theta`) are converted automatically by
 [`convert_unit_angle()`](https://animovement.dev/anicore/reference/convert_unit_angle.md)

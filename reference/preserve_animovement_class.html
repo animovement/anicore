@@ -9,7 +9,7 @@ without registering their own methods."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@ without registering their own methods.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">preserve_animovement_class</span><span class="op">(</span><span class="va">x</span>, <span class="va">cls</span>, <span class="va">md</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">preserve_animovement_class</span><span class="op">(</span><span class="va">x</span>, <span class="va">cls</span>, <span class="va">md</span>, before <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,7 +83,13 @@ without registering their own methods.</p>
 
 
 <dt id="arg-md">md<a class="anchor" aria-label="anchor" href="#arg-md"></a></dt>
-<dd><p>Metadata captured before dispatch via <code><a href="get_metadata.html">get_metadata()</a></code>.</p>
+<dd><p>Metadata captured before dispatch via <code><a href="get_metadata.html">get_metadata()</a></code>.</p></dd>
+
+
+<dt id="arg-before">before<a class="anchor" aria-label="anchor" href="#arg-before"></a></dt>
+<dd><p>The frame the verb was given. The stored
+<code>sampling_interval</code> is measured again unless its index and keys are
+unchanged; <code>NULL</code> measures it always.</p>
 <p>A result that has lost a column the frame is keyed, indexed or bounded by
 is no longer that frame: it comes back as the plain data frame, without
 metadata that would describe columns it does not have (#178).</p></dd>

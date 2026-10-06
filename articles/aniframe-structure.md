@@ -46,18 +46,18 @@ data
 #> # Keypoints:   head, neck, shoulder_right
 #> # Sessions:    1
 #> # Trials:      1
-#>    individual keypoint session trial  time        x       y confidence
-#>         <int> <fct>      <int> <int> <int>    <dbl>   <dbl>      <dbl>
-#>  1          1 head           1     1     1  0.337   -0.166       0.381
-#>  2          1 head           1     1     2  0.837   -0.0449      0.766
-#>  3          1 head           1     1     3 -0.885    1.62        0.743
-#>  4          1 head           1     1     4 -0.556    0.813       0.660
-#>  5          1 head           1     1     5  0.748   -1.49        0.870
-#>  6          1 neck           1     1     1  0.00453  0.434       0.820
-#>  7          1 neck           1     1     2 -0.362   -0.178       0.455
-#>  8          1 neck           1     1     3 -0.815   -0.385       0.652
-#>  9          1 neck           1     1     4  0.0246   0.779       0.821
-#> 10          1 neck           1     1     5 -1.58     0.921       0.841
+#>    individual keypoint session trial  time      x      y confidence
+#>         <int> <fct>      <int> <int> <int>  <dbl>  <dbl>      <dbl>
+#>  1          1 head           1     1     1  0.788  0.190      0.296
+#>  2          1 head           1     1     2 -2.59  -0.233      0.761
+#>  3          1 head           1     1     3 -0.757 -1.04       0.865
+#>  4          1 head           1     1     4 -0.412  0.564      0.836
+#>  5          1 head           1     1     5  0.539  0.986      0.818
+#>  6          1 neck           1     1     1  0.270 -1.34       0.786
+#>  7          1 neck           1     1     2  1.48   0.862      0.757
+#>  8          1 neck           1     1     3  1.55   0.897      0.914
+#>  9          1 neck           1     1     4  1.25  -1.38       0.767
+#> 10          1 neck           1     1     5 -0.911  0.285      0.969
 #> # ℹ 20 more rows
 ```
 
@@ -140,20 +140,20 @@ custom <- as_anipoint(
 custom
 #> # Tracks: A, B, C
 #> # Trials: 1, 2
-#>    track trial  time     x      y
-#>    <fct> <int> <int> <dbl>  <dbl>
-#>  1 A         1     1 0.868 0.336 
-#>  2 A         1     1 0.877 0.906 
-#>  3 A         1     2 0.901 0.291 
-#>  4 A         1     2 0.378 0.996 
-#>  5 B         1     1 0.218 0.350 
-#>  6 B         1     2 0.377 0.656 
-#>  7 B         2     1 0.726 0.406 
-#>  8 B         2     2 0.180 0.882 
-#>  9 C         2     1 0.759 0.337 
-#> 10 C         2     1 0.304 0.223 
-#> 11 C         2     2 0.509 0.758 
-#> 12 C         2     2 0.900 0.0686
+#>    track trial  time      x      y
+#>    <fct> <int> <int>  <dbl>  <dbl>
+#>  1 A         1     1 0.831  0.0350
+#>  2 A         1     1 0.276  0.959 
+#>  3 A         1     2 0.671  0.714 
+#>  4 A         1     2 0.985  0.783 
+#>  5 B         1     1 0.842  0.917 
+#>  6 B         1     2 0.0455 0.348 
+#>  7 B         2     1 0.992  0.761 
+#>  8 B         2     2 0.313  0.0143
+#>  9 C         2     1 0.149  0.376 
+#> 10 C         2     1 0.998  0.269 
+#> 11 C         2     2 0.882  0.578 
+#> 12 C         2     2 0.306  0.892
 ```
 
 ## The index
@@ -219,26 +219,36 @@ dplyr::group_vars(data)
 ```
 
 [`set_index()`](https://animovement.dev/anicore/reference/set_index.md)
-changes it, re-ordering the frame to match. The column that was
-previously the index becomes an ordinary, undeclared one — it is not
-promoted to temporal context, for the reason just given:
+changes it, re-ordering the frame to match. It only says which column is
+the index: the new column’s unit is declared with `unit`, or the frame
+goes on saying it counts frames. The column that was previously the
+index becomes an ordinary, undeclared one, not promoted to temporal
+context, for the reason just given:
 
 ``` r
 
 timestamped <- data |>
   dplyr::mutate(timestamp = time / 30) |>
-  set_index("timestamp")
+  set_index("timestamp", unit = "s")
 
 get_index(timestamped)
 #> [1] "timestamp"
+get_metadata(timestamped, "unit_time")
+#> [1] s
+#> Levels: unknown frame ns us ms s m h
 get_variables(timestamped, "when", "keys")
 #> [1] "session" "trial"
 dplyr::group_vars(timestamped)
 #> [1] "individual" "keypoint"   "session"    "trial"
 ```
 
-`time` is still there as a column; it is simply no longer declared as
-anything.
+The old index counted frames, so it is kept as a column named `frame`:
+frame numbers are data, and `convert_unit_time(timestamped, "frame")`
+makes it the index again. Otherwise it is no longer declared as
+anything. The new index must increase with the old one within each group
+of keys;
+[`?set_index`](https://animovement.dev/anicore/reference/set_index.md)
+shows how to match a camera’s timestamp log to the rows by frame number.
 
 Downstream operations (smoothing, derivatives) assume the index is
 monotonically ordered within each entity, which is how

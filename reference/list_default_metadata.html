@@ -7,9 +7,12 @@ set_metadata(data, sampling_rate = 30) regardless of its category,
 and a category name returns the whole category.
 The categories:
 recording — provenance: source, source_version,
-source_format, filename.
-time — unit_time, sampling_rate (declared), sampling_interval
-(derived from the index; read it with get_sampling_interval()),
+source_format, source_sampling_rate, filename.
+source_sampling_rate is the rate the device recorded at, in Hz, and
+no processing changes it; see set_metadata() for how it is filled.
+time — unit_time, sampling_rate (declared: the rate of the data
+as it is now, which resampling changes), sampling_interval (derived
+from the index; read it with get_sampling_interval()),
 start_datetime.
 space — coordinate_system, reference_frame, handedness,
 axis_directions, axis_extents, unit_space, unit_angle, and
@@ -39,9 +42,12 @@ set_metadata(data, sampling_rate = 30) regardless of its category,
 and a category name returns the whole category.
 The categories:
 recording — provenance: source, source_version,
-source_format, filename.
-time — unit_time, sampling_rate (declared), sampling_interval
-(derived from the index; read it with get_sampling_interval()),
+source_format, source_sampling_rate, filename.
+source_sampling_rate is the rate the device recorded at, in Hz, and
+no processing changes it; see set_metadata() for how it is filled.
+time — unit_time, sampling_rate (declared: the rate of the data
+as it is now, which resampling changes), sampling_interval (derived
+from the index; read it with get_sampling_interval()),
 start_datetime.
 space — coordinate_system, reference_frame, handedness,
 axis_directions, axis_extents, unit_space, unit_angle, and
@@ -71,7 +77,7 @@ package version.
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,9 +136,12 @@ with <code>get_metadata(data, "sampling_rate")</code> and written with
 <code>set_metadata(data, sampling_rate = 30)</code> regardless of its category,
 and a category name returns the whole category.</p>
 <p>The categories:</p><ul><li><p><code>recording</code> — provenance: <code>source</code>, <code>source_version</code>,
-<code>source_format</code>, <code>filename</code>.</p></li>
-<li><p><code>time</code> — <code>unit_time</code>, <code>sampling_rate</code> (declared), <code>sampling_interval</code>
-(derived from the index; read it with <code><a href="get_sampling_interval.html">get_sampling_interval()</a></code>),
+<code>source_format</code>, <code>source_sampling_rate</code>, <code>filename</code>.
+<code>source_sampling_rate</code> is the rate the device recorded at, in Hz, and
+no processing changes it; see <code><a href="set_metadata.html">set_metadata()</a></code> for how it is filled.</p></li>
+<li><p><code>time</code> — <code>unit_time</code>, <code>sampling_rate</code> (declared: the rate of the data
+as it is now, which resampling changes), <code>sampling_interval</code> (derived
+from the index; read it with <code><a href="get_sampling_interval.html">get_sampling_interval()</a></code>),
 <code>start_datetime</code>.</p></li>
 <li><p><code>space</code> — <code>coordinate_system</code>, <code>reference_frame</code>, <code>handedness</code>,
 <code>axis_directions</code>, <code>axis_extents</code>, <code>unit_space</code>, <code>unit_angle</code>, and

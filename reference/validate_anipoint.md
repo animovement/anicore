@@ -11,7 +11,7 @@ checked rather than assumed:
 ## Usage
 
 ``` r
-validate_anipoint(data)
+validate_anipoint(data, rate_tolerance = 0.01)
 ```
 
 ## Arguments
@@ -19,6 +19,14 @@ validate_anipoint(data)
 - data:
 
   An anipoint object.
+
+- rate_tolerance:
+
+  How far the declared `sampling_rate` may be from the rate the index is
+  spaced at before it warns, relative to the declared rate. The default,
+  `0.01`, lets real timestamps through: a camera log that averages 30.11
+  Hz agrees with a declared 30 Hz. Lower it for a strict check, such as
+  `1e-6` for an index computed from the rate.
 
 ## Value
 
@@ -39,8 +47,9 @@ The input `data`, invisibly.
 - identity, temporal context and the index together name one observation
   per row — **warning** only (#49);
 
-- a declared `sampling_rate` agrees with the spacing of the index —
-  **warning** only (#114).
+- a declared `sampling_rate` agrees with the spacing of the index, to
+  within `rate_tolerance` — **warning** only (#114). The spacing is the
+  median gap, so a few dropped frames do not count against it.
 
 ## See also
 

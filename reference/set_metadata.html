@@ -23,7 +23,7 @@ factors if they match allowed levels.'><meta property="og:image" content="https:
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,6 +113,28 @@ simultaneously with <code>...</code></p></dd>
     <p>The object with updated metadata.</p>
     </div>
     <div class="section level2">
+    <h2 id="the-recorded-and-the-current-sampling-rate">The recorded and the current sampling rate<a class="anchor" aria-label="anchor" href="#the-recorded-and-the-current-sampling-rate"></a></h2>
+
+
+<p>A frame keeps two rates apart. <code>source_sampling_rate</code>, with the other
+provenance in <code>recording</code>, is the rate the device recorded at, and no
+processing changes it. <code>sampling_rate</code>, in <code>time</code>, is the rate of the
+data as it is now: the rate filters and conversions compute with, and
+the one resampling changes.</p>
+<p>The first declaration of a rate fills both. Setting <code>sampling_rate</code> on a
+frame that has neither rate yet also sets <code>source_sampling_rate</code>, since
+that is the moment the camera's rate is declared; this holds for
+<code>as_anipoint(metadata = )</code> too. After that <code>sampling_rate</code> changes on its
+own, so correcting a wrong camera rate means setting
+<code>source_sampling_rate</code> as well, in the same call.</p>
+<p>A device with no fixed rate, such as an event-driven sensor whose
+readings a reader integrates into windows, is declared with
+<code>source_sampling_rate = NaN</code>: "no fixed rate", as distinct from <code>NA</code>,
+"not declared yet". The first declaration then leaves it alone, and
+<code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> is still <code>TRUE</code> for code that only asks whether there is a
+recorded rate to use.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="get_metadata.html">get_metadata()</a></code>, <code><a href="list_default_metadata.html">list_default_metadata()</a></code></p></div>
     </div>
@@ -127,6 +149,28 @@ simultaneously with <code>...</code></p></dd>
 <span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sampling_rate <span class="op">=</span> <span class="fl">30</span>, source <span class="op">=</span> <span class="st">"sleap"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">set_metadata</span><span class="op">(</span><span class="va">data</span>, metadata <span class="op">=</span> <span class="va">md</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The first declared rate is also recorded as the device's</span></span></span>
+<span class="r-in"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu">set_metadata</span><span class="op">(</span><span class="fu"><a href="example_anipoint.html">example_anipoint</a></span><span class="op">(</span><span class="op">)</span>, sampling_rate <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">af</span>, <span class="st">"source_sampling_rate"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Later rates are the data's own, as after resampling</span></span></span>
+<span class="r-in"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu">set_metadata</span><span class="op">(</span><span class="va">af</span>, sampling_rate <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">af</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sampling_rate"</span>, <span class="st">"source_sampling_rate"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $sampling_rate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $source_sampling_rate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A sensor with no fixed rate</span></span></span>
+<span class="r-in"><span><span class="va">trackball</span> <span class="op">&lt;-</span> <span class="fu"><a href="example_anipoint.html">example_anipoint</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">set_metadata</span><span class="op">(</span>source_sampling_rate <span class="op">=</span> <span class="cn">NaN</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">set_metadata</span><span class="op">(</span>sampling_rate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">trackball</span>, <span class="st">"source_sampling_rate"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NaN</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
