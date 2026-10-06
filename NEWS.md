@@ -25,6 +25,11 @@
 
 ## Added
 
+* `convert_unit_time()` converts to `"frame"` (#190). Frame numbers a file records are data, and frames computed from a rate are only nominal, so it never invents them:
+  * A frame with a column named `frame`, not its index, holds the recorded frame numbers, and converting to `"frame"` makes that column the index again. The column it replaces is kept.
+  * Otherwise frames are computed from the declared `sampling_rate`, counting from 0 (seconds times the rate), and rounded to the nearest whole frame. The conversion refuses when the sampling is irregular, a gap more than 1% from a whole number of frames, or when rounding would put two times of the same keys on one frame.
+  * A wrong rate can now be put right by converting back to frames, declaring the right rate and converting forward again, rather than with a hand-worked `calibration_factor`.
+
 * `angle_to_rad()` and `angle_from_rad()` convert angle values between radians and a frame's declared `unit_angle`, for functions that compute angles in radians and return them in the frame's unit (#170). The frame's unit, or a unit string read once for use inside `mutate()`, says which. A frame that declares no angular unit (`"none"`, or an anievent) is read as radians. `as_anijoint()` and `reflect_axis()` use them in place of their own copies of the check.
 
 * `as_anisegment()` gives one row per segment of a structure: its `length` and unit direction (#154). `as_anipoint(seg, root = )` rebuilds positions from segments, for example after holding lengths constant.
@@ -46,6 +51,8 @@
   The rename follows the convention these settle on: `circ_*()` for functions that compute with the wraparound, where an ordinary mean or difference would give the wrong answer, and `*_angle()` or `x_to_y()` for manipulating how an angle is written.
 
 ## Changed
+
+* `validate_anipoint()` allows the declared `sampling_rate` and the measured spacing of the index to differ by 1% before warning, rather than by one part in a million (#190). The spacing of a real timestamp log never matches the nominal rate exactly, so the warning fired on every one: a camera log averaging 30.11 Hz against a declared 30 Hz. The new `rate_tolerance` argument sets the margin; `rate_tolerance = 1e-6` gives the old, strict check.
 
 * The order of the identity keys (formerly `variables_what`) no longer asserts a hierarchy (#140, #141). It was documented as coarse to fine, which reads naturally for the names that nest — a subject has tracks, a track has keypoints — but identity variables need not nest at all. `sex`, `treatment` and `genotype` partition a population without containing one another, and there is no sense in which one is finer than the next.
 

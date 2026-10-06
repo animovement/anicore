@@ -110,7 +110,7 @@ verbs and update the metadata to match:
 | Function                | Does                                                          |
 |-------------------------|---------------------------------------------------------------|
 | `convert_unit_space()`  | rescales the length axes to another unit                      |
-| `convert_unit_time()`   | rescales the index to another unit, using `sampling_rate` from frames |
+| `convert_unit_time()`   | rescales the index to another unit, using `sampling_rate` to and from frames |
 | `convert_unit_angle()`  | converts `phi`/`theta` (and any `cols`) between rad and deg   |
 | `reflect_axis()`        | turns an axis over, reflecting its column                     |
 
@@ -207,8 +207,8 @@ depth axis matters even for 2D data.
 
 Declare a unit with `set_metadata()`; convert values with
 `convert_unit_*()`. Factors between standard units are derived;
-converting from `px` or `unknown` needs a `calibration_factor`, and from
-`frame` a declared `sampling_rate`.
+converting from `px` or `unknown` needs a `calibration_factor`, and to or
+from `frame` a declared `sampling_rate`.
 
 ```{r}
 data <- example_anipoint(n_dims = 2) |>
@@ -224,6 +224,24 @@ data <- example_anipoint() |> # default unit_time = "frame"
 data_s <- convert_unit_time(data, "s")
 range(data_s$time) # frames divided by fps
 ```
+
+Frames count from 0, so the first frame is at 0 s. Converting back to
+frames uses the rate the frame declares, which is how a wrong rate is put
+right: back to frames, declare the right rate, and forward again.
+
+```{r}
+data_s |>
+  convert_unit_time("frame") |>
+  set_metadata(sampling_rate = 25) |>
+  convert_unit_time("s") |>
+  get_sampling_interval()
+```
+
+Frames computed from a rate are nominal, so converting to frames rounds
+to the nearest whole frame and refuses sampling that is irregular by more
+than 1%, or rounding that would put two times on one frame. Frame numbers
+a file recorded are data: if the frame has a column named `frame` that is
+not its index, converting to frames makes that column the index again.
 
 Spatial angular columns (`phi`, `theta`) are converted automatically
 by `convert_unit_angle()` whenever they're present. Pass `cols` only for

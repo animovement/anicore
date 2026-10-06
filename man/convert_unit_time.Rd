@@ -22,11 +22,12 @@ convert_unit_time(data, to_unit, calibration_factor = NULL)
 \item{data}{An anipoint or anievent.}
 
 \item{to_unit}{Target unit, one of the levels of \code{unit_time} in
-\code{\link[=list_default_metadata]{list_default_metadata()}}.}
+\code{\link[=list_default_metadata]{list_default_metadata()}} other than \code{"unknown"}.}
 
 \item{calibration_factor}{Multiplier from the current unit to \code{to_unit}.
-Required when converting from \code{"frame"} without a \code{sampling_rate}, or
-from \code{"unknown"}.}
+Required when converting to or from \code{"frame"} without a
+\code{sampling_rate}, or from \code{"unknown"}. Refused when the frame numbers
+are taken from a \code{frame} column.}
 }
 \value{
 \code{data}, rescaled, with \code{unit_time} and, for an anipoint,
@@ -35,16 +36,60 @@ from \code{"unknown"}.}
 \description{
 Rescales the temporal columns — the index of an anipoint, \code{start} and
 \code{stop} of an anievent — and records the new \code{unit_time}. An anipoint's
-\code{sampling_interval} is rescaled with its index; \code{sampling_rate} is in Hz
-and is left as it is. Between SI units the factor is derived; from
-\code{"frame"} it is derived from the declared \code{sampling_rate}.
+\code{sampling_interval} is measured again in the new unit; \code{sampling_rate}
+is in Hz and is left as it is. Between SI units the factor is derived; to
+and from \code{"frame"} it is derived from the declared \code{sampling_rate}.
+
+Frames count from 0: the first frame is at time 0, so frames are seconds
+multiplied by the rate, and seconds are frames divided by it. Converting
+from frames to a time unit keeps nothing extra, as frames are evenly
+spaced and multiplying by the rate gives them back.
+
+Converting back to frames is also how a wrong rate is put right: convert
+to \code{"frame"} with the rate the frame declares, declare the right one, and
+convert forward again (see the examples).
 
 To declare a unit without changing values, use
 \code{set_metadata(data, unit_time = "s")}.
 }
+\section{Converting to frames}{
+
+Frame numbers that a file records are data; frame numbers computed from
+a rate are only nominal. So converting to \code{"frame"} uses recorded frame
+numbers when the frame has them, and computes them only from regular
+sampling.
+\itemize{
+\item \strong{Recorded frame numbers.} If an anipoint has a column named
+\code{frame} that is not its index, it holds the frame numbers recorded
+with the data, and converting to \code{"frame"} makes that column the index
+again rather than computing frames from the rate. The column it
+replaces stays in the frame as an ordinary column, so the times are
+not lost.
+\item \strong{Computed frame numbers.} Otherwise each time is multiplied by the
+rate and rounded to the nearest whole frame. Rather than invent frame
+numbers, the conversion refuses when the sampling is irregular, with a
+gap between consecutive times of the same keys more than 1\% (the
+margin \code{\link[=validate_anipoint]{validate_anipoint()}} allows by default) from a whole number of
+frames, or when rounding would put two different times of the same
+keys on the same frame. A timestamp log, or a \code{sampling_rate} that does
+not match the data, is refused this way.
+}
+}
+
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 af <- set_metadata(af, sampling_rate = 30)
-convert_unit_time(af, "s")
+in_seconds <- convert_unit_time(af, "s")
+in_seconds
+
+# The camera was really 25 fps: back to frames, then forward at 25 fps
+in_seconds |>
+  convert_unit_time("frame") |>
+  set_metadata(sampling_rate = 25) |>
+  convert_unit_time("s")
+
+# Times off the frame grid by a little jitter round to whole frames
+jittered <- dplyr::mutate(in_seconds, time = time + c(1e-4, -1e-4, 0))
+convert_unit_time(jittered, "frame")$time
 
 }

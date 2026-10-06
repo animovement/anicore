@@ -4,10 +4,16 @@
 \alias{validate_anipoint}
 \title{Validate an anipoint}
 \usage{
-validate_anipoint(data)
+validate_anipoint(data, rate_tolerance = 0.01)
 }
 \arguments{
 \item{data}{An anipoint object.}
+
+\item{rate_tolerance}{How far the declared \code{sampling_rate} may be from the
+rate the index is spaced at before it warns, relative to the declared
+rate. The default, \code{0.01}, lets real timestamps through: a camera log
+that averages 30.11 Hz agrees with a declared 30 Hz. Lower it for a
+strict check, such as \code{1e-6} for an index computed from the rate.}
 }
 \value{
 The input \code{data}, invisibly.
@@ -29,8 +35,9 @@ only. The frame is still usable, and the field is derived rather
 than declared, so it can be refreshed;
 \item identity, temporal context and the index together name one
 observation per row — \strong{warning} only (#49);
-\item a declared \code{sampling_rate} agrees with the spacing of the index —
-\strong{warning} only (#114).
+\item a declared \code{sampling_rate} agrees with the spacing of the index, to
+within \code{rate_tolerance} — \strong{warning} only (#114). The spacing is the
+median gap, so a few dropped frames do not count against it.
 }
 }
 \examples{
