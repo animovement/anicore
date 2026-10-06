@@ -74,6 +74,9 @@ list_base_frame_classes <- function() {
 #' @param x The bare result returned by `NextMethod()`.
 #' @param cls Class vector of the original input, captured before dispatch.
 #' @param md Metadata captured before dispatch via [get_metadata()].
+#' @param before The frame the verb was given. The stored
+#'   `sampling_interval` is measured again unless its index and keys are
+#'   unchanged; `NULL` measures it always.
 #'
 #' A result that has lost a column the frame is keyed, indexed or bounded by
 #' is no longer that frame: it comes back as the plain data frame, without
@@ -82,7 +85,7 @@ list_base_frame_classes <- function() {
 #' @return `x` with the animovement classes and metadata restored, or `x`
 #'   without them when it lacks a column from [list_frame_columns()].
 #' @keywords internal
-preserve_animovement_class <- function(x, cls, md) {
+preserve_animovement_class <- function(x, cls, md, before = NULL) {
   if (!all(list_frame_columns(md) %in% names(x))) {
     x <- strip_animovement_class(x)
     attr(x, "metadata") <- NULL
@@ -91,7 +94,7 @@ preserve_animovement_class <- function(x, cls, md) {
   # Keep original order so subclasses stay ahead of `aniframe`.
   animovement_cls <- setdiff(cls, list_base_frame_classes())
   class(x) <- c(animovement_cls, setdiff(class(x), animovement_cls))
-  write_metadata(x, md)
+  write_metadata(x, refresh_sampling_interval(md, x, before))
 }
 
 

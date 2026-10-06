@@ -117,11 +117,8 @@ restructure_anipoint <- function(
     as_metadata_factor(coordinate_system, "coordinate_system")
   )
 
-  out <- preserve_animovement_class(bare, cls, md)
-
-  # Computed from the finished frame, after arranging.
-  md <- md_field_set(md, "sampling_interval", compute_sampling_interval(out))
-  attach_metadata(out, md)
+  # Measures the sampling interval on the finished frame, after arranging.
+  preserve_animovement_class(bare, cls, md)
 }
 
 

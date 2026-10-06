@@ -248,5 +248,10 @@ test_that("a full pipeline keeps class & metadata", {
     dplyr::arrange(desc(new))
 
   expect_s3_class(out, "aniframe")
-  expect_metadata_equal(get_metadata(out), src$meta)
+  # The filter dropped rows, so the interval is measured again (#190).
+  expected <- src$meta
+  expected$time$sampling_interval <- compute_sampling_interval(
+    compute_sampling_gaps(out)
+  )
+  expect_metadata_equal(get_metadata(out), expected)
 })

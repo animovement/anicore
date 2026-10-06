@@ -4,13 +4,13 @@
 \alias{compute_sampling_interval}
 \title{Derive the sampling interval from the index}
 \usage{
-compute_sampling_interval(data)
+compute_sampling_interval(gaps)
 }
 \arguments{
-\item{data}{An anipoint object.}
+\item{gaps}{Numeric vector of gaps, from \code{\link[=measure_sampling_gaps]{measure_sampling_gaps()}}.}
 }
 \value{
-Numeric scalar, or \code{NA} when the frame has no gaps to measure.
+Numeric scalar, or \code{NA} when there are no gaps to measure.
 }
 \description{
 The median gap, robust to a few dropped frames.

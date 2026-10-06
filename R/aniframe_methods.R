@@ -1,7 +1,10 @@
 # Each method captures the class vector before dispatch and restores it, so
 # downstream subclasses survive a pipeline (#81). A result missing a key,
 # the index or an interval bound comes back as a plain data frame instead,
-# and renaming carries the new names into the metadata (#178).
+# and renaming carries the new names into the metadata (#178). Each passes
+# the frame it was given, so the sampling interval is measured again when
+# the rows or the index change (#190); the verbs that only rename or move
+# columns pass their result, as they change no values.
 
 #' The metadata for a verb's result
 #'
@@ -33,9 +36,10 @@ ungroup.aniframe <- function(x, ...) {
   )
   cls <- class(x)
   md <- get_metadata(x)
+  before <- x
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Group an aniframe
@@ -49,7 +53,7 @@ group_by.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, .data)
 }
 
 #' Mutate columns in an aniframe
@@ -63,7 +67,7 @@ mutate.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, .data)
 }
 
 #' Select columns from an aniframe
@@ -77,7 +81,7 @@ select.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, renamed_metadata(x, md))
+  preserve_animovement_class(x, cls, renamed_metadata(x, md), before = x)
 }
 
 #' Filter rows of an aniframe
@@ -92,7 +96,7 @@ filter.aniframe <- function(.data, ..., .preserve = FALSE) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, .data)
 }
 
 #' Arrange rows of an aniframe
@@ -107,7 +111,7 @@ arrange.aniframe <- function(.data, ..., .by_group = FALSE) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, .data)
 }
 
 #' Rename columns in an aniframe
@@ -121,7 +125,7 @@ rename.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, renamed_metadata(x, md))
+  preserve_animovement_class(x, cls, renamed_metadata(x, md), before = x)
 }
 
 #' Relocate columns in an aniframe
@@ -135,7 +139,7 @@ relocate.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, renamed_metadata(x, md))
+  preserve_animovement_class(x, cls, renamed_metadata(x, md), before = x)
 }
 
 #' Slice rows from an aniframe
@@ -150,7 +154,7 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
   cls <- class(.data)
   md <- get_metadata(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, .data)
 }
 
 # ---- Base R extraction methods ----
@@ -168,9 +172,10 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
 `[.aniframe` <- function(x, i, j, ..., drop = FALSE) {
   cls <- class(x)
   md <- get_metadata(x)
+  before <- x
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Extract single column from aniframe with [[
@@ -221,9 +226,10 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
 `[<-.aniframe` <- function(x, i, j, ..., value) {
   cls <- class(x)
   md <- get_metadata(x)
+  before <- x
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Column assignment for aniframe with [[<-
@@ -238,9 +244,10 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
 `[[<-.aniframe` <- function(x, i, ..., value) {
   cls <- class(x)
   md <- get_metadata(x)
+  before <- x
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Column assignment for aniframe with $<-
@@ -254,9 +261,10 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
 `$<-.aniframe` <- function(x, name, value) {
   cls <- class(x)
   md <- get_metadata(x)
+  before <- x
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md)
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Rename columns with names<-
@@ -273,7 +281,8 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
   class(x) <- setdiff(class(x), "aniframe")
   x <- NextMethod()
   md <- rename_metadata_columns(md, from, names(x))
-  preserve_animovement_class(x, cls, md)
+  # Renaming moves no values, so the interval stands.
+  preserve_animovement_class(x, cls, md, before = x)
 }
 
 # ---- Conversion methods ----
