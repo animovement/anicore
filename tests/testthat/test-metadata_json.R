@@ -24,6 +24,15 @@ test_that("an anipoint's metadata round-trips identically", {
   expect_identical(get_metadata(round_trip(x)), get_metadata(x))
 })
 
+test_that("the restored metadata is classed as get_metadata() classes it", {
+  skip_if_not_installed("jsonlite")
+  x <- example_anipoint(n_obs = 2, n_individuals = 1)
+  expect_identical(
+    class(get_metadata(round_trip(x))),
+    c("aniframe_metadata", "list")
+  )
+})
+
 test_that("a structure round-trips identically", {
   skip_if_not_installed("jsonlite")
   x <- structured()

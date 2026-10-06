@@ -84,7 +84,7 @@ set_metadata_json <- function(data, json) {
     )
   }
   metadata <- Map(decode_metadata_category, names(json), json)
-  class(metadata) <- "aniframe_metadata"
+  class(metadata) <- c("aniframe_metadata", "list")
   set_metadata(data, metadata = metadata)
 }
 
