@@ -52,6 +52,8 @@
 
 ## Changed
 
+* `set_index()` declares the unit of the new index in the same call, with `unit`, and checks that the new index increases with the old one within each group of keys (#190). An index that counted frames is no longer left under its old name: it is renamed `frame`, as recorded frame numbers are data, and `convert_unit_time(x, "frame")` makes that column the index again. `set_index()` refuses when another `frame` column is in the way, and a new index with missing values. Its help page shows how to index a frame by a camera's timestamp log, matched to rows by frame number.
+
 * `validate_anipoint()` allows the declared `sampling_rate` and the measured spacing of the index to differ by 1% before warning, rather than by one part in a million (#190). The spacing of a real timestamp log never matches the nominal rate exactly, so the warning fired on every one: a camera log averaging 30.11 Hz against a declared 30 Hz. The new `rate_tolerance` argument sets the margin; `rate_tolerance = 1e-6` gives the old, strict check.
 
 * The order of the identity keys (formerly `variables_what`) no longer asserts a hierarchy (#140, #141). It was documented as coarse to fine, which reads naturally for the names that nest — a subject has tracks, a track has keypoints — but identity variables need not nest at all. `sex`, `treatment` and `genotype` partition a population without containing one another, and there is no sense in which one is finer than the next.

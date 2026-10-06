@@ -302,8 +302,8 @@ logged_track <- function() {
   single_track() |>
     dplyr::filter(time != 100) |>
     dplyr::mutate(timestamp = stamps[time + 1]) |>
-    set_index("timestamp") |>
-    set_metadata(unit_time = "s", sampling_rate = 30)
+    set_index("timestamp", unit = "s") |>
+    set_metadata(sampling_rate = 30)
 }
 
 test_that("a jittered timestamp log agrees with its nominal rate (example 6)", {

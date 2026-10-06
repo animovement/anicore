@@ -174,22 +174,29 @@ own, so it stays out:
 dplyr::group_vars(data)
 ```
 
-`set_index()` changes it, re-ordering the frame to match. The column
-that was previously the index becomes an ordinary, undeclared one — it
-is not promoted to temporal context, for the reason just given:
+`set_index()` changes it, re-ordering the frame to match. It only
+says which column is the index: the new column's unit is declared with
+`unit`, or the frame goes on saying it counts frames. The column that was
+previously the index becomes an ordinary, undeclared one, not promoted
+to temporal context, for the reason just given:
 
 ```{r}
 timestamped <- data |>
   dplyr::mutate(timestamp = time / 30) |>
-  set_index("timestamp")
+  set_index("timestamp", unit = "s")
 
 get_index(timestamped)
+get_metadata(timestamped, "unit_time")
 get_variables(timestamped, "when", "keys")
 dplyr::group_vars(timestamped)
 ```
 
-`time` is still there as a column; it is simply no longer declared as
-anything.
+The old index counted frames, so it is kept as a column named `frame`:
+frame numbers are data, and `convert_unit_time(timestamped, "frame")`
+makes it the index again. Otherwise it is no longer declared as anything.
+The new index must increase with the old one within each group of keys;
+`?set_index` shows how to match a camera's timestamp log to the rows by
+frame number.
 
 Downstream operations (smoothing, derivatives) assume the index is
 monotonically ordered within each entity, which is how `as_anipoint()`

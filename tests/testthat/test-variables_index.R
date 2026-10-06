@@ -82,6 +82,177 @@ test_that("set_index() rejects a column that cannot be an index", {
   expect_error(set_index(af, c("time", "x")), "single column name")
 })
 
+# set_index() declares the unit and keeps frame numbers (#190) ----
+
+# Two keypoints over frames 0 to 4, frames counted from 0.
+two_keypoints <- function() {
+  as_anipoint(data.frame(
+    individual = "a",
+    keypoint = rep(c("head", "tail"), each = 5),
+    time = rep(0:4, 2),
+    x = 1:10,
+    y = 1:10
+  ))
+}
+
+test_that("set_index() declares the unit of the new index", {
+  af <- dplyr::mutate(two_keypoints(), timestamp = time / 30)
+
+  result <- set_index(af, "timestamp", unit = "s")
+
+  expect_equal(get_index(result), "timestamp")
+  expect_equal(as.character(get_metadata(result, "unit_time")), "s")
+  expect_equal(get_sampling_interval(result), 1 / 30)
+})
+
+test_that("set_index() leaves the unit alone without one", {
+  af <- dplyr::mutate(two_keypoints(), tick = time * 2)
+
+  result <- set_index(af, "tick")
+
+  expect_equal(as.character(get_metadata(result, "unit_time")), "frame")
+  # Declaring the unit of the current index changes nothing else.
+  same <- set_index(two_keypoints(), "time", unit = "s")
+  expect_equal(get_index(same), "time")
+  expect_equal(as.character(get_metadata(same, "unit_time")), "s")
+})
+
+test_that("set_index() rejects a unit that is not a unit_time level", {
+  af <- two_keypoints()
+
+  for (bad in list("sec", c("s", "ms"), NA_character_, 1)) {
+    expect_error(set_index(af, "time", unit = bad), "must be one of")
+  }
+})
+
+test_that("set_index() moves an index that counts frames to a frame column", {
+  af <- dplyr::mutate(two_keypoints(), timestamp = time / 30)
+
+  result <- set_index(af, "timestamp", unit = "s")
+
+  expect_false("time" %in% names(result))
+  expect_equal(result$frame, rep(0:4, 2))
+  expect_false("frame" %in% get_variables(result, "when"))
+})
+
+test_that("the frame numbers set_index() keeps become the index again", {
+  af <- dplyr::mutate(two_keypoints(), timestamp = time / 30.11)
+
+  frames <- af |>
+    set_index("timestamp", unit = "s") |>
+    set_metadata(sampling_rate = 30) |>
+    convert_unit_time("frame")
+
+  expect_equal(get_index(frames), "frame")
+  expect_equal(frames$frame, rep(0:4, 2))
+  expect_equal(as.character(get_metadata(frames, "unit_time")), "frame")
+  expect_equal(frames$timestamp, rep(0:4, 2) / 30.11)
+})
+
+test_that("an index in another unit keeps its name", {
+  af <- two_keypoints() |>
+    set_metadata(unit_time = "s") |>
+    dplyr::mutate(tick = time * 1000)
+
+  result <- set_index(af, "tick", unit = "ms")
+
+  expect_equal(result$time, rep(0:4, 2))
+  expect_false("frame" %in% names(result))
+})
+
+test_that("an index already named frame, or replaced by one, keeps its name", {
+  named <- as_anipoint(
+    data.frame(frame = 0:2, individual = "a", x = 1:3, y = 1:3),
+    index = "frame"
+  ) |>
+    dplyr::mutate(timestamp = frame / 30)
+  result <- set_index(named, "timestamp", unit = "s")
+  expect_equal(result$frame, 0:2)
+
+  replaced <- dplyr::mutate(two_keypoints(), frame = time + 100)
+  result <- set_index(replaced, "frame")
+  expect_equal(get_index(result), "frame")
+  expect_equal(result$time, rep(0:4, 2))
+})
+
+test_that("set_index() refuses to overwrite another frame column", {
+  af <- dplyr::mutate(two_keypoints(), frame = 7, timestamp = time / 30)
+
+  expect_error(
+    set_index(af, "timestamp", unit = "s"),
+    "already has a column named"
+  )
+})
+
+test_that("set_index() needs the new index to increase within each key", {
+  af <- dplyr::mutate(two_keypoints(), backwards = 10 - time)
+
+  expect_error(set_index(af, "backwards"), "must increase with")
+  expect_error(set_index(af, "backwards"), "individual, keypoint")
+  expect_error(set_index(af, "backwards"), "goes from 10 to 9")
+
+  # Each key on its own scale is fine.
+  per_key <- dplyr::mutate(
+    two_keypoints(),
+    offset = time + ifelse(keypoint == "head", 100, 0)
+  )
+  expect_equal(get_index(set_index(per_key, "offset")), "offset")
+})
+
+test_that("set_index() refuses missing values and date-times", {
+  af <- two_keypoints()
+
+  expect_error(
+    set_index(dplyr::mutate(af, gappy = ifelse(time == 2, NA, time)), "gappy"),
+    "missing values"
+  )
+  stamped <- dplyr::mutate(
+    af,
+    clock = as.POSIXct("2026-01-01", tz = "UTC") + time
+  )
+  expect_error(set_index(stamped, "clock"), "start_datetime")
+})
+
+test_that("a camera log is matched to rows by frame number", {
+  # The tail is missing from frame 2, and frame 3 was dropped altogether;
+  # the log has one entry per frame the camera took.
+  stamps <- c(0, 0.0332, 0.0668, 0.1001, 0.1333)
+  af <- two_keypoints() |>
+    dplyr::filter(!(keypoint == "tail" & time == 2), time != 3)
+
+  logged <- af |>
+    dplyr::mutate(timestamp = stamps[time + 1]) |>
+    set_index("timestamp", unit = "s")
+
+  tail <- dplyr::filter(logged, keypoint == "tail")
+  expect_equal(tail$timestamp, stamps[c(0, 1, 4) + 1])
+  expect_equal(tail$frame, c(0, 1, 4))
+  expect_equal(
+    convert_unit_time(logged, "frame")$frame,
+    c(0, 1, 2, 4, 0, 1, 4)
+  )
+})
+
+test_that("set_index() does not check rows that already repeat the old index", {
+  # Duplicates of the old index are reported by validate_anipoint().
+  af <- as_anipoint(
+    data.frame(individual = "a", time = c(0, 1, 1, 2), x = 1:4, y = 1:4)
+  ) |>
+    dplyr::mutate(tick = c(0, 20, 10, 30))
+
+  expect_equal(get_index(set_index(af, "tick")), "tick")
+})
+
+test_that("set_index() works when the old index column is gone", {
+  af <- dplyr::mutate(two_keypoints(), tick = time * 2)
+  stripped <- drop_column_unchecked(af, "time")
+
+  result <- set_index(stripped, "tick")
+
+  expect_equal(get_index(result), "tick")
+  expect_false("frame" %in% names(result))
+})
+
 test_that("as_anipoint() aborts when the declared index is absent", {
   df <- data.frame(
     frame = 1:3,
