@@ -112,6 +112,27 @@ as_metadata_factor <- function(value, field) {
 #' Character values for factor fields will be automatically converted to
 #' factors if they match allowed levels.
 #'
+#' @section The recorded and the current sampling rate:
+#' A frame keeps two rates apart. `source_sampling_rate`, with the other
+#' provenance in `recording`, is the rate the device recorded at, and no
+#' processing changes it. `sampling_rate`, in `time`, is the rate of the
+#' data as it is now: the rate filters and conversions compute with, and
+#' the one resampling changes.
+#'
+#' The first declaration of a rate fills both. Setting `sampling_rate` on a
+#' frame that has neither rate yet also sets `source_sampling_rate`, since
+#' that is the moment the camera's rate is declared; this holds for
+#' `as_anipoint(metadata = )` too. After that `sampling_rate` changes on its
+#' own, so correcting a wrong camera rate means setting
+#' `source_sampling_rate` as well, in the same call.
+#'
+#' A device with no fixed rate, such as an event-driven sensor whose
+#' readings a reader integrates into windows, is declared with
+#' `source_sampling_rate = NaN`: "no fixed rate", as distinct from `NA`,
+#' "not declared yet". The first declaration then leaves it alone, and
+#' `is.na()` is still `TRUE` for code that only asks whether there is a
+#' recorded rate to use.
+#'
 #' @param data An aniframe or anievent object.
 #' @param ... Named metadata values (e.g., `sampling_rate = 30, source = "sleap"`)
 #' @param metadata Alternatively, a named list of metadata. Cannot be used
@@ -130,6 +151,20 @@ as_metadata_factor <- function(value, field) {
 #' md <- list(sampling_rate = 30, source = "sleap")
 #' data <- set_metadata(data, metadata = md)
 #' }
+#'
+#' # The first declared rate is also recorded as the device's
+#' af <- set_metadata(example_anipoint(), sampling_rate = 200)
+#' get_metadata(af, "source_sampling_rate")
+#'
+#' # Later rates are the data's own, as after resampling
+#' af <- set_metadata(af, sampling_rate = 50)
+#' get_metadata(af, c("sampling_rate", "source_sampling_rate"))
+#'
+#' # A sensor with no fixed rate
+#' trackball <- example_anipoint() |>
+#'   set_metadata(source_sampling_rate = NaN) |>
+#'   set_metadata(sampling_rate = 100)
+#' get_metadata(trackball, "source_sampling_rate")
 #'
 #' @export
 set_metadata <- function(data, ..., metadata = NULL) {
@@ -198,12 +233,72 @@ set_metadata <- function(data, ..., metadata = NULL) {
     )
   }
 
+  old_md <- new_md
   for (n in names(user_md)) {
     new_md <- md_field_set(new_md, n, user_md[[n]])
   }
   new_md <- check_orientation_fields(data, new_md, user_md)
+  new_md <- fill_source_sampling_rate(old_md, new_md, user_md)
 
   write_metadata(data, new_md)
+}
+
+
+#' Record the first declared rate as the device's
+#'
+#' Fills `source_sampling_rate` when `sampling_rate` is declared on a frame
+#' that has neither yet, unless the call sets `source_sampling_rate` itself.
+#' `NaN` declares that the device has no fixed rate, and is left alone.
+#'
+#' @param old_md The metadata before the write.
+#' @param new_md The metadata about to be written.
+#' @param user_md The fields the caller supplied.
+#'
+#' @return `new_md`.
+#' @keywords internal
+fill_source_sampling_rate <- function(old_md, new_md, user_md) {
+  if (
+    !"sampling_rate" %in% names(user_md) ||
+      "source_sampling_rate" %in% names(user_md)
+  ) {
+    return(new_md)
+  }
+  rate <- md_field(new_md, "sampling_rate")
+  if (
+    !is.numeric(rate) ||
+      length(rate) != 1L ||
+      is.na(rate) ||
+      !is_metadata_undeclared(md_field(old_md, "sampling_rate")) ||
+      !is_metadata_undeclared(md_field(old_md, "source_sampling_rate"))
+  ) {
+    return(new_md)
+  }
+  md_field_set(new_md, "source_sampling_rate", as.numeric(rate))
+}
+
+
+#' Has a metadata field not been declared?
+#'
+#' Absent (metadata older than the field), or `NA`. `NaN` is a declaration:
+#' of a rate that is not a number, because the device has no fixed rate.
+#'
+#' @param x A field's value, or `NULL`.
+#'
+#' @return Logical scalar.
+#' @keywords internal
+is_metadata_undeclared <- function(x) {
+  is.null(x) || (length(x) == 1L && is.na(x) && !is_no_fixed_rate(x))
+}
+
+
+#' Is this the marker for a device with no fixed rate?
+#'
+#' @param x A field's value.
+#'
+#' @return Logical scalar.
+#' @keywords internal
+is_no_fixed_rate <- function(x) {
+  is.double(x) && length(x) == 1L && is.nan(x)
 }
 
 

@@ -26,9 +26,12 @@ and a category name returns the whole category.
 The categories:
 \itemize{
 \item \code{recording} — provenance: \code{source}, \code{source_version},
-\code{source_format}, \code{filename}.
-\item \code{time} — \code{unit_time}, \code{sampling_rate} (declared), \code{sampling_interval}
-(derived from the index; read it with \code{\link[=get_sampling_interval]{get_sampling_interval()}}),
+\code{source_format}, \code{source_sampling_rate}, \code{filename}.
+\code{source_sampling_rate} is the rate the device recorded at, in Hz, and
+no processing changes it; see \code{\link[=set_metadata]{set_metadata()}} for how it is filled.
+\item \code{time} — \code{unit_time}, \code{sampling_rate} (declared: the rate of the data
+as it is now, which resampling changes), \code{sampling_interval} (derived
+from the index; read it with \code{\link[=get_sampling_interval]{get_sampling_interval()}}),
 \code{start_datetime}.
 \item \code{space} — \code{coordinate_system}, \code{reference_frame}, \code{handedness},
 \code{axis_directions}, \code{axis_extents}, \code{unit_space}, \code{unit_angle}, and

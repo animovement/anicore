@@ -21,6 +21,7 @@ list_metadata_field_categories <- function() {
     source = "recording",
     source_version = "recording",
     source_format = "recording",
+    source_sampling_rate = "recording",
     filename = "recording",
     unit_time = "time",
     sampling_rate = "time",

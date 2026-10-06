@@ -44,6 +44,7 @@
       source: deeplabcut
       source_version: -
       source_format: -
+      source_sampling_rate: 30 Hz
       filename: -
       
       -- time 
@@ -96,8 +97,8 @@
       what  keys: individual
       when  interval: start, stop | keys: -
       
-      Not set: source, source_version, source_format, filename, sampling_rate,
-        sampling_interval, start_datetime, structure
+      Not set: source, source_version, source_format, source_sampling_rate, filename,
+        sampling_rate, sampling_interval, start_datetime, structure
 
 # metadata print wraps to the console width
 
@@ -124,7 +125,7 @@
       event  state: - | point: -
       
       Not set: source, source_version, source_format,
-        filename, sampling_rate, start_datetime,
-        axis_directions, axis_extents, euler_sequence,
-        euler_intrinsic, structure
+        source_sampling_rate, filename, sampling_rate,
+        start_datetime, axis_directions, axis_extents,
+        euler_sequence, euler_intrinsic, structure
 

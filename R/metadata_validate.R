@@ -84,7 +84,32 @@ ensure_valid_metadata <- function(metadata, class = "anipoint") {
   ensure_known_metadata_fields(metadata)
   ensure_valid_structure_category(metadata[["structure"]])
   ensure_valid_metadata_types(metadata)
+  ensure_valid_source_sampling_rate(md_field(metadata, "source_sampling_rate"))
   ensure_valid_metadata_variables(metadata, schema$slots)
+}
+
+
+#' Validate a recorded sampling rate
+#'
+#' A positive number, `NA` (not declared yet) or `NaN` (declared as having
+#' no fixed rate).
+#'
+#' @param x The value of `source_sampling_rate`, or `NULL` when the
+#'   metadata predates the field.
+#'
+#' @return `TRUE`, invisibly.
+#' @keywords internal
+ensure_valid_source_sampling_rate <- function(x) {
+  if (is.null(x) || (length(x) == 1L && is.na(x))) {
+    return(invisible(TRUE))
+  }
+  if (length(x) != 1L || !is.finite(x) || x <= 0) {
+    cli::cli_abort(c(
+      "{.field source_sampling_rate} must be a single positive number of Hz, not {.val {x}}.",
+      "i" = "Use {.code NaN} for a device with no fixed rate, or {.code NA} when the rate is not known."
+    ))
+  }
+  invisible(TRUE)
 }
 
 
@@ -129,7 +154,13 @@ ensure_known_metadata_fields <- function(metadata) {
 
 # Added after the initial schema; tolerated as absent so old objects validate.
 list_optional_metadata_fields <- function() {
-  c("source_format", "sampling_interval", "euler_sequence", "euler_intrinsic")
+  c(
+    "source_format",
+    "source_sampling_rate",
+    "sampling_interval",
+    "euler_sequence",
+    "euler_intrinsic"
+  )
 }
 
 # Empty and all-NA collapse to character().
