@@ -1,7 +1,7 @@
 Package: anicore
 Type: Package
 Title: An R package providing core data structures for movement data
-Version: 0.8.0.9008
+Version: 0.8.0.9009
 Authors@R: 
     person(
       "Mikkel", 
@@ -26,6 +26,7 @@ Imports:
     pillar,
     anytime,
 Suggests:
+  jsonlite,
   knitr,
   rmarkdown,
   testthat (>= 3.0.0),

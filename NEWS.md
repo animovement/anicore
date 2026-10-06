@@ -25,6 +25,8 @@
 
 ## Added
 
+* `get_metadata_json()` and `set_metadata_json()` read and write a frame's metadata as JSON, so it can travel outside R (#203). The round trip gives back exactly what `get_metadata()` gave, for every frame class. The layout is documented in `?metadata_json` so other languages can read it: fixed-choice fields are strings, `NA` is `null`, `NaN` and `Inf` are strings, `start_datetime` is ISO 8601 in UTC with its time zone beside it as `start_timezone`, and numbers are written with as few digits as read back exactly. aniread uses this to store the metadata in a Parquet file where Python can read it. Needs jsonlite.
+
 * A `source_sampling_rate` metadata field, in `recording`, holds the rate the device recorded at, apart from `sampling_rate`, the rate of the data as it is now (#190). Resampling changes the current rate and never the recorded one; filters, `convert_unit_time()` and the rate check keep using `sampling_rate`.
   * The first rate declared fills both: `set_metadata(sampling_rate = )` on a frame with neither rate set also sets `source_sampling_rate`, so readers that declare a rate record the camera's without changing. This applies to `as_anipoint(metadata = )` too. After that `sampling_rate` changes on its own, so correcting a wrong camera rate means setting `source_sampling_rate` in the same call.
   * `source_sampling_rate = NaN` declares that the device has no fixed rate, such as an event-driven sensor whose readings a reader integrates into windows. The first declaration leaves it alone, where `NA` means not declared yet.
