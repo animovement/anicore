@@ -58,23 +58,46 @@ diff_angle <- function(x, lag = 1L) {
 #' @return Numeric scalar – the angular difference wrapped to \[-π, π\].
 #' @export
 calculate_angular_difference <- function(from_angle, to_angle) {
-  diff_angle <- wrap_angle(to_angle - from_angle)
-  dplyr::if_else(
-    diff_angle > pi,
-    diff_angle - 2 * pi,
-    diff_angle
-  )
+  wrap_angle(to_angle - from_angle, modulo = "pi")
 }
 
-#' Constrain angles to \[0, 2π)
+#' Constrain angles to a standard range
 #'
-#' Wraps any numeric vector to the interval \[0, 2π) using modulo arithmetic.
+#' Wraps any numeric vector of angles (in radians) to a standard interval
+#' using modulo arithmetic.
 #'
 #' @param x Numeric vector of angles (radians).
-#' @return Numeric vector of the same length, each element in \[0, 2π).
+#' @param modulo Character string specifying the target range:
+#'   \describe
+#'     \item{`"2pi"`}{Wrap to \[0, 2π) (default)}
+#'     \item{`"pi"`}{Wrap to \[-π, π)}
+#'     \item{`"asis"`}{No wrapping, return unchanged}
+#'   }
+#'
+#' @return Numeric vector of the same length as `x`, with angles wrapped
+#'   to the specified range.
+#'
+#' @examples
+#' angles <- c(-pi, 0, pi, 2 * pi, 3 * pi)
+#'
+#' # Wrap to [0, 2π)
+#' wrap_angle(angles, "2pi")
+#'
+#' # Wrap to [-π, π)
+#' wrap_angle(angles, "pi")
+#'
+#' # No wrapping
+#' wrap_angle(angles, "asis")
+#'
 #' @export
-wrap_angle <- function(x) {
-  x %% (2 * pi)
+wrap_angle <- function(x, modulo = c("2pi", "pi", "asis")) {
+  modulo <- match.arg(modulo)
+
+  switch(modulo,
+         "2pi" = x %% (2 * pi),
+         "pi" = ((x + pi) %% (2 * pi)) - pi,
+         "asis" = x
+  )
 }
 
 #' Remove constrain for angles to keep within \[0, 2π)
@@ -86,7 +109,7 @@ wrap_angle <- function(x) {
 #' @export
 unwrap_angle <- function(x) {
   angle_diff <- diff(x)
-  angle_diff_wrapped <- ((angle_diff + pi) %% (2 * pi)) - pi
+  angle_diff_wrapped <- wrap_angle(angle_diff, modulo = "pi")
   c(x[1], x[1] + cumsum(angle_diff_wrapped))
 }
 
