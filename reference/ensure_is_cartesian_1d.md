@@ -1,6 +1,7 @@
-# Internal guard for 1-D Cartesian checks
+# Ensure an anipoint uses a 1-D Cartesian coordinate system
 
-Internal guard for 1-D Cartesian checks
+Stops with an informative error if `data` is not in a 1-D Cartesian
+coordinate system.
 
 ## Usage
 
@@ -13,6 +14,10 @@ ensure_is_cartesian_1d(data)
 - data:
 
   An anipoint.
+
+## Value
+
+`TRUE`, invisibly, if the coordinate system matches; otherwise an error.
 
 ## Examples
 

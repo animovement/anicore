@@ -1,6 +1,7 @@
-# Internal guard for cylindrical checks
+# Ensure an anipoint uses a cylindrical coordinate system
 
-Internal guard for cylindrical checks
+Stops with an informative error if `data` is not in a cylindrical
+coordinate system.
 
 ## Usage
 
@@ -13,6 +14,10 @@ ensure_is_cylindrical(data)
 - data:
 
   An anipoint.
+
+## Value
+
+`TRUE`, invisibly, if the coordinate system matches; otherwise an error.
 
 ## Examples
 

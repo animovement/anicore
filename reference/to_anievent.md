@@ -102,9 +102,7 @@ that shape from per-frame data.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-library(tibble)
-df <- tibble(
+df <- data.frame(
   individual = 1L,
   time = 1:8,
   behaviour = factor(c("REM", "REM", "REM", "wake", "wake", "REM", "REM", NA)),
@@ -118,5 +116,10 @@ to_anievent(
   point = call,
   variables_what = individual
 )
-} # }
+#>   individual start stop   channel  type   label
+#> 1          1     1    3 behaviour state     REM
+#> 2          1     2    2      call point   alarm
+#> 3          1     4    5 behaviour state    wake
+#> 4          1     4    4   woke_up state woke_up
+#> 5          1     6    7 behaviour state     REM
 ```

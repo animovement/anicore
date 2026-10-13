@@ -1,6 +1,7 @@
-# Internal guard for polar checks
+# Ensure an anipoint uses a polar coordinate system
 
-Internal guard for polar checks
+Stops with an informative error if `data` is not in a polar coordinate
+system.
 
 ## Usage
 
@@ -13,6 +14,10 @@ ensure_is_polar(data)
 - data:
 
   An anipoint.
+
+## Value
+
+`TRUE`, invisibly, if the coordinate system matches; otherwise an error.
 
 ## Examples
 

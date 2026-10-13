@@ -1,6 +1,7 @@
-# Internal guard for spherical checks
+# Ensure an anipoint uses a spherical coordinate system
 
-Internal guard for spherical checks
+Stops with an informative error if `data` is not in a spherical
+coordinate system.
 
 ## Usage
 
@@ -13,6 +14,10 @@ ensure_is_spherical(data)
 - data:
 
   An anipoint.
+
+## Value
+
+`TRUE`, invisibly, if the coordinate system matches; otherwise an error.
 
 ## Examples
 

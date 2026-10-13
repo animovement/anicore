@@ -433,6 +433,93 @@
   same help topic, so the two were merged into one page; it is now
   [`?anicore`](https://animovement.dev/anicore/reference/anicore.md).
 
+- Declaring an axis role that is carried by one column while a
+  different, undeclared column has that role’s name now warns
+  ([\#119](https://github.com/animovement/anicore/issues/119)). The
+  frame is legal and the mapping is right, but `.data$x` then returns a
+  column that is not the x axis. Silence it with
+  `options(aniframe.quiet = TRUE)`.
+
+- `coordinate_system` follows from which axis roles are declared rather
+  than from column names
+  ([\#109](https://github.com/animovement/anicore/issues/109)). A frame
+  whose coordinates are named something else is now inferred correctly,
+  where it degraded to `unknown` and was refused by every spatial
+  function.
+
+- [`is_cartesian()`](https://animovement.dev/anicore/reference/is_cartesian.md),
+  [`is_polar()`](https://animovement.dev/anicore/reference/is_polar.md),
+  [`is_cylindrical()`](https://animovement.dev/anicore/reference/is_cylindrical.md),
+  [`is_spherical()`](https://animovement.dev/anicore/reference/is_spherical.md),
+  the `is_cartesian_*d()` variants and their `ensure_` guards read
+  `coordinate_system` rather than matching column names, and require an
+  aniframe ([\#107](https://github.com/animovement/anicore/issues/107),
+  [\#109](https://github.com/animovement/anicore/issues/109)). A frame
+  whose coordinates are called something else now satisfies the
+  predicate for the system it is in, and an undeclared column no longer
+  decides the answer — a spherical frame that has dropped `rho` from its
+  declaration is no longer reported as spherical. The guards say which
+  system the frame is in and how to get to the one you need.
+
+- `add_variables_where()` and `remove_variables_where()` carry the axis
+  roles through
+  ([\#109](https://github.com/animovement/anicore/issues/109)). They
+  combined bare column names, so on a frame with declared roles every
+  addition or removal reduced it to `unknown`. Removing an axis until
+  the remainder forms no coordinate system warns rather than aborting;
+  declaring such a set outright still aborts.
+
+- [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
+  warns when identity, temporal context and the index together do not
+  name one observation per row
+  ([\#49](https://github.com/animovement/anicore/issues/49)). A repeat
+  means some variable that tells the rows apart is undeclared, and every
+  grouped operation folds them together.
+
+- `variables_when` no longer names the column the frame is indexed by;
+  read that from `variables_index`, via
+  [`get_index()`](https://animovement.dev/anicore/reference/get_index.md)
+  ([\#109](https://github.com/animovement/anicore/issues/109)). It holds
+  only the temporal context, so a frame with none has
+  [`character()`](https://rdrr.io/r/base/character.html) where it had
+  `c("time")`, as does
+  [`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md).
+  `aniprocess::filter_across()` and `filter_na_across()` take
+  `variables_when[1]` as the time column and must swap to
+  `aniframe::get_index()`. Code reading the grouping columns is
+  unaffected, and no longer has anything to exclude: they are
+  `c(variables_what, variables_when)`.
+
+- `default_metadata()` is renamed
+  [`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md)
+  ([\#121](https://github.com/animovement/anicore/issues/121)).
+
+- `origin` and `y_height` are removed, along with `set_origin()` and
+  `set_y_height()`
+  ([\#124](https://github.com/animovement/anicore/issues/124)). Use
+  [`set_axis_directions()`](https://animovement.dev/anicore/reference/set_axis_directions.md)
+  and `set_axis_extents()`. `origin` recorded a corner, but the origin
+  is `(0, 0)` in both of its values — what differed was the direction y
+  increases in, which is what is recorded now. It also had nothing to
+  say for 3D data or for a recording with no frame corners at all. The
+  deprecated `point_of_reference` alias goes with the field it aliased.
+
+- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
+  no longer fills in an axis extent from the data
+  ([\#124](https://github.com/animovement/anicore/issues/124)).
+  `y_height` fell back to `max(y)`, which is the highest tracked point
+  rather than the frame height, so a frame that was never told its
+  height reflected around the wrong place. A frame now declares no
+  extent until given one, and an axis with no extent is negated when
+  turned over rather than reflected around a guess. `aniread`’s readers
+  supply the video height they know about.
+
+- `spec_version` moves to `aniframe = "2.0.0"` and `anievent = "0.3.0"`
+  ([\#109](https://github.com/animovement/anicore/issues/109)). Major
+  for `aniframe`: `variables_when` no longer names the index, which
+  breaks a consumer reading it from there. Minor for `anievent`, which
+  gains `variables_index` as `NA`.
+
 ### Added
 
 - An aniframe can be indexed by a column that is not called `time`
@@ -576,95 +663,6 @@
 
 - Every exported function now has a runnable example
   ([\#106](https://github.com/animovement/anicore/issues/106)).
-
-### Changed
-
-- Declaring an axis role that is carried by one column while a
-  different, undeclared column has that role’s name now warns
-  ([\#119](https://github.com/animovement/anicore/issues/119)). The
-  frame is legal and the mapping is right, but `.data$x` then returns a
-  column that is not the x axis. Silence it with
-  `options(aniframe.quiet = TRUE)`.
-
-- `coordinate_system` follows from which axis roles are declared rather
-  than from column names
-  ([\#109](https://github.com/animovement/anicore/issues/109)). A frame
-  whose coordinates are named something else is now inferred correctly,
-  where it degraded to `unknown` and was refused by every spatial
-  function.
-
-- [`is_cartesian()`](https://animovement.dev/anicore/reference/is_cartesian.md),
-  [`is_polar()`](https://animovement.dev/anicore/reference/is_polar.md),
-  [`is_cylindrical()`](https://animovement.dev/anicore/reference/is_cylindrical.md),
-  [`is_spherical()`](https://animovement.dev/anicore/reference/is_spherical.md),
-  the `is_cartesian_*d()` variants and their `ensure_` guards read
-  `coordinate_system` rather than matching column names, and require an
-  aniframe ([\#107](https://github.com/animovement/anicore/issues/107),
-  [\#109](https://github.com/animovement/anicore/issues/109)). A frame
-  whose coordinates are called something else now satisfies the
-  predicate for the system it is in, and an undeclared column no longer
-  decides the answer — a spherical frame that has dropped `rho` from its
-  declaration is no longer reported as spherical. The guards say which
-  system the frame is in and how to get to the one you need.
-
-- `add_variables_where()` and `remove_variables_where()` carry the axis
-  roles through
-  ([\#109](https://github.com/animovement/anicore/issues/109)). They
-  combined bare column names, so on a frame with declared roles every
-  addition or removal reduced it to `unknown`. Removing an axis until
-  the remainder forms no coordinate system warns rather than aborting;
-  declaring such a set outright still aborts.
-
-- [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  warns when identity, temporal context and the index together do not
-  name one observation per row
-  ([\#49](https://github.com/animovement/anicore/issues/49)). A repeat
-  means some variable that tells the rows apart is undeclared, and every
-  grouped operation folds them together.
-
-- `variables_when` no longer names the column the frame is indexed by;
-  read that from `variables_index`, via
-  [`get_index()`](https://animovement.dev/anicore/reference/get_index.md)
-  ([\#109](https://github.com/animovement/anicore/issues/109)). It holds
-  only the temporal context, so a frame with none has
-  [`character()`](https://rdrr.io/r/base/character.html) where it had
-  `c("time")`, as does
-  [`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md).
-  `aniprocess::filter_across()` and `filter_na_across()` take
-  `variables_when[1]` as the time column and must swap to
-  `aniframe::get_index()`. Code reading the grouping columns is
-  unaffected, and no longer has anything to exclude: they are
-  `c(variables_what, variables_when)`.
-
-- `default_metadata()` is renamed
-  [`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md)
-  ([\#121](https://github.com/animovement/anicore/issues/121)).
-
-- `origin` and `y_height` are removed, along with `set_origin()` and
-  `set_y_height()`
-  ([\#124](https://github.com/animovement/anicore/issues/124)). Use
-  [`set_axis_directions()`](https://animovement.dev/anicore/reference/set_axis_directions.md)
-  and `set_axis_extents()`. `origin` recorded a corner, but the origin
-  is `(0, 0)` in both of its values — what differed was the direction y
-  increases in, which is what is recorded now. It also had nothing to
-  say for 3D data or for a recording with no frame corners at all. The
-  deprecated `point_of_reference` alias goes with the field it aliased.
-
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  no longer fills in an axis extent from the data
-  ([\#124](https://github.com/animovement/anicore/issues/124)).
-  `y_height` fell back to `max(y)`, which is the highest tracked point
-  rather than the frame height, so a frame that was never told its
-  height reflected around the wrong place. A frame now declares no
-  extent until given one, and an axis with no extent is negated when
-  turned over rather than reflected around a guess. `aniread`’s readers
-  supply the video height they know about.
-
-- `spec_version` moves to `aniframe = "2.0.0"` and `anievent = "0.3.0"`
-  ([\#109](https://github.com/animovement/anicore/issues/109)). Major
-  for `aniframe`: `variables_when` no longer names the index, which
-  breaks a consumer reading it from there. Minor for `anievent`, which
-  gains `variables_index` as `NA`.
 
 ### Fixed
 

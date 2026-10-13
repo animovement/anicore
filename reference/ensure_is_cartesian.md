@@ -1,6 +1,7 @@
-# Internal guard for Cartesian checks
+# Ensure an anipoint uses a Cartesian coordinate system
 
-Stops with a clear error message if `data` is not Cartesian.
+Stops with an informative error if `data` is not in a Cartesian
+coordinate system.
 
 ## Usage
 
@@ -13,6 +14,10 @@ ensure_is_cartesian(data)
 - data:
 
   An anipoint.
+
+## Value
+
+`TRUE`, invisibly, if the coordinate system matches; otherwise an error.
 
 ## Examples
 

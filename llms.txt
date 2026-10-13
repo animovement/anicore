@@ -245,19 +245,19 @@ in, which follows from the axis roles it declares.
 - [`is_spherical()`](https://animovement.dev/anicore/reference/is_spherical.md)
   : Test whether an anipoint uses a spherical coordinate system
 - [`ensure_is_cartesian()`](https://animovement.dev/anicore/reference/ensure_is_cartesian.md)
-  : Internal guard for Cartesian checks
+  : Ensure an anipoint uses a Cartesian coordinate system
 - [`ensure_is_cartesian_1d()`](https://animovement.dev/anicore/reference/ensure_is_cartesian_1d.md)
-  : Internal guard for 1-D Cartesian checks
+  : Ensure an anipoint uses a 1-D Cartesian coordinate system
 - [`ensure_is_cartesian_2d()`](https://animovement.dev/anicore/reference/ensure_is_cartesian_2d.md)
-  : Internal guard for 2-D Cartesian checks
+  : Ensure an anipoint uses a 2-D Cartesian coordinate system
 - [`ensure_is_cartesian_3d()`](https://animovement.dev/anicore/reference/ensure_is_cartesian_3d.md)
-  : Internal guard for 3-D Cartesian checks
+  : Ensure an anipoint uses a 3-D Cartesian coordinate system
 - [`ensure_is_polar()`](https://animovement.dev/anicore/reference/ensure_is_polar.md)
-  : Internal guard for polar checks
+  : Ensure an anipoint uses a polar coordinate system
 - [`ensure_is_cylindrical()`](https://animovement.dev/anicore/reference/ensure_is_cylindrical.md)
-  : Internal guard for cylindrical checks
+  : Ensure an anipoint uses a cylindrical coordinate system
 - [`ensure_is_spherical()`](https://animovement.dev/anicore/reference/ensure_is_spherical.md)
-  : Internal guard for spherical checks
+  : Ensure an anipoint uses a spherical coordinate system
 
 ## Angles
 
