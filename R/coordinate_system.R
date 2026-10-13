@@ -42,11 +42,14 @@ is_cartesian <- function(data) {
 }
 
 
-#' Internal guard for Cartesian checks
+#' Ensure an anipoint uses a Cartesian coordinate system
 #'
-#' Stops with a clear error message if `data` is not Cartesian.
+#' Stops with an informative error if `data` is not in a Cartesian
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
@@ -72,9 +75,14 @@ is_cartesian_1d <- function(data, stop = FALSE) {
 }
 
 
-#' Internal guard for 1-D Cartesian checks
+#' Ensure an anipoint uses a 1-D Cartesian coordinate system
+#'
+#' Stops with an informative error if `data` is not in a 1-D Cartesian
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(ensure_is_cartesian_1d(af))
@@ -97,9 +105,14 @@ is_cartesian_2d <- function(data) {
 }
 
 
-#' Internal guard for 2-D Cartesian checks
+#' Ensure an anipoint uses a 2-D Cartesian coordinate system
+#'
+#' Stops with an informative error if `data` is not in a 2-D Cartesian
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' ensure_is_cartesian_2d(af)
@@ -122,9 +135,14 @@ is_cartesian_3d <- function(data) {
 }
 
 
-#' Internal guard for 3-D Cartesian checks
+#' Ensure an anipoint uses a 3-D Cartesian coordinate system
+#'
+#' Stops with an informative error if `data` is not in a 3-D Cartesian
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' try(ensure_is_cartesian_3d(af))
@@ -147,9 +165,14 @@ is_polar <- function(data) {
 }
 
 
-#' Internal guard for polar checks
+#' Ensure an anipoint uses a polar coordinate system
+#'
+#' Stops with an informative error if `data` is not in a polar
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
@@ -173,9 +196,14 @@ is_cylindrical <- function(data) {
 }
 
 
-#' Internal guard for cylindrical checks
+#' Ensure an anipoint uses a cylindrical coordinate system
+#'
+#' Stops with an informative error if `data` is not in a cylindrical
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
@@ -199,9 +227,14 @@ is_spherical <- function(data) {
 }
 
 
-#' Internal guard for spherical checks
+#' Ensure an anipoint uses a spherical coordinate system
+#'
+#' Stops with an informative error if `data` is not in a spherical
+#' coordinate system.
 #'
 #' @param data An anipoint.
+#' @return `TRUE`, invisibly, if the coordinate system matches; otherwise
+#'   an error.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' # Passes silently when the coordinate system matches
