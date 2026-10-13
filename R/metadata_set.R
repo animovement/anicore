@@ -143,14 +143,14 @@ as_metadata_factor <- function(value, field) {
 #' @seealso [get_metadata()], [list_default_metadata()]
 #'
 #' @examples
-#' \dontrun{
+#' data <- example_anipoint()
+#'
 #' # Set metadata using named arguments
 #' data <- set_metadata(data, sampling_rate = 30, source = "sleap")
 #'
 #' # Set metadata using a list
 #' md <- list(sampling_rate = 30, source = "sleap")
 #' data <- set_metadata(data, metadata = md)
-#' }
 #'
 #' # The first declared rate is also recorded as the device's
 #' af <- set_metadata(example_anipoint(), sampling_rate = 200)
