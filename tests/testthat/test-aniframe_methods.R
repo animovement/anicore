@@ -108,9 +108,12 @@ test_that("rename preserves class & metadata", {
 
 test_that("rename carries keys, the index and structures along (#178)", {
   src <- make_af()
-  af <- set_structure(
-    src$obj,
-    anistructure(segments = list(c("head", "centroid")))
+  expect_warning(
+    af <- set_structure(
+      src$obj,
+      anistructure(segments = list(c("head", "centroid")))
+    ),
+    "centroid"
   )
   out <- dplyr::rename(af, t = time, part = keypoint)
   expect_equal(get_index(out), "t")
