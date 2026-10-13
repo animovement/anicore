@@ -2,15 +2,20 @@
 % Please edit documentation in R/coordinate_system.R
 \name{ensure_is_cartesian_2d}
 \alias{ensure_is_cartesian_2d}
-\title{Internal guard for 2-D Cartesian checks}
+\title{Ensure an anipoint uses a 2-D Cartesian coordinate system}
 \usage{
 ensure_is_cartesian_2d(data)
 }
 \arguments{
 \item{data}{An anipoint.}
 }
+\value{
+\code{TRUE}, invisibly, if the coordinate system matches; otherwise
+an error.
+}
 \description{
-Internal guard for 2-D Cartesian checks
+Stops with an informative error if \code{data} is not in a 2-D Cartesian
+coordinate system.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)

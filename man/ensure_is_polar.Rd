@@ -2,15 +2,20 @@
 % Please edit documentation in R/coordinate_system.R
 \name{ensure_is_polar}
 \alias{ensure_is_polar}
-\title{Internal guard for polar checks}
+\title{Ensure an anipoint uses a polar coordinate system}
 \usage{
 ensure_is_polar(data)
 }
 \arguments{
 \item{data}{An anipoint.}
 }
+\value{
+\code{TRUE}, invisibly, if the coordinate system matches; otherwise
+an error.
+}
 \description{
-Internal guard for polar checks
+Stops with an informative error if \code{data} is not in a polar
+coordinate system.
 }
 \examples{
 af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
