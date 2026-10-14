@@ -3,7 +3,7 @@
 ## Breaking changes
 
 * The position frame is now `anipoint`, and `aniframe` is the abstract parent of every frame class: `anipoint`, `anisegment`, `anijoint` and `anievent` (#154).
-  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace the `aniframe()` versions, which remain as soft-deprecated aliases for one release.
+  * `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` replace the `aniframe()` versions, which are removed.
   * `is_aniframe()` is now `TRUE` for any frame, including an anievent. Test the grain with `is_anipoint()` or `ensure_is_anipoint()`; functions that need coordinates now reject other grains.
   * Re-cast objects saved with earlier versions with `as_anipoint()` or `as_anievent()`.
 
@@ -22,6 +22,8 @@
 * Subsetting a frame so that it loses a column it is keyed, indexed or bounded by gives a plain tibble rather than a frame whose metadata names columns it does not have (#178). This covers `[`, `select()`, `distinct()` and removing a column with `$<-` or `[[<-`. `af[c("x", "y")]` and `select(af, x, y)` used to return an anipoint missing its `time` and keys, which `ensure_is_anipoint()` accepted and later steps tripped over; they now return the columns asked for, ready for plain data-frame work. Dropping a declared value column (a position, an orientation) still returns the frame, so it can be re-declared.
 
 * Directions are signed, in `(-pi, pi]`, throughout (#181). `wrap_angle()` now wraps to `(-pi, pi]` by default (`modulo = "pi"`), and `circ_mean()` and `circ_median()` return that range, so a summary such as `animetric::summarise_aniframe()`'s `median_course` matches the per-row directions it summarises: a course of a little below zero now has a median of a little below zero, not a little below `2 * pi`. It is the range `atan2()` gives, which per-row directions already used. The range does not change any direction, only how it is written. For the old range, wrap at the end with `wrap_angle(x, "2pi")`, and pass `"2pi"` explicitly to any `wrap_angle()` call that relied on the default. `wrap_angle()`'s help page documents the convention.
+
+* The deprecated `aniframe()`, `as_aniframe()`, `example_aniframe()` and `validate_aniframe()` are removed; use `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` (#209). The `aniframe` class, its methods and `is_aniframe()` are unchanged.
 
 ## Added
 

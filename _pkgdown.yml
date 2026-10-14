@@ -35,7 +35,6 @@ reference:
       - is_aniframe
       - ensure_is_aniframe
       - validate_anipoint
-      - anicore-deprecated
 
   - title: "Creating and converting anievent objects"
     desc: >
