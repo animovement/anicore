@@ -169,7 +169,7 @@ resolve_axes <- function(md) {
 #' @return `TRUE`, invisibly.
 #' @keywords internal
 warn_shadowed_axis_roles <- function(axes, columns) {
-  if (isTRUE(getOption("aniframe.quiet", FALSE)) || length(axes) == 0L) {
+  if (isTRUE(getOption("anicore.quiet", FALSE)) || length(axes) == 0L) {
     return(invisible(TRUE))
   }
 
@@ -180,7 +180,7 @@ warn_shadowed_axis_roles <- function(axes, columns) {
     cli::cli_warn(c(
       "{cli::qty(shadowed)}Axis role{?s} {.val {shadowed}} {?is/are} carried by {.val {carried_by}}, but the frame also has {cli::qty(shadowed)}{?a column/columns} of {?that/those} name{?s}.",
       "i" = "{.val {shadowed}} {?is/are} not {?a coordinate column/coordinate columns} here; read the axes with {.fn get_axes}.",
-      "i" = "Silence this with {.code options(aniframe.quiet = TRUE)}."
+      "i" = "Silence this with {.code options(anicore.quiet = TRUE)}."
     ))
   }
 

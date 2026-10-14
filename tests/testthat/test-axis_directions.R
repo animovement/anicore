@@ -198,7 +198,7 @@ test_that("an extent the data runs past is worth saying so about", {
 })
 
 test_that("the warning is silenced with the package option", {
-  previous <- options(aniframe.quiet = TRUE)
+  previous <- options(anicore.quiet = TRUE)
   on.exit(options(previous), add = TRUE)
 
   expect_no_warning(

@@ -63,14 +63,12 @@ ensure_is_cartesian <- function(data) {
 #' Test for a 1-D Cartesian coordinate system
 #'
 #' @param data An anipoint.
-#' @param stop Unused, and kept only so the signature does not change.
-#'   It has no effect.
 #' @return A logical value.
 #' @examples
 #' af <- example_anipoint(n_obs = 3, n_individuals = 1, n_keypoints = 1)
 #' is_cartesian_1d(af)
 #' @export
-is_cartesian_1d <- function(data, stop = FALSE) {
+is_cartesian_1d <- function(data) {
   identical(get_coordinate_system(data), "cartesian_1d")
 }
 

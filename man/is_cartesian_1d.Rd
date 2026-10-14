@@ -4,13 +4,10 @@
 \alias{is_cartesian_1d}
 \title{Test for a 1-D Cartesian coordinate system}
 \usage{
-is_cartesian_1d(data, stop = FALSE)
+is_cartesian_1d(data)
 }
 \arguments{
 \item{data}{An anipoint.}
-
-\item{stop}{Unused, and kept only so the signature does not change.
-It has no effect.}
 }
 \value{
 A logical value.

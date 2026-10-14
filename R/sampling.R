@@ -236,7 +236,7 @@ is_sampling_regular <- function(data, tolerance = 1e-6) {
 #' @return `TRUE`, invisibly.
 #' @keywords internal
 warn_sampling_rate_mismatch <- function(data, tolerance = 0.01) {
-  if (isTRUE(getOption("aniframe.quiet", FALSE))) {
+  if (isTRUE(getOption("anicore.quiet", FALSE))) {
     return(invisible(TRUE))
   }
 

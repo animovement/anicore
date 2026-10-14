@@ -29,6 +29,10 @@
 
 * `as_anipoint()` on a data frame without metadata leaves `unit_time` as `"unknown"` when the index is not whole numbers, rather than declaring it `"frame"` (#207). Times in seconds were labelled as frames. Declare the unit with `metadata = list(unit_time = "s")` or `set_metadata()`.
 
+* The option that silences the warnings about a shadowed axis name, short axis extents and a mismatched sampling rate is now `anicore.quiet`, not `aniframe.quiet`, to match the package name (#209). Replace `options(aniframe.quiet = TRUE)` with `options(anicore.quiet = TRUE)`; the old name is no longer read.
+
+* `is_cartesian_1d()` loses its `stop` argument, which had no effect (#209). Calls that passed it should drop it.
+
 ## Added
 
 * `get_metadata_json()` and `set_metadata_json()` read and write a frame's metadata as JSON, so it can travel outside R (#203). The round trip gives back exactly what `get_metadata()` gave, for every frame class. The layout is documented in `?metadata_json` so other languages can read it: fixed-choice fields are strings, `NA` is `null`, `NaN` and `Inf` are strings, `start_datetime` is ISO 8601 in UTC with its time zone beside it as `start_timezone`, and numbers are written with as few digits as read back exactly. aniread uses this to store the metadata in a Parquet file where Python can read it. Needs jsonlite.

@@ -388,7 +388,7 @@ test_that("no warning when the shadowing column is not there", {
   )
 })
 
-test_that("aniframe.quiet silences the shadowing warning", {
+test_that("anicore.quiet silences the shadowing warning", {
   # An option rather than an argument, so a loop can set it once.
   df <- data.frame(
     time = 1:3,
@@ -398,7 +398,7 @@ test_that("aniframe.quiet silences the shadowing warning", {
     x = 9:11
   )
 
-  previous <- options(aniframe.quiet = TRUE)
+  previous <- options(anicore.quiet = TRUE)
   on.exit(options(previous), add = TRUE)
 
   expect_no_warning(as_anipoint(df, variables_where = c(x = "u", y = "v")))
