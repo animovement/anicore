@@ -44,6 +44,11 @@ ungroup.aniframe <- function(x, ...) {
 
 #' Group an aniframe
 #'
+#' A frame grouped by its keys, one trajectory per group, stays grouped by
+#' them: the levels asked for are added after the keys rather than replacing
+#' them, so a group is one trajectory or one stretch of it (#208). To group by
+#' something else instead, [dplyr::ungroup()] first.
+#'
 #' @param .data An aniframe object
 #' @param ... Variables to group by
 #' @return A grouped aniframe
@@ -52,8 +57,34 @@ ungroup.aniframe <- function(x, ...) {
 group_by.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
+  keys <- intersect(c(md_what_keys(md), md_when_keys(md)), names(.data))
+  # Only a frame still grouped by every key keeps them; once a user has
+  # ungrouped, their grouping is taken as asked.
+  keep_keys <- length(keys) > 0 && all(keys %in% dplyr::group_vars(.data))
+  before <- .data
+  # dplyr ungroups the frame to compute grouping columns, which would warn as
+  # if the user had.
+  .data <- strip_animovement_class(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md, .data)
+  asked <- dplyr::group_vars(x)
+  if (keep_keys && !all(keys %in% asked)) {
+    x <- dplyr::group_by(
+      x,
+      dplyr::across(dplyr::all_of(c(keys, setdiff(asked, keys)))),
+      .drop = dplyr::group_by_drop_default(x)
+    )
+    if (length(setdiff(asked, keys)) > 0) {
+      cli::cli_inform(
+        c(
+          "{.fn group_by} keeps the keys of an {cls[[1]]}, {.val {keys}}, and adds {.val {setdiff(asked, keys)}} after them.",
+          "i" = "To group by other levels only, {.fn ungroup} first."
+        ),
+        .frequency = "once",
+        .frequency_id = "anicore_group_by_keys"
+      )
+    }
+  }
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Mutate columns in an aniframe
@@ -155,6 +186,76 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
   md <- get_metadata(.data)
   x <- NextMethod()
   preserve_animovement_class(x, cls, md, .data)
+}
+
+# ---- dplyr's extension points ----
+# Most verbs without a method of their own end in `dplyr_reconstruct()`, and
+# those that drop rows go through `dplyr_row_slice()` first. Without these
+# methods a grouped frame came back as a plain `grouped_df` and an ungrouped
+# one kept its class and metadata unchecked (#199).
+
+#' Rebuild an aniframe after a dplyr verb
+#'
+#' @param data The verb's result.
+#' @param template The frame the verb was given.
+#' @return An aniframe, or a plain data frame when a key, the index or an
+#'   interval bound is gone.
+#' @keywords internal
+#' @export
+dplyr_reconstruct.aniframe <- function(data, template) {
+  cls <- class(template)
+  md <- get_metadata(template)
+  data <- NextMethod()
+  preserve_animovement_class(data, cls, md, template)
+}
+
+#' Take rows of an aniframe
+#'
+#' @param data An aniframe.
+#' @param i Row positions or a logical vector.
+#' @param ... Passed on.
+#' @return An aniframe.
+#' @keywords internal
+#' @export
+dplyr_row_slice.aniframe <- function(data, i, ...) {
+  cls <- class(data)
+  md <- get_metadata(data)
+  before <- data
+  out <- NextMethod()
+  preserve_animovement_class(out, cls, md, before)
+}
+
+#' Apply a function to each group of an aniframe
+#'
+#' @param .data An aniframe.
+#' @param .f,...,.keep Passed to [dplyr::group_modify()].
+#' @return An aniframe, or a plain data frame when `.f` drops a key, the
+#'   index or an interval bound.
+#' @keywords internal
+#' @export
+group_modify.aniframe <- function(.data, .f, ..., .keep = FALSE) {
+  cls <- class(.data)
+  md <- get_metadata(.data)
+  before <- .data
+  # dplyr ungroups the frame on the way, which would warn as if the user had.
+  .data <- strip_animovement_class(.data)
+  out <- NextMethod()
+  preserve_animovement_class(out, cls, md, before)
+}
+
+#' Drop rows of an aniframe with missing values
+#'
+#' @param data An aniframe.
+#' @param ... Columns to look in, passed to [tidyr::drop_na()].
+#' @return An aniframe.
+#' @keywords internal
+#' @exportS3Method tidyr::drop_na
+drop_na.aniframe <- function(data, ...) {
+  cls <- class(data)
+  md <- get_metadata(data)
+  before <- data
+  out <- NextMethod()
+  preserve_animovement_class(out, cls, md, before)
 }
 
 # ---- Base R extraction methods ----

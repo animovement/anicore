@@ -25,6 +25,10 @@
 
 * The deprecated `aniframe()`, `as_aniframe()`, `example_aniframe()` and `validate_aniframe()` are removed; use `anipoint()`, `as_anipoint()`, `example_anipoint()` and `validate_anipoint()` (#209). The `aniframe` class, its methods and `is_aniframe()` are unchanged.
 
+* `group_by()` on an anipoint keeps the keys it is grouped by, and adds the levels it is given after them (#208). `group_by(data, behaviour)` used to replace the grouping by individual, keypoint, session and trial, so a group pooled several trajectories and anything computed from successive rows mixed them; it now groups by those and then `behaviour`. A message says so, once per session. To group by other levels only, `ungroup()` first. An anievent, which is not grouped by its keys, is grouped as asked.
+
+* `as_anipoint()` on a data frame without metadata leaves `unit_time` as `"unknown"` when the index is not whole numbers, rather than declaring it `"frame"` (#207). Times in seconds were labelled as frames. Declare the unit with `metadata = list(unit_time = "s")` or `set_metadata()`.
+
 ## Added
 
 * `get_metadata_json()` and `set_metadata_json()` read and write a frame's metadata as JSON, so it can travel outside R (#203). The round trip gives back exactly what `get_metadata()` gave, for every frame class. The layout is documented in `?metadata_json` so other languages can read it: fixed-choice fields are strings, `NA` is `null`, `NaN` and `Inf` are strings, `start_datetime` is ISO 8601 in UTC with its time zone beside it as `start_timezone`, and numbers are written with as few digits as read back exactly. aniread uses this to store the metadata in a Parquet file where Python can read it. Needs jsonlite.
@@ -81,6 +85,12 @@
   * A structure writes each segment once, as `from - to`, with its name only when it has one of its own, and wraps its lists to the console width. Like a tibble's rows, a list of more than 20 shows its first 10; `print(x, n = Inf)` shows all.
 
 ## Fixed
+
+* dplyr and tidyr verbs without a method of their own keep a frame's class and metadata (#199). Through dplyr's extension points, `dplyr_reconstruct()` and `dplyr_row_slice()`, plus methods for `group_modify()` and `tidyr::drop_na()`, every verb now treats a frame alike, grouped or not:
+  * `distinct()`, the joins, `bind_rows()`, `bind_cols()` and `add_count()` turned a grouped anipoint, the default, into a plain `grouped_df` without its metadata. They now keep the frame, and the verbs that drop rows measure `sampling_interval` again.
+  * On an ungrouped frame or an anievent, the same verbs kept the class and metadata unchecked. `count()` returned an "anievent" without the columns an anievent needs; a verb that loses a key, the index or an interval bound now returns a plain tibble.
+  * `group_modify()` and `group_by()` with computed columns no longer warn about ungrouping, which dplyr does internally.
+  * The aniframe structure article has a new section, "Working with dplyr and tidyr", that sets out what each kind of verb returns.
 
 * `sampling_interval` follows the rows and the index (#190). `filter()`, `slice()`, `[`, and changing the index or a key with `mutate()`, `$<-`, `[<-` or `[[<-` measure it again, so a 30 Hz recording thinned to every third frame reports the 10 Hz spacing it now has, and `validate_anipoint()` warns that its `sampling_rate` no longer matches. It used to keep the spacing measured when the frame was built. Verbs that leave the rows and the index alone, such as a `mutate()` of another column, `rename()` or `select()`, keep the stored value without measuring.
 

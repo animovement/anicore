@@ -20,9 +20,12 @@ S3method(convert_unit_time,anievent)
 S3method(convert_unit_time,anijoint)
 S3method(convert_unit_time,anipoint)
 S3method(convert_unit_time,anisegment)
+S3method(dplyr_reconstruct,aniframe)
+S3method(dplyr_row_slice,aniframe)
 S3method(filter,aniframe)
 S3method(format,anistructure)
 S3method(group_by,aniframe)
+S3method(group_modify,aniframe)
 S3method(mutate,aniframe)
 S3method(print,aniframe_metadata)
 S3method(print,anistructure)
@@ -34,6 +37,7 @@ S3method(tbl_sum,anievent)
 S3method(tbl_sum,anijoint)
 S3method(tbl_sum,anipoint)
 S3method(tbl_sum,anisegment)
+S3method(tidyr::drop_na,aniframe)
 S3method(to_anievent,anievent)
 S3method(to_anievent,anipoint)
 S3method(to_anievent,data.frame)
@@ -123,8 +127,11 @@ export(validate_anistructure)
 export(wrap_angle)
 importFrom(dplyr,
   arrange,
+  dplyr_reconstruct,
+  dplyr_row_slice,
   filter,
   group_by,
+  group_modify,
   mutate,
   relocate,
   rename,

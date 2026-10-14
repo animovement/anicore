@@ -61,6 +61,7 @@ as_anipoint <- function(
     return(anisegment_to_anipoint(data, root))
   }
   defaults <- list_default_metadata()
+  had_metadata <- is_aniframe(data)
 
   if (!is.null(index)) {
     ensure_index_name(index)
@@ -112,6 +113,16 @@ as_anipoint <- function(
   data <- new_anipoint(data)
   data <- set_metadata(data, metadata = metadata)
 
+  # The default unit is frames, which a time that isn't whole numbers cannot
+  # be in; leave it unknown rather than claim it (#207).
+  if (
+    !had_metadata &&
+      !declares_unit_time(metadata) &&
+      !is_whole_index(data, index)
+  ) {
+    data <- set_metadata(data, unit_time = "unknown")
+  }
+
   # `set_metadata()` refuses declarations, so the index is attached directly.
   md <- get_metadata(data)
   md$variables$when$index <- index
@@ -125,6 +136,33 @@ as_anipoint <- function(
   )
 
   data
+}
+
+
+#' Does a metadata list declare the time unit?
+#'
+#' @param metadata A metadata list, flat or by category.
+#' @return `TRUE` or `FALSE`.
+#' @keywords internal
+declares_unit_time <- function(metadata) {
+  !is.null(metadata$unit_time) || !is.null(metadata$time$unit_time)
+}
+
+
+#' Could the index be frame numbers?
+#'
+#' @param data A data frame.
+#' @param index Name of the index column.
+#' @return `TRUE` unless the column is numeric and holds a value that is not
+#'   a whole number.
+#' @keywords internal
+is_whole_index <- function(data, index) {
+  x <- data[[index]]
+  if (!is.numeric(x)) {
+    return(TRUE)
+  }
+  x <- x[is.finite(x)]
+  all(abs(x - round(x)) < sqrt(.Machine$double.eps))
 }
 
 

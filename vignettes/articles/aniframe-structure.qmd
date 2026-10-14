@@ -202,6 +202,29 @@ Downstream operations (smoothing, derivatives) assume the index is
 monotonically ordered within each entity, which is how `as_anipoint()`
 arranges the frame.
 
+## Working with dplyr and tidyr
+
+A frame stays what it is through dplyr and tidyr verbs for as long as it
+keeps the columns it is keyed by, indexed by and, for an anievent, bounded
+by. Whether it is grouped makes no difference:
+
+| What the verb does | For example | Result |
+|---|---|---|
+| Changes values or columns | `mutate()`, `select()`, `rename()`, `relocate()`, `arrange()` | The same class and metadata. Renamed columns are renamed in the metadata too. |
+| Drops or adds rows | `filter()`, `slice()` and `slice_*()`, `distinct()`, `semi_join()`, `anti_join()`, `tidyr::drop_na()`, `bind_rows()` | The same class and metadata, with `sampling_interval` measured again |
+| Adds columns | `left_join()` and the other mutating joins, `add_count()`, `bind_cols()` | The same class and metadata |
+| Loses a key, the index or an interval bound | `summarise()`, `count()`, `reframe()`, `transmute()`, `pivot_longer()`, `select(-time)` | A plain tibble, without metadata |
+
+`bind_rows()` keeps the metadata of its first frame, and does not compare
+it with the others'. Bind frames that share their units, sampling rate and
+coordinate system.
+
+An anipoint is grouped by its keys, so that each group is one trajectory.
+`group_by()` keeps them and adds the levels it is given after them:
+`group_by(data, behaviour)` groups by trajectory and behaviour, so a group is
+one stretch of a trajectory. To group by other levels only, `ungroup()`
+first.
+
 ## Coordinate systems
 
 The set of spatial columns determines the coordinate system. `anipoint`
