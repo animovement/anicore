@@ -26,7 +26,8 @@ Imports:
     pillar,
     anytime
 Suggests:
-  testthat (>= 3.0.0)
+  testthat (>= 3.0.0),
+  tidyr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 Config/Needs/website: animovement/animovementtemplate, knitr, rmarkdown

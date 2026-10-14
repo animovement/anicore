@@ -157,6 +157,76 @@ slice.aniframe <- function(.data, ..., .preserve = FALSE) {
   preserve_animovement_class(x, cls, md, .data)
 }
 
+# ---- dplyr's extension points ----
+# Most verbs without a method of their own end in `dplyr_reconstruct()`, and
+# those that drop rows go through `dplyr_row_slice()` first. Without these
+# methods a grouped frame came back as a plain `grouped_df` and an ungrouped
+# one kept its class and metadata unchecked (#199).
+
+#' Rebuild an aniframe after a dplyr verb
+#'
+#' @param data The verb's result.
+#' @param template The frame the verb was given.
+#' @return An aniframe, or a plain data frame when a key, the index or an
+#'   interval bound is gone.
+#' @keywords internal
+#' @export
+dplyr_reconstruct.aniframe <- function(data, template) {
+  cls <- class(template)
+  md <- get_metadata(template)
+  data <- NextMethod()
+  preserve_animovement_class(data, cls, md, template)
+}
+
+#' Take rows of an aniframe
+#'
+#' @param data An aniframe.
+#' @param i Row positions or a logical vector.
+#' @param ... Passed on.
+#' @return An aniframe.
+#' @keywords internal
+#' @export
+dplyr_row_slice.aniframe <- function(data, i, ...) {
+  cls <- class(data)
+  md <- get_metadata(data)
+  before <- data
+  out <- NextMethod()
+  preserve_animovement_class(out, cls, md, before)
+}
+
+#' Apply a function to each group of an aniframe
+#'
+#' @param .data An aniframe.
+#' @param .f,...,.keep Passed to [dplyr::group_modify()].
+#' @return An aniframe, or a plain data frame when `.f` drops a key, the
+#'   index or an interval bound.
+#' @keywords internal
+#' @export
+group_modify.aniframe <- function(.data, .f, ..., .keep = FALSE) {
+  cls <- class(.data)
+  md <- get_metadata(.data)
+  before <- .data
+  # dplyr ungroups the frame on the way, which would warn as if the user had.
+  .data <- strip_animovement_class(.data)
+  out <- NextMethod()
+  preserve_animovement_class(out, cls, md, before)
+}
+
+#' Drop rows of an aniframe with missing values
+#'
+#' @param data An aniframe.
+#' @param ... Columns to look in, passed to [tidyr::drop_na()].
+#' @return An aniframe.
+#' @keywords internal
+#' @exportS3Method tidyr::drop_na
+drop_na.aniframe <- function(data, ...) {
+  cls <- class(data)
+  md <- get_metadata(data)
+  before <- data
+  out <- NextMethod()
+  preserve_animovement_class(out, cls, md, before)
+}
+
 # ---- Base R extraction methods ----
 
 #' Subset aniframe with [

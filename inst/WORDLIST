@@ -29,6 +29,7 @@ anispace's
 anistructure
 datetimes
 dplyr
+dplyr's
 durative
 erroring
 etc
@@ -44,6 +45,7 @@ misclassifies
 shorthands
 tibble
 tibble's
+tidyr
 tidyselect
 tidyverse
 writable

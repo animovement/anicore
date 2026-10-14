@@ -80,6 +80,12 @@
 
 ## Fixed
 
+* dplyr and tidyr verbs without a method of their own keep a frame's class and metadata (#199). Through dplyr's extension points, `dplyr_reconstruct()` and `dplyr_row_slice()`, plus methods for `group_modify()` and `tidyr::drop_na()`, every verb now treats a frame alike, grouped or not:
+  * `distinct()`, the joins, `bind_rows()`, `bind_cols()` and `add_count()` turned a grouped anipoint, the default, into a plain `grouped_df` without its metadata. They now keep the frame, and the verbs that drop rows measure `sampling_interval` again.
+  * On an ungrouped frame or an anievent, the same verbs kept the class and metadata unchecked. `count()` returned an "anievent" without the columns an anievent needs; a verb that loses a key, the index or an interval bound now returns a plain tibble.
+  * `group_modify()` and `group_by()` with computed columns no longer warn about ungrouping, which dplyr does internally.
+  * The aniframe structure article has a new section, "Working with dplyr and tidyr", that sets out what each kind of verb returns.
+
 * `sampling_interval` follows the rows and the index (#190). `filter()`, `slice()`, `[`, and changing the index or a key with `mutate()`, `$<-`, `[<-` or `[[<-` measure it again, so a 30 Hz recording thinned to every third frame reports the 10 Hz spacing it now has, and `validate_anipoint()` warns that its `sampling_rate` no longer matches. It used to keep the spacing measured when the frame was built. Verbs that leave the rows and the index alone, such as a `mutate()` of another column, `rename()` or `select()`, keep the stored value without measuring.
 
 * `convert_unit_time()` converts `sampling_interval` along with the index (#185). It used to stay in the old unit, so frames at 30 Hz converted to seconds kept an interval of 1 rather than 1/30. `sampling_rate` is in Hz and is unchanged.
