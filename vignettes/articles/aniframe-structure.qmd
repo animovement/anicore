@@ -215,6 +215,12 @@ by. Whether it is grouped makes no difference:
 | Adds columns | `left_join()` and the other mutating joins, `add_count()`, `bind_cols()` | The same class and metadata |
 | Loses a key, the index or an interval bound | `summarise()`, `count()`, `reframe()`, `transmute()`, `pivot_longer()`, `select(-time)` | A plain tibble, without metadata |
 
+An anipoint is grouped by its keys, so that each group is one trajectory.
+`group_by()` keeps them and adds the levels it is given after them:
+`group_by(data, behaviour)` groups by trajectory and behaviour, so a group is
+one stretch of a trajectory. To group by other levels only, `ungroup()`
+first.
+
 ## Coordinate systems
 
 The set of spatial columns determines the coordinate system. `anipoint`

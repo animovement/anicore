@@ -44,6 +44,11 @@ ungroup.aniframe <- function(x, ...) {
 
 #' Group an aniframe
 #'
+#' A frame grouped by its keys, one trajectory per group, stays grouped by
+#' them: the levels asked for are added after the keys rather than replacing
+#' them, so a group is one trajectory or one stretch of it (#208). To group by
+#' something else instead, [dplyr::ungroup()] first.
+#'
 #' @param .data An aniframe object
 #' @param ... Variables to group by
 #' @return A grouped aniframe
@@ -52,8 +57,34 @@ ungroup.aniframe <- function(x, ...) {
 group_by.aniframe <- function(.data, ...) {
   cls <- class(.data)
   md <- get_metadata(.data)
+  keys <- intersect(c(md_what_keys(md), md_when_keys(md)), names(.data))
+  # Only a frame still grouped by every key keeps them; once a user has
+  # ungrouped, their grouping is taken as asked.
+  keep_keys <- length(keys) > 0 && all(keys %in% dplyr::group_vars(.data))
+  before <- .data
+  # dplyr ungroups the frame to compute grouping columns, which would warn as
+  # if the user had.
+  .data <- strip_animovement_class(.data)
   x <- NextMethod()
-  preserve_animovement_class(x, cls, md, .data)
+  asked <- dplyr::group_vars(x)
+  if (keep_keys && !all(keys %in% asked)) {
+    x <- dplyr::group_by(
+      x,
+      dplyr::across(dplyr::all_of(c(keys, setdiff(asked, keys)))),
+      .drop = dplyr::group_by_drop_default(x)
+    )
+    if (length(setdiff(asked, keys)) > 0) {
+      cli::cli_inform(
+        c(
+          "{.fn group_by} keeps the keys of an {cls[[1]]}, {.val {keys}}, and adds {.val {setdiff(asked, keys)}} after them.",
+          "i" = "To group by other levels only, {.fn ungroup} first."
+        ),
+        .frequency = "once",
+        .frequency_id = "anicore_group_by_keys"
+      )
+    }
+  }
+  preserve_animovement_class(x, cls, md, before)
 }
 
 #' Mutate columns in an aniframe
