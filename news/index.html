@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anicore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="added-development-version">Added<a class="anchor" aria-label="anchor" href="#added-development-version"></a></h3>
-<ul><li>
+<ul><li><p><code><a href="../reference/metadata_json.html">get_metadata_json()</a></code> and <code><a href="../reference/metadata_json.html">set_metadata_json()</a></code> read and write a frame’s metadata as JSON, so it can travel outside R (<a href="https://github.com/animovement/anicore/issues/203" class="external-link">#203</a>). The round trip gives back exactly what <code><a href="../reference/get_metadata.html">get_metadata()</a></code> gave, for every frame class. The layout is documented in <code><a href="../reference/metadata_json.html">?metadata_json</a></code> so other languages can read it: fixed-choice fields are strings, <code>NA</code> is <code>null</code>, <code>NaN</code> and <code>Inf</code> are strings, <code>start_datetime</code> is ISO 8601 in UTC with its time zone beside it as <code>start_timezone</code>, and numbers are written with as few digits as read back exactly. aniread uses this to store the metadata in a Parquet file where Python can read it. Needs jsonlite.</p></li>
+<li>
 <p>A <code>source_sampling_rate</code> metadata field, in <code>recording</code>, holds the rate the device recorded at, apart from <code>sampling_rate</code>, the rate of the data as it is now (<a href="https://github.com/animovement/anicore/issues/190" class="external-link">#190</a>). Resampling changes the current rate and never the recorded one; filters, <code><a href="../reference/convert_unit_time.html">convert_unit_time()</a></code> and the rate check keep using <code>sampling_rate</code>.</p>
 <ul><li>The first rate declared fills both: <code>set_metadata(sampling_rate = )</code> on a frame with neither rate set also sets <code>source_sampling_rate</code>, so readers that declare a rate record the camera’s without changing. This applies to <code>as_anipoint(metadata = )</code> too. After that <code>sampling_rate</code> changes on its own, so correcting a wrong camera rate means setting <code>source_sampling_rate</code> in the same call.</li>
 <li>

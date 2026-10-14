@@ -142,6 +142,22 @@
 
 ### Added
 
+- [`get_metadata_json()`](https://animovement.dev/anicore/reference/metadata_json.md)
+  and
+  [`set_metadata_json()`](https://animovement.dev/anicore/reference/metadata_json.md)
+  read and write a frame’s metadata as JSON, so it can travel outside R
+  ([\#203](https://github.com/animovement/anicore/issues/203)). The
+  round trip gives back exactly what
+  [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md)
+  gave, for every frame class. The layout is documented in
+  [`?metadata_json`](https://animovement.dev/anicore/reference/metadata_json.md)
+  so other languages can read it: fixed-choice fields are strings, `NA`
+  is `null`, `NaN` and `Inf` are strings, `start_datetime` is ISO 8601
+  in UTC with its time zone beside it as `start_timezone`, and numbers
+  are written with as few digits as read back exactly. aniread uses this
+  to store the metadata in a Parquet file where Python can read it.
+  Needs jsonlite.
+
 - A `source_sampling_rate` metadata field, in `recording`, holds the
   rate the device recorded at, apart from `sampling_rate`, the rate of
   the data as it is now

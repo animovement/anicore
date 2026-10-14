@@ -50,6 +50,9 @@ value.
   : Get metadata
 - [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md)
   : Set metadata
+- [`get_metadata_json()`](https://animovement.dev/anicore/reference/metadata_json.md)
+  [`set_metadata_json()`](https://animovement.dev/anicore/reference/metadata_json.md)
+  : Read and write a frame's metadata as JSON
 - [`list_default_metadata()`](https://animovement.dev/anicore/reference/list_default_metadata.md)
   : Default metadata structure
 - [`print(`*`<aniframe_metadata>`*`)`](https://animovement.dev/anicore/reference/print.aniframe_metadata.md)
