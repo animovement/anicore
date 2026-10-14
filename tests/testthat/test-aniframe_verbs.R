@@ -9,6 +9,7 @@
 #   without metadata, rather than an invalid aniframe
 # - group_modify() keeps the class when .f keeps the keys and index
 # - drop_na() keeps the class and measures the interval again
+# - bind_rows() keeps the class and the first frame's metadata (#207)
 
 verb_frames <- function() {
   point <- example_anipoint(n_obs = 20, n_individuals = 2, n_keypoints = 2) |>
@@ -112,4 +113,22 @@ test_that("drop_na() keeps the class and measures the interval again", {
 
   event <- verb_frames()$event
   expect_s3_class(tidyr::drop_na(event), "anievent")
+})
+
+test_that("bind_rows() keeps the class and the first frame's metadata", {
+  # It came back as a grouped_df, and re-casting it then labelled the times,
+  # in seconds, as frames (#207).
+  for (name in c("grouped", "ungrouped")) {
+    x <- verb_frames()[[name]]
+    early <- dplyr::filter(x, time < 0.3)
+    late <- dplyr::filter(x, time >= 0.3)
+
+    out <- dplyr::bind_rows(early, late)
+
+    expect_s3_class(out, "anipoint")
+    expect_identical(dplyr::group_vars(out), dplyr::group_vars(x))
+    expect_equal(as.character(get_metadata(out, "unit_time")), "s")
+    expect_equal(get_metadata(out, "sampling_rate"), 30)
+    expect_equal(get_sampling_interval(out), 1 / 30)
+  }
 })

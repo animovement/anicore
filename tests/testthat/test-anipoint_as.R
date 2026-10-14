@@ -572,3 +572,28 @@ test_that("unit conversions and declarations leave the variables alone", {
     expect_false("keypoint" %in% names(out))
   }
 })
+
+test_that("as_anipoint leaves the time unit unknown for a time that isn't frames", {
+  # The default unit is frames, which a fractional time cannot be in (#207).
+  df <- data.frame(
+    individual = "a",
+    time = c(0, 1 / 30, 2 / 30),
+    x = 1:3,
+    y = 1:3
+  )
+
+  expect_equal(
+    as.character(get_metadata(as_anipoint(df), "unit_time")),
+    "unknown"
+  )
+
+  df$time <- 0:2
+  expect_equal(
+    as.character(get_metadata(as_anipoint(df), "unit_time")),
+    "frame"
+  )
+
+  df$time <- c(0, 0.5, 1)
+  declared <- as_anipoint(df, metadata = list(unit_time = "s"))
+  expect_equal(as.character(get_metadata(declared, "unit_time")), "s")
+})

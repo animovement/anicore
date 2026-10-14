@@ -27,6 +27,8 @@
 
 * `group_by()` on an anipoint keeps the keys it is grouped by, and adds the levels it is given after them (#208). `group_by(data, behaviour)` used to replace the grouping by individual, keypoint, session and trial, so a group pooled several trajectories and anything computed from successive rows mixed them; it now groups by those and then `behaviour`. A message says so, once per session. To group by other levels only, `ungroup()` first. An anievent, which is not grouped by its keys, is grouped as asked.
 
+* `as_anipoint()` on a data frame without metadata leaves `unit_time` as `"unknown"` when the index is not whole numbers, rather than declaring it `"frame"` (#207). Times in seconds were labelled as frames. Declare the unit with `metadata = list(unit_time = "s")` or `set_metadata()`.
+
 ## Added
 
 * A `source_sampling_rate` metadata field, in `recording`, holds the rate the device recorded at, apart from `sampling_rate`, the rate of the data as it is now (#190). Resampling changes the current rate and never the recorded one; filters, `convert_unit_time()` and the rate check keep using `sampling_rate`.
