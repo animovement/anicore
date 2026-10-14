@@ -49,7 +49,7 @@ ensure_valid_axis_extents <- function(extents) {
 #' @return `TRUE`, invisibly.
 #' @keywords internal
 warn_short_axis_extents <- function(data, extents) {
-  if (isTRUE(getOption("aniframe.quiet", FALSE))) {
+  if (isTRUE(getOption("anicore.quiet", FALSE))) {
     return(invisible(TRUE))
   }
 

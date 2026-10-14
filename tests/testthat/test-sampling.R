@@ -237,7 +237,7 @@ test_that("a frame-indexed recording is not second-guessed", {
   expect_no_warning(validate_anipoint(af))
 })
 
-test_that("aniframe.quiet silences the mismatch warning", {
+test_that("anicore.quiet silences the mismatch warning", {
   af <- as_anipoint(
     data.frame(
       individual = "a",
@@ -248,7 +248,7 @@ test_that("aniframe.quiet silences the mismatch warning", {
   ) |>
     set_metadata(unit_time = "s", sampling_rate = 30)
 
-  previous <- options(aniframe.quiet = TRUE)
+  previous <- options(anicore.quiet = TRUE)
   on.exit(options(previous), add = TRUE)
 
   expect_no_warning(validate_anipoint(af))
