@@ -5,6 +5,7 @@ Codecov
 FicTrac's
 FreeMoCap's
 HH
+IANA
 Inf
 ORCID
 Octron
@@ -37,6 +38,7 @@ fff
 ggplot
 gimbal
 github
+jsonlite
 keypoint
 keypoints
 lifecycle
