@@ -102,6 +102,25 @@
 
 * `?aniframe` is the constructor again. The package documentation had claimed the same help topic, so the two were merged into one page; it is now `?anicore`.
 
+* Declaring an axis role that is carried by one column while a different, undeclared column has that role's name now warns (#119). The frame is legal and the mapping is right, but `.data$x` then returns a column that is not the x axis. Silence it with `options(aniframe.quiet = TRUE)`.
+
+* `coordinate_system` follows from which axis roles are declared rather than from column names (#109). A frame whose coordinates are named something else is now inferred correctly, where it degraded to `unknown` and was refused by every spatial function.
+
+* `is_cartesian()`, `is_polar()`, `is_cylindrical()`, `is_spherical()`, the `is_cartesian_*d()` variants and their `ensure_` guards read `coordinate_system` rather than matching column names, and require an aniframe (#107, #109). A frame whose coordinates are called something else now satisfies the predicate for the system it is in, and an undeclared column no longer decides the answer — a spherical frame that has dropped `rho` from its declaration is no longer reported as spherical. The guards say which system the frame is in and how to get to the one you need.
+
+* `add_variables_where()` and `remove_variables_where()` carry the axis roles through (#109). They combined bare column names, so on a frame with declared roles every addition or removal reduced it to `unknown`. Removing an axis until the remainder forms no coordinate system warns rather than aborting; declaring such a set outright still aborts.
+
+* `validate_aniframe()` warns when identity, temporal context and the index together do not name one observation per row (#49). A repeat means some variable that tells the rows apart is undeclared, and every grouped operation folds them together.
+
+* `variables_when` no longer names the column the frame is indexed by; read that from `variables_index`, via `get_index()` (#109). It holds only the temporal context, so a frame with none has `character()` where it had `c("time")`, as does `list_default_metadata()`. `aniprocess::filter_across()` and `filter_na_across()` take `variables_when[1]` as the time column and must swap to `aniframe::get_index()`. Code reading the grouping columns is unaffected, and no longer has anything to exclude: they are `c(variables_what, variables_when)`.
+
+* `default_metadata()` is renamed `list_default_metadata()` (#121).
+
+* `origin` and `y_height` are removed, along with `set_origin()` and `set_y_height()` (#124). Use `set_axis_directions()` and `set_axis_extents()`. `origin` recorded a corner, but the origin is `(0, 0)` in both of its values — what differed was the direction y increases in, which is what is recorded now. It also had nothing to say for 3D data or for a recording with no frame corners at all. The deprecated `point_of_reference` alias goes with the field it aliased.
+
+* `as_aniframe()` no longer fills in an axis extent from the data (#124). `y_height` fell back to `max(y)`, which is the highest tracked point rather than the frame height, so a frame that was never told its height reflected around the wrong place. A frame now declares no extent until given one, and an axis with no extent is negated when turned over rather than reflected around a guess. `aniread`'s readers supply the video height they know about.
+
+* `spec_version` moves to `aniframe = "2.0.0"` and `anievent = "0.3.0"` (#109). Major for `aniframe`: `variables_when` no longer names the index, which breaks a consumer reading it from there. Minor for `anievent`, which gains `variables_index` as `NA`.
 
 ## Added
 
@@ -136,28 +155,6 @@
 * Turning an axis over on a frame that stores angles recomputes them, rather than refusing (#134). No column carries `x`, `y` or `z` on a polar, cylindrical or spherical frame, but the angles are measured from those axes: turning `x` over takes the supplement of `phi`, turning `y` over negates it, and turning `z` over takes the supplement of `theta`. The result comes back in the unit and range the frame keeps its angles in, and `rho` never moves. An axis with a declared extent still refuses, because reflecting around it would move every point's distance from the origin.
 
 * Every exported function now has a runnable example (#106).
-
-## Changed
-
-* Declaring an axis role that is carried by one column while a different, undeclared column has that role's name now warns (#119). The frame is legal and the mapping is right, but `.data$x` then returns a column that is not the x axis. Silence it with `options(aniframe.quiet = TRUE)`.
-
-* `coordinate_system` follows from which axis roles are declared rather than from column names (#109). A frame whose coordinates are named something else is now inferred correctly, where it degraded to `unknown` and was refused by every spatial function.
-
-* `is_cartesian()`, `is_polar()`, `is_cylindrical()`, `is_spherical()`, the `is_cartesian_*d()` variants and their `ensure_` guards read `coordinate_system` rather than matching column names, and require an aniframe (#107, #109). A frame whose coordinates are called something else now satisfies the predicate for the system it is in, and an undeclared column no longer decides the answer — a spherical frame that has dropped `rho` from its declaration is no longer reported as spherical. The guards say which system the frame is in and how to get to the one you need.
-
-* `add_variables_where()` and `remove_variables_where()` carry the axis roles through (#109). They combined bare column names, so on a frame with declared roles every addition or removal reduced it to `unknown`. Removing an axis until the remainder forms no coordinate system warns rather than aborting; declaring such a set outright still aborts.
-
-* `validate_aniframe()` warns when identity, temporal context and the index together do not name one observation per row (#49). A repeat means some variable that tells the rows apart is undeclared, and every grouped operation folds them together.
-
-* `variables_when` no longer names the column the frame is indexed by; read that from `variables_index`, via `get_index()` (#109). It holds only the temporal context, so a frame with none has `character()` where it had `c("time")`, as does `list_default_metadata()`. `aniprocess::filter_across()` and `filter_na_across()` take `variables_when[1]` as the time column and must swap to `aniframe::get_index()`. Code reading the grouping columns is unaffected, and no longer has anything to exclude: they are `c(variables_what, variables_when)`.
-
-* `default_metadata()` is renamed `list_default_metadata()` (#121).
-
-* `origin` and `y_height` are removed, along with `set_origin()` and `set_y_height()` (#124). Use `set_axis_directions()` and `set_axis_extents()`. `origin` recorded a corner, but the origin is `(0, 0)` in both of its values — what differed was the direction y increases in, which is what is recorded now. It also had nothing to say for 3D data or for a recording with no frame corners at all. The deprecated `point_of_reference` alias goes with the field it aliased.
-
-* `as_aniframe()` no longer fills in an axis extent from the data (#124). `y_height` fell back to `max(y)`, which is the highest tracked point rather than the frame height, so a frame that was never told its height reflected around the wrong place. A frame now declares no extent until given one, and an axis with no extent is negated when turned over rather than reflected around a guess. `aniread`'s readers supply the video height they know about.
-
-* `spec_version` moves to `aniframe = "2.0.0"` and `anievent = "0.3.0"` (#109). Major for `aniframe`: `variables_when` no longer names the index, which breaks a consumer reading it from there. Minor for `anievent`, which gains `variables_index` as `NA`.
 
 ## Fixed
 

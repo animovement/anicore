@@ -38,9 +38,7 @@
 #' @return An [anievent()].
 #'
 #' @examples
-#' \dontrun{
-#' library(tibble)
-#' df <- tibble(
+#' df <- data.frame(
 #'   individual = 1L,
 #'   time = 1:8,
 #'   behaviour = factor(c("REM", "REM", "REM", "wake", "wake", "REM", "REM", NA)),
@@ -54,7 +52,6 @@
 #'   point = call,
 #'   variables_what = individual
 #' )
-#' }
 #'
 #' @export
 to_anievent <- function(data, ...) {

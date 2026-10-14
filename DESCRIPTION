@@ -6,7 +6,7 @@ Authors@R:
     person(
       "Mikkel", 
       "Roald-Arbøl", 
-      role = c("aut", "cre"), 
+      role = c("aut", "cre", "cph"), 
       email = "animovement.84w1m@passmail.com",
       comment = c(ORCID = "0000-0002-9998-0058")
       )
@@ -15,7 +15,7 @@ License: MIT + file LICENSE
 URL: https://animovement.dev/anicore/, https://github.com/animovement/anicore/
 BugReports: https://github.com/animovement/anicore/issues
 Encoding: UTF-8
-LazyData: true
+Language: en-GB
 Depends:
   R (>= 4.1.0)
 Imports:
@@ -24,16 +24,11 @@ Imports:
     lifecycle,
     rlang,
     pillar,
-    anytime,
+    anytime
 Suggests:
   jsonlite,
-  knitr,
-  rmarkdown,
-  testthat (>= 3.0.0),
-  covr,
-  pkgdown
+  testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
-VignetteBuilder: knitr
-Config/Needs/website: animovement/animovementtemplate
+Config/Needs/website: animovement/animovementtemplate, knitr, rmarkdown
 Config/roxygen2/version: 8.1.0

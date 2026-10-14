@@ -79,9 +79,7 @@ bout, with \code{channel} / \code{type} / \code{label} / \code{start} / \code{st
 from per-frame data.
 }
 \examples{
-\dontrun{
-library(tibble)
-df <- tibble(
+df <- data.frame(
   individual = 1L,
   time = 1:8,
   behaviour = factor(c("REM", "REM", "REM", "wake", "wake", "REM", "REM", NA)),
@@ -95,6 +93,5 @@ to_anievent(
   point = call,
   variables_what = individual
 )
-}
 
 }
