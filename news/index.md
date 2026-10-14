@@ -140,6 +140,25 @@
   [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
   are unchanged.
 
+- `group_by()` on an anipoint keeps the keys it is grouped by, and adds
+  the levels it is given after them
+  ([\#208](https://github.com/animovement/anicore/issues/208)).
+  `group_by(data, behaviour)` used to replace the grouping by
+  individual, keypoint, session and trial, so a group pooled several
+  trajectories and anything computed from successive rows mixed them; it
+  now groups by those and then `behaviour`. A message says so, once per
+  session. To group by other levels only, `ungroup()` first. An
+  anievent, which is not grouped by its keys, is grouped as asked.
+
+- [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md)
+  on a data frame without metadata leaves `unit_time` as `"unknown"`
+  when the index is not whole numbers, rather than declaring it
+  `"frame"`
+  ([\#207](https://github.com/animovement/anicore/issues/207)). Times in
+  seconds were labelled as frames. Declare the unit with
+  `metadata = list(unit_time = "s")` or
+  [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md).
+
 ### Added
 
 - [`get_metadata_json()`](https://animovement.dev/anicore/reference/metadata_json.md)
@@ -384,6 +403,27 @@
     10; `print(x, n = Inf)` shows all.
 
 ### Fixed
+
+- dplyr and tidyr verbs without a method of their own keep a frame’s
+  class and metadata
+  ([\#199](https://github.com/animovement/anicore/issues/199)). Through
+  dplyr’s extension points, `dplyr_reconstruct()` and
+  `dplyr_row_slice()`, plus methods for `group_modify()` and
+  [`tidyr::drop_na()`](https://tidyr.tidyverse.org/reference/drop_na.html),
+  every verb now treats a frame alike, grouped or not:
+
+  - `distinct()`, the joins, `bind_rows()`, `bind_cols()` and
+    `add_count()` turned a grouped anipoint, the default, into a plain
+    `grouped_df` without its metadata. They now keep the frame, and the
+    verbs that drop rows measure `sampling_interval` again.
+  - On an ungrouped frame or an anievent, the same verbs kept the class
+    and metadata unchecked. `count()` returned an “anievent” without the
+    columns an anievent needs; a verb that loses a key, the index or an
+    interval bound now returns a plain tibble.
+  - `group_modify()` and `group_by()` with computed columns no longer
+    warn about ungrouping, which dplyr does internally.
+  - The aniframe structure article has a new section, “Working with
+    dplyr and tidyr”, that sets out what each kind of verb returns.
 
 - `sampling_interval` follows the rows and the index
   ([\#190](https://github.com/animovement/anicore/issues/190)).

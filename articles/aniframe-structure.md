@@ -46,18 +46,18 @@ data
 #> # Keypoints:   head, neck, shoulder_right
 #> # Sessions:    1
 #> # Trials:      1
-#>    individual keypoint session trial  time      x      y confidence
-#>         <int> <fct>      <int> <int> <int>  <dbl>  <dbl>      <dbl>
-#>  1          1 head           1     1     1 -0.640  0.408      0.289
-#>  2          1 head           1     1     2  0.186 -0.487      0.628
-#>  3          1 head           1     1     3 -0.381  0.546      0.564
-#>  4          1 head           1     1     4 -1.32   0.144      0.712
-#>  5          1 head           1     1     5 -0.725 -0.596      0.689
-#>  6          1 neck           1     1     1  1.11   1.20       0.694
-#>  7          1 neck           1     1     2 -0.488 -0.668      0.742
-#>  8          1 neck           1     1     3  0.185  1.97       0.385
-#>  9          1 neck           1     1     4 -0.183  0.207      0.894
-#> 10          1 neck           1     1     5  0.249  0.137      0.921
+#>    individual keypoint session trial  time       x       y confidence
+#>         <int> <fct>      <int> <int> <int>   <dbl>   <dbl>      <dbl>
+#>  1          1 head           1     1     1  0.903  -0.382       0.383
+#>  2          1 head           1     1     2 -0.0423  0.0832      0.912
+#>  3          1 head           1     1     3 -0.567   0.874       0.665
+#>  4          1 head           1     1     4 -0.165   0.0354      0.725
+#>  5          1 head           1     1     5 -0.265  -0.0630      0.890
+#>  6          1 neck           1     1     1  1.65   -1.39        0.756
+#>  7          1 neck           1     1     2  1.41   -2.39        0.835
+#>  8          1 neck           1     1     3  0.965   0.562       0.724
+#>  9          1 neck           1     1     4 -0.721   0.112       0.758
+#> 10          1 neck           1     1     5  0.361   0.486       0.923
 #> # ℹ 20 more rows
 ```
 
@@ -140,20 +140,20 @@ custom <- as_anipoint(
 custom
 #> # Tracks: A, B, C
 #> # Trials: 1, 2
-#>    track trial  time      x      y
-#>    <fct> <int> <int>  <dbl>  <dbl>
-#>  1 A         1     1 0.851  0.728 
-#>  2 A         1     1 0.0602 0.756 
-#>  3 A         1     2 0.466  0.0763
-#>  4 A         1     2 0.503  0.956 
-#>  5 B         1     1 0.325  0.877 
-#>  6 B         1     2 0.111  0.854 
-#>  7 B         2     1 0.987  0.187 
-#>  8 B         2     2 0.253  0.236 
-#>  9 C         2     1 0.287  0.921 
-#> 10 C         2     1 0.111  0.849 
-#> 11 C         2     2 0.265  0.585 
-#> 12 C         2     2 0.850  0.470
+#>    track trial  time      x     y
+#>    <fct> <int> <int>  <dbl> <dbl>
+#>  1 A         1     1 0.274  0.289
+#>  2 A         1     1 0.422  0.944
+#>  3 A         1     2 0.190  0.458
+#>  4 A         1     2 0.0678 0.520
+#>  5 B         1     1 0.977  0.170
+#>  6 B         1     2 0.713  0.424
+#>  7 B         2     1 0.150  0.526
+#>  8 B         2     2 0.785  0.665
+#>  9 C         2     1 0.720  0.525
+#> 10 C         2     1 0.206  0.314
+#> 11 C         2     2 0.832  0.236
+#> 12 C         2     2 0.0713 0.569
 ```
 
 ## The index
@@ -254,6 +254,29 @@ Downstream operations (smoothing, derivatives) assume the index is
 monotonically ordered within each entity, which is how
 [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md)
 arranges the frame.
+
+## Working with dplyr and tidyr
+
+A frame stays what it is through dplyr and tidyr verbs for as long as it
+keeps the columns it is keyed by, indexed by and, for an anievent,
+bounded by. Whether it is grouped makes no difference:
+
+| What the verb does | For example | Result |
+|----|----|----|
+| Changes values or columns | `mutate()`, `select()`, `rename()`, `relocate()`, `arrange()` | The same class and metadata. Renamed columns are renamed in the metadata too. |
+| Drops or adds rows | [`filter()`](https://rdrr.io/r/stats/filter.html), `slice()` and `slice_*()`, `distinct()`, `semi_join()`, `anti_join()`, [`tidyr::drop_na()`](https://tidyr.tidyverse.org/reference/drop_na.html), `bind_rows()` | The same class and metadata, with `sampling_interval` measured again |
+| Adds columns | `left_join()` and the other mutating joins, `add_count()`, `bind_cols()` | The same class and metadata |
+| Loses a key, the index or an interval bound | `summarise()`, `count()`, `reframe()`, `transmute()`, `pivot_longer()`, `select(-time)` | A plain tibble, without metadata |
+
+`bind_rows()` keeps the metadata of its first frame, and does not
+compare it with the others’. Bind frames that share their units,
+sampling rate and coordinate system.
+
+An anipoint is grouped by its keys, so that each group is one
+trajectory. `group_by()` keeps them and adds the levels it is given
+after them: `group_by(data, behaviour)` groups by trajectory and
+behaviour, so a group is one stretch of a trajectory. To group by other
+levels only, `ungroup()` first.
 
 ## Coordinate systems
 

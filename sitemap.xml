@@ -53,12 +53,16 @@
 <url><loc>https://animovement.dev/anicore/reference/convert_unit_time.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/cross_product.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/declare_variables_event.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/declares_unit_time.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/default_metadata_leaf.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/deg_to_rad.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/derive_angle_direction.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/derive_handedness.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/detect_event_scope.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/detect_variables_where.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/dplyr_reconstruct.aniframe.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/dplyr_row_slice.aniframe.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/drop_na.aniframe.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/drop_spatial_metadata.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/encode_point_bouts.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/encode_state_bouts.html</loc></url>
@@ -122,6 +126,7 @@
 <url><loc>https://animovement.dev/anicore/reference/get_system_axes.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/group_by.aniframe.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/group_ids.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/group_modify.aniframe.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/has_axis_roles.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/has_recorded_frames.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/has_same_timing.html</loc></url>
@@ -146,6 +151,7 @@
 <url><loc>https://animovement.dev/anicore/reference/is_sampling_regular.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/is_spatial.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/is_spherical.html</loc></url>
+<url><loc>https://animovement.dev/anicore/reference/is_whole_index.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/joint_axis.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/keeps_recorded_frames.html</loc></url>
 <url><loc>https://animovement.dev/anicore/reference/key_group_ids.html</loc></url>
