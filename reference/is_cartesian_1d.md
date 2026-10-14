@@ -5,7 +5,7 @@ Test for a 1-D Cartesian coordinate system
 ## Usage
 
 ``` r
-is_cartesian_1d(data, stop = FALSE)
+is_cartesian_1d(data)
 ```
 
 ## Arguments
@@ -13,11 +13,6 @@ is_cartesian_1d(data, stop = FALSE)
 - data:
 
   An anipoint.
-
-- stop:
-
-  Unused, and kept only so the signature does not change. It has no
-  effect.
 
 ## Value
 

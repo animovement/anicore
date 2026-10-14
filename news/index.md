@@ -159,6 +159,18 @@
   `metadata = list(unit_time = "s")` or
   [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md).
 
+- The option that silences the warnings about a shadowed axis name,
+  short axis extents and a mismatched sampling rate is now
+  `anicore.quiet`, not `aniframe.quiet`, to match the package name
+  ([\#209](https://github.com/animovement/anicore/issues/209)). Replace
+  `options(aniframe.quiet = TRUE)` with `options(anicore.quiet = TRUE)`;
+  the old name is no longer read.
+
+- [`is_cartesian_1d()`](https://animovement.dev/anicore/reference/is_cartesian_1d.md)
+  loses its `stop` argument, which had no effect
+  ([\#209](https://github.com/animovement/anicore/issues/209)). Calls
+  that passed it should drop it.
+
 ### Added
 
 - [`get_metadata_json()`](https://animovement.dev/anicore/reference/metadata_json.md)
