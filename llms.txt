@@ -74,11 +74,6 @@ abstract parent class shared by anipoint and anievent.
   : Ensure object is an aniframe
 - [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
   : Validate an anipoint
-- [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  [`example_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  **\[deprecated\]** : Deprecated aniframe constructors
 
 ## Creating and converting anievent objects
 

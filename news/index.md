@@ -14,9 +14,7 @@
     [`example_anipoint()`](https://animovement.dev/anicore/reference/example_anipoint.md)
     and
     [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
-    replace the
-    [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-    versions, which remain as soft-deprecated aliases for one release.
+    replace the `aniframe()` versions, which are removed.
   - [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
     is now `TRUE` for any frame, including an anievent. Test the grain
     with
@@ -129,6 +127,18 @@
   call that relied on the default.
   [`wrap_angle()`](https://animovement.dev/anicore/reference/wrap_angle.md)’s
   help page documents the convention.
+
+- The deprecated `aniframe()`, `as_aniframe()`, `example_aniframe()` and
+  `validate_aniframe()` are removed; use
+  [`anipoint()`](https://animovement.dev/anicore/reference/anipoint.md),
+  [`as_anipoint()`](https://animovement.dev/anicore/reference/as_anipoint.md),
+  [`example_anipoint()`](https://animovement.dev/anicore/reference/example_anipoint.md)
+  and
+  [`validate_anipoint()`](https://animovement.dev/anicore/reference/validate_anipoint.md)
+  ([\#209](https://github.com/animovement/anicore/issues/209)). The
+  `aniframe` class, its methods and
+  [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
+  are unchanged.
 
 ### Added
 
@@ -418,8 +428,7 @@
   and masks ([\#11](https://github.com/animovement/anicore/issues/11))
   arrive.
 
-  **The `aniframe` class keeps its name**, as do
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md),
+  **The `aniframe` class keeps its name**, as do `as_aniframe()`,
   [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
   and every other function. Only the package changes:
   [`library(anicore)`](https://animovement.dev/anicore/), `anicore::`,
@@ -428,9 +437,9 @@
   Done now rather than at 1.0.0 because a rename only ever gets more
   expensive, and there are no external users yet to carry the cost.
 
-- [`?aniframe`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  is the constructor again. The package documentation had claimed the
-  same help topic, so the two were merged into one page; it is now
+- `?aniframe` is the constructor again. The package documentation had
+  claimed the same help topic, so the two were merged into one page; it
+  is now
   [`?anicore`](https://animovement.dev/anicore/reference/anicore.md).
 
 - Declaring an axis role that is carried by one column while a
@@ -469,9 +478,8 @@
   the remainder forms no coordinate system warns rather than aborting;
   declaring such a set outright still aborts.
 
-- [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  warns when identity, temporal context and the index together do not
-  name one observation per row
+- `validate_aniframe()` warns when identity, temporal context and the
+  index together do not name one observation per row
   ([\#49](https://github.com/animovement/anicore/issues/49)). A repeat
   means some variable that tells the rows apart is undeclared, and every
   grouped operation folds them together.
@@ -504,8 +512,7 @@
   say for 3D data or for a recording with no frame corners at all. The
   deprecated `point_of_reference` alias goes with the field it aliased.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  no longer fills in an axis extent from the data
+- `as_aniframe()` no longer fills in an axis extent from the data
   ([\#124](https://github.com/animovement/anicore/issues/124)).
   `y_height` fell back to `max(y)`, which is the highest tracked point
   rather than the frame height, so a frame that was never told its
@@ -529,18 +536,14 @@
   [`get_index()`](https://animovement.dev/anicore/reference/get_index.md)
   reads it,
   [`set_index()`](https://animovement.dev/anicore/reference/set_index.md)
-  changes it and re-orders the frame, and
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  and
-  [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  take an `index` argument. A frame has exactly one index, and it is
-  never a grouping variable.
+  changes it and re-orders the frame, and `as_aniframe()` and
+  `aniframe()` take an `index` argument. A frame has exactly one index,
+  and it is never a grouping variable.
 
   `set_unit_time()`, `set_sampling_rate()` and
   [`to_anievent()`](https://animovement.dev/anicore/reference/to_anievent.md)
   act on the declared index rather than a column named `time`, and
-  [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  checks it is present and numeric.
+  `validate_aniframe()` checks it is present and numeric.
 
   An `anievent` has no index, since a bout is delimited by `start` and
   `stop`. Its `variables_index` is `NA` and
@@ -564,9 +567,8 @@
   floating-point timestamps are not called irregular over the last
   decimal place.
 
-  [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  warns when a declared `sampling_rate` disagrees with the measured
-  spacing — the same shape as
+  `validate_aniframe()` warns when a declared `sampling_rate` disagrees
+  with the measured spacing — the same shape as
   [\#98](https://github.com/animovement/anicore/issues/98), where the
   metadata claimed a unit the data was not in.
 
@@ -589,9 +591,8 @@
   so coordinates may be carried by columns of any name
   ([\#109](https://github.com/animovement/anicore/issues/109)).
   [`get_axes()`](https://animovement.dev/anicore/reference/get_axes.md)
-  reads it, `set_axes()` changes it, and
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  and `set_variables_where()` accept the same mapping —
+  reads it, `set_axes()` changes it, and `as_aniframe()` and
+  `set_variables_where()` accept the same mapping —
   `c(x = "u", y = "v")`. `coordinate_system` follows from it, and
   `set_unit_space()` and the axis extents resolve through it. The roles
   are a closed set: `x`, `y`, `z`, `rho`, `phi`, `theta`, and one that
@@ -688,9 +689,8 @@
   given a custom identity such as `id` was silently regrouped on a
   constant column.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  keeps the roles a frame already declares rather than re-deriving them,
-  so casting an aniframe is no longer destructive
+- `as_aniframe()` keeps the roles a frame already declares rather than
+  re-deriving them, so casting an aniframe is no longer destructive
   ([\#96](https://github.com/animovement/anicore/issues/96)). A
   declaration whose columns have since been dropped still falls through
   to detection, so a cast continues to repair a drifted frame.
@@ -707,10 +707,9 @@
   and the frame cannot drift apart. `add_variables_*()` appends, so
   adding one identity column no longer means restating the others.
 
-- [`validate_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  re-checks that the metadata still describes the frame: every declared
-  column present, `time` and the spatial columns numeric
-  ([\#79](https://github.com/animovement/anicore/issues/79)).
+- `validate_aniframe()` re-checks that the metadata still describes the
+  frame: every declared column present, `time` and the spatial columns
+  numeric ([\#79](https://github.com/animovement/anicore/issues/79)).
   Counterpart to
   [`validate_anievent()`](https://animovement.dev/anicore/reference/validate_anievent.md).
 
@@ -730,9 +729,9 @@
   before, so operations silently integrated across identities. A
   complete metadata object can still be restored wholesale.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  errors when `variables_what` names a column that is not in the data,
-  as it already did for `variables_when` and `variables_where`
+- `as_aniframe()` errors when `variables_what` names a column that is
+  not in the data, as it already did for `variables_when` and
+  `variables_where`
   ([\#77](https://github.com/animovement/anicore/issues/77)).
 
 - `aniframe` and `anievent` recognise the same identity variables —
@@ -743,9 +742,8 @@
 
 ### Removed
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  no longer adds a `keypoint = "centroid"` column to data that already
-  has an identity column
+- `as_aniframe()` no longer adds a `keypoint = "centroid"` column to
+  data that already has an identity column
   ([\#77](https://github.com/animovement/anicore/issues/77)). Results
   are unaffected — the column was constant — but it no longer appears in
   the frame or the print header.
@@ -816,9 +814,8 @@
   `aniframe` and `anievent` methods. On an anievent the calibration
   factor applies to `start` and `stop` rather than `time`.
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  auto-detects `observation` as a temporal grouping column, alongside
-  `session` and `trial`.
+- `as_aniframe()` auto-detects `observation` as a temporal grouping
+  column, alongside `session` and `trial`.
 
 - New article, “The anievent data structure”, covering channels, state
   and point events, modifiers, validation and multi-observation data
@@ -852,8 +849,7 @@
 
 - `set_y_height()` sets the y-axis frame height that `set_origin()`
   uses, validated against the data range, and a `y_height` metadata
-  field to hold it. Readers populate it from the source;
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
+  field to hold it. Readers populate it from the source; `as_aniframe()`
   falls back to `max(y)` when missing, and never overwrites an existing
   value.
 
@@ -912,9 +908,8 @@
 
 ### Fixed
 
-- [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  no longer mis-classifies cylindrical (`rho`, `phi`, `z`) and spherical
-  (`rho`, `phi`, `theta`) data as Cartesian
+- `as_aniframe()` no longer mis-classifies cylindrical (`rho`, `phi`,
+  `z`) and spherical (`rho`, `phi`, `theta`) data as Cartesian
   ([\#44](https://github.com/animovement/anicore/issues/44)). Detection
   recognises the `rho` + `phi` signature first, so cylindrical data is
   no longer reduced to `cartesian_1d` by its `z` column. Cylindrical
@@ -925,20 +920,17 @@
 
 ### Fixed
 
-- Corrected metadata written by
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md).
+- Corrected metadata written by `as_aniframe()`.
 
 ## anicore 0.4.0 (as aniframe)
 
 ### Added
 
 - `variables_what`, `variables_when` and `variables_where` arguments to
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  and
-  [`example_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md),
-  written into the frame’s metadata. These declare which columns carry
-  identity, temporal position and spatial position, and are the basis
-  for how the frame is typed, ordered and grouped.
+  `as_aniframe()` and `example_aniframe()`, written into the frame’s
+  metadata. These declare which columns carry identity, temporal
+  position and spatial position, and are the basis for how the frame is
+  typed, ordered and grouped.
 
 ### Changed
 
@@ -1109,14 +1101,9 @@ columns hold identity, time and position.
 
 ### Added
 
-- [`aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  and
-  [`as_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  to construct a frame,
+- `aniframe()` and `as_aniframe()` to construct a frame,
   [`is_aniframe()`](https://animovement.dev/anicore/reference/is_aniframe.md)
-  to test one, and
-  [`example_aniframe()`](https://animovement.dev/anicore/reference/anicore-deprecated.md)
-  to generate one.
+  to test one, and `example_aniframe()` to generate one.
 - [`get_metadata()`](https://animovement.dev/anicore/reference/get_metadata.md),
   [`set_metadata()`](https://animovement.dev/anicore/reference/set_metadata.md)
   and `default_metadata()` to read and write the metadata a frame
